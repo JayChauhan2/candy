@@ -135,7 +135,7 @@ export const ClashVillageMap = () => {
     // Three small residential neighborhoods connected by the village paths.
     // Neighborhoods are deliberately spaced into west, east, rear, and entrance districts.
     const homeSites=[[-15,5,.88],[-13,7,.76],[-16,8,.78],[-14,-7,.82],[-16,-10,.76],
-      [14,-5,.9],[16,-3,.75],[18,-8,.78],[-5,-14,.8],[-1,-16,.9],[4,-16,.72],[15,12,.8],[10,16,.76]]
+      [14,-5,.9],[16,-3,.75],[18,-8,.78],[-5,-14,.8],[-1,-16,.9],[0,15,.72],[15,12,.8],[10,16,.76]]
     homeSites.forEach(([x,z,s], index) => addHouse(x,z,index%2?0xe0bd78:0xd8a76a,index%3?0xc85b43:0x627492,s))
 
     // Open-front stable beside the castle's main exit, with two visible horses in their stalls.
@@ -232,7 +232,7 @@ export const ClashVillageMap = () => {
     }
     const addSignpost = (x:number,z:number) => {const sign=new THREE.Group();sign.position.set(x,.38,z);island.add(sign);addGroundTuft(x-.2,z+.18,.72);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.09,1.25,6),makeMaterial(0x755038));pole.position.y=.63;sign.add(pole);const arm=new THREE.Mesh(new THREE.BoxGeometry(.9,.25,.1),makeMaterial(0xceb16c));arm.position.set(.28,1.12,0);arm.rotation.y=.2;sign.add(arm)}
     const addLantern = (x:number,z:number) => {const post=new THREE.Group();post.position.set(x,.38,z);island.add(post);addGroundTuft(x+.12,z-.12,.65);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,1.35,6),makeMaterial(0x5e4b3b));pole.position.y=.68;post.add(pole);const light=new THREE.Mesh(new THREE.OctahedronGeometry(.16),makeMaterial(0xf2d77b,.35));light.position.y=1.42;post.add(light)}
-    addWatchPost(-5.1,17);addWatchPost(5.1,17);addWatchPost(-18,12);addWatchPost(16,-12)
+    addWatchPost(-5.1,17);addWatchPost(5.1,17);addWatchPost(16,-12)
     addMarket(12,11)
     addSignpost(7.5,-3);addSignpost(-7,2);addSignpost(5,-10);addSignpost(-14,-7)
     addLantern(-2.1,6.5);addLantern(2.1,6.5);addLantern(-13,5);addLantern(-12,-8);addLantern(12,-5);addLantern(7,12)
@@ -247,7 +247,7 @@ export const ClashVillageMap = () => {
     }
     addLandmarkPin('A',0,0,9.8);addLandmarkPin('B',2.25,-12.15,3.5);addLandmarkPin('C',-20,-2,4.7);addLandmarkPin('D',10,-13,7.2)
     addLandmarkPin('E',-5.8,7.5,4.5);addLandmarkPin('F',12,11,4.1);addLandmarkPin('H',14,2.2,3.8)
-    addLandmarkPin('I',9,4.4,4);addLandmarkPin('J',-8.8,-7,3.8);addLandmarkPin('K',-18,12,5.2);addLandmarkPin('L',16,-12,5.2)
+    addLandmarkPin('I',9,4.4,4);addLandmarkPin('J',-8.8,-7,3.8);addLandmarkPin('L',16,-12,5.2)
     addLandmarkPin('M',-5.1,17,5.2);addLandmarkPin('N',5.1,17,5.2)
     homeSites.forEach(([x,z],index)=>addLandmarkPin(`H${index+1}`,x,z,3.7))
     addLandmarkPin('S1',-7.2,-4.4,3.8);addLandmarkPin('S2',7,-4.3,3.8);addLandmarkPin('S3',7,5.6,3.8)

@@ -84,7 +84,7 @@ export default function KingdomHome() {
         <div><span>A</span> Castle <span>B</span> Well <span>C</span> Farm <span>D</span> Windmill</div>
         <div><span>E</span> Stable <span>F</span> Market</div>
         <div><span>H</span> Blue storage <span>I</span> Forge <span>J</span> Depot</div>
-        <div><span>K–N</span> Watch posts</div>
+        <div><span>L–N</span> Watch posts</div>
         <div><span>H1–H13</span> Homes <span>S1–S3</span> Stores</div>
         <div><span>O1</span> Farm cottage <span>P1–P4</span> Signs <span>T1–T6</span> Lamps</div>
       </aside>
