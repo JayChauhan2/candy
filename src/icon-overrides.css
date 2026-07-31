@@ -21,6 +21,8 @@
 
 .kh-resource>span img{display:block;width:34px;height:34px;object-fit:contain}
 .kh-gold>span,.kh-gems>span,.kh-stars>span{background:transparent!important;clip-path:none!important;color:transparent!important;text-shadow:none!important}
+.kh-resource>span{position:absolute;left:7px;top:50%;transform:translateY(-50%)}
+.kh-resource small,.kh-resource b{grid-column:2}
 
 /* Every action control uses the same centered icon-over-label rhythm. */
 .kh-dock-item{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0}
@@ -31,6 +33,7 @@
   .kh-dock-icon img{width:37px;height:37px}
   .kh-battle-icon{width:36px;height:36px}
   .kh-resource>span img{width:27px;height:27px}
+  .kh-resource>span{left:4px}
 }
 
 @media (max-width:560px){
