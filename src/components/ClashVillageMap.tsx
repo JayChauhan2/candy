@@ -43,12 +43,16 @@ export const ClashVillageMap = () => {
     const pathMat = makeMaterial(0xd4d0bf)
     const ring = new THREE.Mesh(new THREE.RingGeometry(4.2, 5.3, 36), pathMat); ring.rotation.x = -Math.PI / 2; ring.position.y = .36; island.add(ring)
     const addPath = (x1:number, z1:number, x2:number, z2:number, width = 1.1) => {
-      const length = Math.hypot(x2 - x1, z2 - z1)
-      const path = new THREE.Mesh(new THREE.BoxGeometry(width, .08, length), pathMat)
-      path.position.set((x1+x2)/2, .08, (z1+z2)/2); path.rotation.y = Math.atan2(x2-x1, z2-z1); island.add(path)
+      const bend = (z2-z1)*.12
+      const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(x1,.09,z1), new THREE.Vector3((x1+x2)/2+bend,.09,(z1+z2)/2+(x1-x2)*.08), new THREE.Vector3(x2,.09,z2)
+      ])
+      const path = new THREE.Mesh(new THREE.TubeGeometry(curve,36,width*.48,8,false),pathMat)
+      path.scale.y=.13; path.receiveShadow=true; island.add(path)
     }
     addPath(0, -4.6, 0, -13); addPath(4.8, 0, 12, 0); addPath(-4.8, 0, -12, 1); addPath(0, 4.6, -1, 11)
     addPath(-12, 1, -15, 6, .8); addPath(12, 0, 15, -5, .8); addPath(-1, 11, 7, 13, .8)
+    addPath(12,0,8,-10,.8); addPath(-12,1,-10,-8,.8); addPath(0,-13,7,-11,.85)
 
     const addBox = (width:number, height:number, depth:number, color:number, x:number, z:number) => {
       const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), makeMaterial(color))
@@ -73,10 +77,7 @@ export const ClashVillageMap = () => {
     addBox(7.2,1.25,6.4,stoneDark,0,0)
     addBox(6.7,1.85,.7,stoneLight,0,-2.85); addBox(6.7,1.85,.7,stoneLight,0,2.85)
     addBox(.7,1.85,5.3,stoneLight,-3.0,0); addBox(.7,1.85,5.3,stoneLight,3.0,0)
-    // Gate recessed into the curtain wall so it leaves the road clear.
-    const gate = new THREE.Mesh(new THREE.PlaneGeometry(1.25,1.62),makeMaterial(0x5a4030));gate.position.set(0,1.2,3.21);gate.rotation.y=Math.PI;island.add(gate)
-    const gateArch = new THREE.Mesh(new THREE.TorusGeometry(.68,.14,7,12,Math.PI), makeMaterial(stoneDark)); gateArch.rotation.z=Math.PI; gateArch.rotation.y=Math.PI; gateArch.position.set(0,1.92,3.22); island.add(gateArch)
-    for(let i=-.42;i<=.42;i+=.21){const bar=addBox(.07,1.35,.06,0xb8bdba,i,3.25);bar.position.y=1.18}
+    // Keep the road clear: the gate is only implied by the curtain-wall opening, with no projecting slab.
     // Tall central keep, stepped behind the wall rather than capped by one giant roof.
     addBox(4.25,4.75,3.8,stoneLight,0,.45)
     addBox(3.65,.42,3.25,stoneMid,0,4.9)
@@ -104,7 +105,7 @@ export const ClashVillageMap = () => {
       const chimney = new THREE.Mesh(new THREE.CylinderGeometry(.16,.21,.68,6),makeMaterial(0x956952));chimney.position.set(.5,3.15,.08);home.add(chimney)
     }
     // Three small residential neighborhoods connected by the village paths.
-    ;[[-15,5,.88],[-13,7,.76],[-16,8,.78], [14,-5,.9],[16,-3,.75],[13,-7,.78], [6,13,.8],[9,13,.9],[7,15,.72]].forEach(([x,z,s], index) => addHouse(x,z,index%2?0xe0bd78:0xd8a76a,index%3?0xc85b43:0x627492,s))
+    ;[[-15,5,.88],[-13,7,.76],[-16,8,.78],[-14,-7,.82],[-16,-10,.76], [14,-5,.9],[16,-3,.75],[13,-7,.78], [14,10,.8],[17,11,.76], [6,13,.8],[9,13,.9],[7,15,.72]].forEach(([x,z,s], index) => addHouse(x,z,index%2?0xe0bd78:0xd8a76a,index%3?0xc85b43:0x627492,s))
 
     const addStorage = (x:number, z:number, liquid:number) => {
       const group = new THREE.Group(); group.position.set(x, .38, z); island.add(group)
@@ -155,7 +156,15 @@ export const ClashVillageMap = () => {
       const hub=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,.24,8),makeMaterial(0x7a563d));hub.rotation.x=Math.PI/2;rotor.add(hub)
       for(let i=0;i<4;i++){const angle=i*Math.PI/2;const blade=new THREE.Mesh(new THREE.BoxGeometry(.34,1.8,.08),makeMaterial(i%2?0xf1ca50:0x4d80b8));blade.position.set(Math.sin(angle)*.74,Math.cos(angle)*.74,0);blade.rotation.z=-angle;rotor.add(blade)}
     }
-    addHut(-10,4.7,'farm',1.05); addHut(9,4.4,'forge',.98); addHut(-8.8,-7,'depot',.95); addWindmill(15,8)
+    const addFarmstead = (x:number,z:number) => {
+      addHut(x,z,'farm',1.18)
+      const soil = new THREE.Mesh(new THREE.PlaneGeometry(5.1,3.6),makeMaterial(0x887052));soil.rotation.x=-Math.PI/2;soil.position.set(x+1.2,.08,z-4.0);island.add(soil)
+      // Simple hand-built fence enclosing the crop plot.
+      const railMat=makeMaterial(0x86634a)
+      ;[[0,-1.8,5.2,.13],[0,1.8,5.2,.13],[-2.6,0,.13,3.7],[2.6,0,.13,3.7]].forEach(([dx,dz,w,d])=>{const rail=new THREE.Mesh(new THREE.BoxGeometry(w,.14,d),railMat);rail.position.set(x+1.2+dx,.48,z-4+dz);rail.castShadow=true;island.add(rail)})
+      for(let row=0;row<4;row++)for(let col=0;col<6;col++){const crop=new THREE.Mesh(new THREE.ConeGeometry(.11,.62,5),makeMaterial((row+col)%4?0x7ea459:0xd2ba4d));crop.position.set(x-.63+col*.72,.36,z-5.1+row*.72);island.add(crop)}
+    }
+    addHut(-10,4.7,'farm',1.05); addHut(9,4.4,'forge',.98); addHut(-8.8,-7,'depot',.95); addFarmstead(5,-11); addWindmill(10,-13)
     const addTree = (x:number,z:number,scale=.85) => {
       const group = new THREE.Group(); group.position.set(x,.4,z); group.scale.setScalar(scale); island.add(group)
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929)); trunk.position.y=.62; trunk.castShadow=true;group.add(trunk)
@@ -175,7 +184,7 @@ export const ClashVillageMap = () => {
       const spindle=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,1.7,6),makeMaterial(0x724f35));spindle.rotation.z=Math.PI/2;spindle.position.y=1.88;group.add(spindle)
       const bucket=new THREE.Mesh(new THREE.CylinderGeometry(.14,.19,.26,7),makeMaterial(0x9b6b40));bucket.position.set(0,1.5,.14);group.add(bucket)
     }
-    addWell(7.3,10.8)
+    addWell(0,-12.2)
 
     // Small roaming sheep and deer keep the fields alive.
     const animals: { group: THREE.Group; legs: THREE.Mesh[]; cx: number; cz: number; radius: number; phase: number; speed: number }[] = []
