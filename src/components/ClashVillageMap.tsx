@@ -44,12 +44,25 @@ export const ClashVillageMap = () => {
     // A full round plaza hides path joins and makes every route flow cleanly into the castle.
     const ring = new THREE.Mesh(new THREE.CircleGeometry(5.7, 40), pathMat); ring.rotation.x = -Math.PI / 2; ring.position.y = .07; ring.receiveShadow = true; island.add(ring)
     const addPath = (x1:number, z1:number, x2:number, z2:number, width = 1.1) => {
-      const bend = (z2-z1)*.12
+      const dx=x2-x1, dz=z2-z1, distance=Math.hypot(dx,dz), seed=Math.sin(x1*7.7+z1*3.1+x2*5.3+z2*2.7)
+      const bend=(.45+Math.abs(seed)*.6)*Math.min(2.4,distance*.14)
       const curve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(x1,.09,z1), new THREE.Vector3((x1+x2)/2+bend,.09,(z1+z2)/2+(x1-x2)*.08), new THREE.Vector3(x2,.09,z2)
+        new THREE.Vector3(x1,.06,z1),
+        new THREE.Vector3(x1+dx*.3-dz/distance*bend,.06,z1+dz*.3+dx/distance*bend),
+        new THREE.Vector3(x1+dx*.7+dz/distance*bend*.62,.06,z1+dz*.7-dx/distance*bend*.62),
+        new THREE.Vector3(x2,.06,z2)
       ])
-      const path = new THREE.Mesh(new THREE.TubeGeometry(curve,36,width*.48,8,false),pathMat)
-      path.scale.y=.13; path.receiveShadow=true; island.add(path)
+      // A flat, uneven ribbon gives the route naturally worn edges instead of a geometric tube.
+      const left: THREE.Vector2[] = [], right: THREE.Vector2[] = []
+      for(let i=0;i<=28;i++){
+        const t=i/28, point=curve.getPoint(t), tangent=curve.getTangent(t).normalize()
+        const uneven=width*.5*(.84+Math.sin(i*2.41+seed*9)*.12+Math.sin(i*.77-seed)*.05)
+        left.push(new THREE.Vector2(point.x-tangent.z*uneven,point.z+tangent.x*uneven))
+        right.push(new THREE.Vector2(point.x+tangent.z*uneven,point.z-tangent.x*uneven))
+      }
+      const outline=new THREE.Shape();outline.moveTo(left[0].x,left[0].y);left.slice(1).forEach(p=>outline.lineTo(p.x,p.y));right.reverse().forEach(p=>outline.lineTo(p.x,p.y));outline.closePath()
+      const pathGeo=new THREE.ShapeGeometry(outline,1);pathGeo.rotateX(Math.PI/2)
+      const path = new THREE.Mesh(pathGeo,pathMat);path.position.y=.075;path.receiveShadow=true;island.add(path)
       // Sparse, subdued tufts are only placed around the path edges to blend path and meadow.
       for(let i=2;i<12;i+=3){
         const t=i/12, point=curve.getPoint(t), tangent=curve.getTangent(t).normalize()
