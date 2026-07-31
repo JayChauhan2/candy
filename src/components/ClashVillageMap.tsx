@@ -13,7 +13,7 @@ export const ClashVillageMap = () => {
     const scene = new THREE.Scene()
     scene.background = new THREE.Color(0x78d6ed)
     scene.fog = new THREE.Fog(0x78d6ed, 34, 78)
-    const camera = new THREE.PerspectiveCamera(38, 16 / 9, .1, 120)
+    const camera = new THREE.OrthographicCamera(-24, 24, 13.5, -13.5, .1, 120)
     camera.position.set(22, 28, 26)
     camera.lookAt(0, 0, 0)
     const renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -185,7 +185,16 @@ export const ClashVillageMap = () => {
     }
     addBird(-23,-10,0); addBird(-18,-13,1.4); addBird(-25,-6,2.8); addBird(-20,-3,4.1)
 
-    const resize = () => { const { width, height } = host.getBoundingClientRect(); renderer.setSize(width, height, false); camera.aspect = width / height; camera.updateProjectionMatrix() }
+    const resize = () => {
+      const { width, height } = host.getBoundingClientRect()
+      const aspect = width / height
+      const halfHeight = 13.5
+      // Matching the horizontal and vertical world-unit scale prevents the old tall/stretchy look.
+      camera.left = -halfHeight * aspect; camera.right = halfHeight * aspect
+      camera.top = halfHeight; camera.bottom = -halfHeight
+      renderer.setSize(width, height, false)
+      camera.updateProjectionMatrix()
+    }
     resize(); window.addEventListener('resize', resize)
     let pointerX = 0, pointerY = 0, lookX = 0, lookZ = 0, frame = 0
     const move = (event:PointerEvent) => { const rect=host.getBoundingClientRect(); pointerX = (event.clientX-rect.left) / rect.width - .5; pointerY = (event.clientY-rect.top) / rect.height - .5 }
