@@ -73,11 +73,10 @@ export const ClashVillageMap = () => {
     addBox(7.2,1.25,6.4,stoneDark,0,0)
     addBox(6.7,1.85,.7,stoneLight,0,-2.85); addBox(6.7,1.85,.7,stoneLight,0,2.85)
     addBox(.7,1.85,5.3,stoneLight,-3.0,0); addBox(.7,1.85,5.3,stoneLight,3.0,0)
-    // The gatehouse pushes forward, so the entrance is legible from the isometric view.
-    addBox(3.15,2.85,1.25,stoneLight,0,3.15)
-    const gate = new THREE.Mesh(new THREE.PlaneGeometry(1.25,1.62),makeMaterial(0x5a4030));gate.position.set(0,1.2,3.79);gate.rotation.y=Math.PI;island.add(gate)
-    const gateArch = new THREE.Mesh(new THREE.TorusGeometry(.68,.14,7,12,Math.PI), makeMaterial(stoneDark)); gateArch.rotation.z=Math.PI; gateArch.rotation.y=Math.PI; gateArch.position.set(0,1.92,3.8); island.add(gateArch)
-    for(let i=-.42;i<=.42;i+=.21){const bar=addBox(.07,1.35,.06,0xb8bdba,i,3.83);bar.position.y=1.18}
+    // Gate recessed into the curtain wall so it leaves the road clear.
+    const gate = new THREE.Mesh(new THREE.PlaneGeometry(1.25,1.62),makeMaterial(0x5a4030));gate.position.set(0,1.2,3.21);gate.rotation.y=Math.PI;island.add(gate)
+    const gateArch = new THREE.Mesh(new THREE.TorusGeometry(.68,.14,7,12,Math.PI), makeMaterial(stoneDark)); gateArch.rotation.z=Math.PI; gateArch.rotation.y=Math.PI; gateArch.position.set(0,1.92,3.22); island.add(gateArch)
+    for(let i=-.42;i<=.42;i+=.21){const bar=addBox(.07,1.35,.06,0xb8bdba,i,3.25);bar.position.y=1.18}
     // Tall central keep, stepped behind the wall rather than capped by one giant roof.
     addBox(4.25,4.75,3.8,stoneLight,0,.45)
     addBox(3.65,.42,3.25,stoneMid,0,4.9)
@@ -163,7 +162,20 @@ export const ClashVillageMap = () => {
       const leaves = new THREE.Mesh(new THREE.ConeGeometry(.92,2.45,8),makeMaterial(0x4f932f)); leaves.position.y=1.85;leaves.castShadow=true;group.add(leaves)
     }
     ;[[-19,-5,1],[-18,10,.9],[-7,15,.85],[2,18,.75],[19,4,.9],[20,-8,.8],[-6,-15,.75],[4,-16,.9],[-20,-13,.9],[18,14,.9]].forEach(([x,z,s])=>addTree(x,z,s))
-    for (let i=0;i<58;i++) { const angle=i*2.4, radius=17+(i%4)*2.3; const bush=new THREE.Mesh(new THREE.DodecahedronGeometry(.28+(i%4)*.05),makeMaterial(i%4?0x5ca639:0xf0d34d)); bush.position.set(Math.cos(angle)*radius,.24,Math.sin(angle)*radius*.74);bush.castShadow=true;island.add(bush) }
+    for (let i=0;i<58;i++) { const angle=i*2.4, radius=17+(i%4)*2.3; const bush=new THREE.Mesh(new THREE.DodecahedronGeometry(.28+(i%4)*.05),makeMaterial(i%5?0x71986c:0xe9e8d5)); bush.position.set(Math.cos(angle)*radius,.24,Math.sin(angle)*radius*.74);bush.castShadow=true;island.add(bush) }
+
+    // Shared stone well at the end of the upper-right village path.
+    const addWell = (x:number,z:number) => {
+      const group=new THREE.Group();group.position.set(x,.38,z);island.add(group)
+      const base=new THREE.Mesh(new THREE.CylinderGeometry(1.04,1.22,.38,10),makeMaterial(0x9b988c));base.position.y=.19;base.castShadow=true;group.add(base)
+      const wall=new THREE.Mesh(new THREE.CylinderGeometry(.82,.98,.62,10),makeMaterial(0xb9b4a8));wall.position.y=.58;wall.castShadow=true;group.add(wall)
+      const water=new THREE.Mesh(new THREE.CircleGeometry(.69,12),makeMaterial(0x86b6c5,.45));water.rotation.x=-Math.PI/2;water.position.y=.92;group.add(water)
+      ;[-.74,.74].forEach((px)=>{const post=new THREE.Mesh(new THREE.BoxGeometry(.15,2.05,.15),makeMaterial(0x825f42));post.position.set(px,1.64,0);group.add(post)})
+      const roof=new THREE.Mesh(new THREE.ConeGeometry(1.27,.95,4),makeMaterial(0x7a94a7));roof.position.y=2.75;roof.rotation.y=Math.PI/4;roof.castShadow=true;group.add(roof)
+      const spindle=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,1.7,6),makeMaterial(0x724f35));spindle.rotation.z=Math.PI/2;spindle.position.y=1.88;group.add(spindle)
+      const bucket=new THREE.Mesh(new THREE.CylinderGeometry(.14,.19,.26,7),makeMaterial(0x9b6b40));bucket.position.set(0,1.5,.14);group.add(bucket)
+    }
+    addWell(7.3,10.8)
 
     // Small roaming sheep and deer keep the fields alive.
     const animals: { group: THREE.Group; legs: THREE.Mesh[]; cx: number; cz: number; radius: number; phase: number; speed: number }[] = []
