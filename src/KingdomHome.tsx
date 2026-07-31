@@ -12,11 +12,29 @@ const HUDButton = ({ label, icon, notice, onClick }: { label: string; icon: stri
   </button>
 )
 
+const BattleLoading = ({ closing, onBack }: { closing: boolean; onBack: () => void }) => (
+  <section className={`battle-loading${closing ? ' closing' : ''}`} aria-label="Battle loading screen">
+    <div className="battle-sky-shine" />
+    <div className="battle-cloud battle-cloud-left"><i /><i /><i /></div>
+    <div className="battle-cloud battle-cloud-right"><i /><i /><i /></div>
+    <div className="battle-character battle-knight" aria-hidden="true"><span className="battle-helmet">♜</span><span className="battle-face" /><span className="battle-body">⚔</span></div>
+    <div className="battle-character battle-scout" aria-hidden="true"><span className="battle-helmet">♞</span><span className="battle-face" /><span className="battle-body">✦</span></div>
+    <div className="battle-loading-copy"><p>TOAD RALLY</p><h2>LOADING<span>...</span></h2><small>PREPARING YOUR TROOPS</small></div>
+    <button className="battle-back" onClick={onBack}>‹ <span>BACK TO KINGDOM</span></button>
+  </section>
+)
+
 export default function KingdomHome() {
   const [notice, setNotice] = useState<Notice>(null)
+  const [battleLoading, setBattleLoading] = useState(false)
+  const [closingBattle, setClosingBattle] = useState(false)
   const show = (message: string) => {
     setNotice(message)
     window.setTimeout(() => setNotice(null), 1900)
+  }
+  const closeBattle = () => {
+    setClosingBattle(true)
+    window.setTimeout(() => { setBattleLoading(false); setClosingBattle(false) }, 680)
   }
 
   return (
@@ -69,11 +87,12 @@ export default function KingdomHome() {
       <nav className="kh-dock" aria-label="Game actions">
         <HUDButton label="SHOP" icon="⌂" onClick={() => show('Shop selected')} />
         <HUDButton label="TROOPS" icon="♟" notice="3" onClick={() => show('Three troops are ready')} />
-        <button className="kh-battle" onClick={() => show('Toad Rally is ready for battle!')}><span>⚔</span><b>BATTLE!</b><small>TOAD RALLY</small></button>
+        <button className="kh-battle" onClick={() => setBattleLoading(true)}><span>⚔</span><b>BATTLE!</b><small>TOAD RALLY</small></button>
         <HUDButton label="FRIENDS" icon="♛" notice="1" onClick={() => show('One friend request')} />
         <HUDButton label="JOURNAL" icon="▤" onClick={() => show('Kingdom journal selected')} />
       </nav>
       <div className={`kh-toast${notice ? ' visible' : ''}`} role="status">{notice}</div>
+      {battleLoading && <BattleLoading closing={closingBattle} onBack={closeBattle} />}
     </main>
   )
 }
