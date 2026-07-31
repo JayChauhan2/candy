@@ -59,19 +59,38 @@ export const ClashVillageMap = () => {
       mesh.position.set(x, height / 2 + .38, z); mesh.rotation.y = Math.PI / 4; mesh.castShadow = true; island.add(mesh); return mesh
     }
 
-    // The one singular castle is the focal point of the entire settlement.
-    addBox(5.2, 3.8, 4.7, 0xd9d3ba, 0, 0); addCone(3.9, 3.1, 0x485c80, 0, 0)
-    addBox(.92, 1.8, .16, 0x624333, 0, -2.41)
-    ;[[-2.2,-1.9],[2.2,-1.9],[-2.2,1.9],[2.2,1.9]].forEach(([x,z]) => { addBox(.75,5,.75,0xb8b4a7,x,z); addCone(.74,1.5,0x5c7094,x,z) })
-    // Chunky masonry details keep the hero castle readable at gameplay distance.
-    ;[-2,-1,0,1,2].forEach((x) => addBox(.46,.45,.42,0xb8b4a7,x,2.44))
-    ;[-2,-1,0,1,2].forEach((x) => addBox(.46,.45,.42,0xb8b4a7,x,-2.44))
-    ;[-1.5,0,1.5].forEach((x) => { const window = addBox(.38,.72,.08,0x355270,x,-2.43); window.position.y=2.9 })
-    ;[-2.2,2.2].forEach((x) => { const banner = new THREE.Mesh(new THREE.PlaneGeometry(.6,1.2), new THREE.MeshBasicMaterial({ color: 0xf0b933, side: THREE.DoubleSide })); banner.position.set(x,3.9,-2.43); island.add(banner) })
-    const gateArch = new THREE.Mesh(new THREE.TorusGeometry(.78,.13,7,12,Math.PI), makeMaterial(0x8c8f91)); gateArch.rotation.z=Math.PI; gateArch.position.set(0,2.08,-2.44); island.add(gateArch)
-    const pole = addBox(.1, 4, .1, 0x835a30, 0, 0); pole.position.y = 5
-    const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.8, .86), new THREE.MeshBasicMaterial({ color: 0xffcf3e, side: THREE.DoubleSide }))
-    flag.position.set(.92, 6.35, 0); flag.rotation.y = Math.PI / 2; island.add(flag)
+    // A proper, readable low-poly castle: broad curtain wall, gatehouse, keep, and four round towers.
+    const stoneLight = 0xd9d3ba, stoneMid = 0xaeb5b7, stoneDark = 0x747f87, roofBlue = 0x405b83
+    const addCastleTower = (x:number, z:number, height:number) => {
+      const tower = new THREE.Mesh(new THREE.CylinderGeometry(.98,1.1,height,10), makeMaterial(stoneMid))
+      tower.position.set(x,height/2+.38,z); tower.castShadow=true;tower.receiveShadow=true;island.add(tower)
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(1.18,1.75,8),makeMaterial(roofBlue,.7))
+      roof.position.set(x,height+1.22,z);roof.castShadow=true;island.add(roof)
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(1.02,.1,6,10),makeMaterial(stoneDark));rim.rotation.x=Math.PI/2;rim.position.set(x,height+.25,z);island.add(rim)
+      for(let i=0;i<6;i++){const angle=i*Math.PI/3;const merlon=addBox(.34,.48,.34,stoneLight,x+Math.cos(angle)*.78,z+Math.sin(angle)*.78);merlon.position.y=height+.62}
+    }
+    // Foundation and curtain wall establish a convincing silhouette before the raised keep.
+    addBox(7.2,1.25,6.4,stoneDark,0,0)
+    addBox(6.7,1.85,.7,stoneLight,0,-2.85); addBox(6.7,1.85,.7,stoneLight,0,2.85)
+    addBox(.7,1.85,5.3,stoneLight,-3.0,0); addBox(.7,1.85,5.3,stoneLight,3.0,0)
+    // The gatehouse pushes forward, so the entrance is legible from the isometric view.
+    addBox(3.15,2.85,1.25,stoneLight,0,-3.15)
+    const gate = new THREE.Mesh(new THREE.PlaneGeometry(1.25,1.62),makeMaterial(0x5a4030));gate.position.set(0,1.2,-3.79);island.add(gate)
+    const gateArch = new THREE.Mesh(new THREE.TorusGeometry(.68,.14,7,12,Math.PI), makeMaterial(stoneDark)); gateArch.rotation.z=Math.PI; gateArch.position.set(0,1.92,-3.8); island.add(gateArch)
+    for(let i=-.42;i<=.42;i+=.21){const bar=addBox(.07,1.35,.06,0xb8bdba,i,-3.83);bar.position.y=1.18}
+    // Tall central keep, stepped behind the wall rather than capped by one giant roof.
+    addBox(4.25,4.75,3.8,stoneLight,0,.45)
+    addBox(3.65,.42,3.25,stoneMid,0,4.9)
+    ;[-1.6,-.8,0,.8,1.6].forEach((x) => { const merlon=addBox(.43,.52,.42,stoneMid,x,-1.44);merlon.position.y=5.14 })
+    ;[-1.6,-.8,0,.8,1.6].forEach((x) => { const merlon=addBox(.43,.52,.42,stoneMid,x,2.36);merlon.position.y=5.14 })
+    ;[-1.35,-.55,.55,1.35].forEach((z) => { const left=addBox(.42,.52,.43,stoneMid,-2.12,z);left.position.y=5.14;const right=addBox(.42,.52,.43,stoneMid,2.12,z);right.position.y=5.14 })
+    addCastleTower(-3.05,-2.85,4.35);addCastleTower(3.05,-2.85,4.35);addCastleTower(-3.05,2.85,4.05);addCastleTower(3.05,2.85,4.05)
+    // Narrow blue slit windows and gold banners add color without breaking the low-poly language.
+    ;[-1.25,0,1.25].forEach((x) => { const window=addBox(.34,.88,.06,0x355270,x,-1.48);window.position.y=3.3 })
+    ;[-2.16,2.16].forEach((x) => { const banner = new THREE.Mesh(new THREE.PlaneGeometry(.65,1.35), new THREE.MeshBasicMaterial({ color: 0xf0b933, side: THREE.DoubleSide })); banner.position.set(x,3.35,-3.84); island.add(banner) })
+    const pole = addBox(.1, 3.8, .1, 0x835a30, 0, .45); pole.position.y = 7.05
+    const flag = new THREE.Mesh(new THREE.PlaneGeometry(2.0, .92), new THREE.MeshBasicMaterial({ color: 0xf0b933, side: THREE.DoubleSide }))
+    flag.position.set(1,8.85,.45); flag.rotation.y = Math.PI / 2; island.add(flag)
 
     const addHouse = (x:number, z:number, tone:number, roofColor:number, scale=.9) => {
       addBox(2.05*scale, 1.9*scale, 1.7*scale, tone, x, z); addCone(1.75*scale, 1.45*scale, roofColor, x, z)
