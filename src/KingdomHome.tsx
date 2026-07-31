@@ -59,7 +59,7 @@ export default function KingdomHome() {
       <aside className="kh-map-key" aria-label="Landmark key">
         <b>MAP KEY</b>
         <div><span>A</span> Castle <span>B</span> Well <span>C</span> Farm <span>D</span> Windmill</div>
-        <div><span>E</span> Stable <span>F</span> Market <span>G</span> Barracks</div>
+        <div><span>E</span> Stable <span>F</span> Market <span>G</span> Training yard</div>
         <div><span>H</span> Blue storage <span>I</span> Forge <span>J</span> Depot</div>
         <div><span>K–N</span> Watch posts</div>
       </aside>
