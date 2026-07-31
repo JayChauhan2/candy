@@ -184,6 +184,14 @@ export const ClashVillageMap = () => {
       const leaves = new THREE.Mesh(new THREE.ConeGeometry(.92,2.45,8),makeMaterial(0x4f932f)); leaves.position.y=1.85;leaves.castShadow=true;group.add(leaves)
     }
     ;[[-19,-5,1],[-18,10,.9],[-7,15,.85],[2,18,.75],[19,4,.9],[20,-8,.8],[-6,-15,.75],[4,-16,.9],[-20,-13,.9],[18,14,.9]].forEach(([x,z,s])=>addTree(x,z,s))
+    // Woodland belt: repeated village tree assets frame the playable countryside at the edges.
+    for(let i=0;i<46;i++){
+      const side=i%4, step=(i%12)*3.4-18.5
+      const x=side===0?-25:side===1?25:step
+      const z=side===2?-18:side===3?18:step*.68
+      addTree(x+(i%3)*.48,z+((i+1)%3)*.42,.7+(i%4)*.09)
+      if(i%3===0)addTree(x+(side<2?1.3:.4),z+(side<2?.4:1.2),.62+(i%3)*.08)
+    }
     for (let i=0;i<58;i++) { const angle=i*2.4, radius=17+(i%4)*2.3; const bush=new THREE.Mesh(new THREE.DodecahedronGeometry(.28+(i%4)*.05),makeMaterial(i%5?0x71986c:0xe9e8d5)); bush.position.set(Math.cos(angle)*radius,.24,Math.sin(angle)*radius*.74);bush.castShadow=true;island.add(bush) }
 
     // Shared stone well at the end of the upper-right village path.
