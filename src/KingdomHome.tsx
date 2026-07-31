@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import battleIcon from './assets/battle.png'
 import coinIcon from './assets/coin.png'
 import emberforgeOpponent from './assets/emberforge-clean.png'
@@ -11,9 +11,11 @@ import starIcon from './assets/star.png'
 import sunstoneOpponent from './assets/sunstone-clean.png'
 import troopsIcon from './assets/troops.png'
 import { ClashVillageMap } from './components/ClashVillageMap'
+import { RubyBattleMap } from './components/RubyBattleMap'
 import './kingdom-home.css'
 import './icon-overrides.css'
 import './battle-picker.css'
+import './ruby-battle-map.css'
 
 type Notice = string | null
 
@@ -62,6 +64,8 @@ export default function KingdomHome() {
   const [notice, setNotice] = useState<Notice>(null)
   const [battleLoading, setBattleLoading] = useState(false)
   const [battlePicker, setBattlePicker] = useState(false)
+  const [battleOpponent, setBattleOpponent] = useState<string | null>(null)
+  const [rubyBattleMap, setRubyBattleMap] = useState(false)
   const [closingBattle, setClosingBattle] = useState(false)
   const show = (message: string) => {
     setNotice(message)
@@ -73,9 +77,15 @@ export default function KingdomHome() {
   }
   const chooseOpponent = (name: string) => {
     setBattlePicker(false)
+    setBattleOpponent(name)
     setBattleLoading(true)
     show(`Marching to face ${name}`)
   }
+  useEffect(() => {
+    if (!battleLoading || battleOpponent !== 'Empress Ruby') return
+    const timer = window.setTimeout(() => { setBattleLoading(false); setRubyBattleMap(true) }, 1600)
+    return () => window.clearTimeout(timer)
+  }, [battleLoading, battleOpponent])
 
   return (
     <main className="kingdom-home" aria-label="Kingdom game home">
@@ -134,6 +144,7 @@ export default function KingdomHome() {
       <div className={`kh-toast${notice ? ' visible' : ''}`} role="status">{notice}</div>
       {battlePicker && <BattlePicker onClose={() => setBattlePicker(false)} onChoose={chooseOpponent} />}
       {battleLoading && <BattleLoading closing={closingBattle} onBack={closeBattle} />}
+      {rubyBattleMap && <RubyBattleMap onBack={() => { setRubyBattleMap(false); setBattleOpponent(null) }} />}
     </main>
   )
 }
