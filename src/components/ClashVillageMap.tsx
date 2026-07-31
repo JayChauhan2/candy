@@ -36,10 +36,6 @@ export const ClashVillageMap = () => {
     countryside.rotation.x = -Math.PI / 2; countryside.position.y = -.04; countryside.receiveShadow = true; island.add(countryside)
     const meadow = new THREE.Mesh(new THREE.CircleGeometry(26, 48), makeMaterial(0x91b989))
     meadow.rotation.x = -Math.PI / 2; meadow.scale.z = .76; meadow.position.y = .01; meadow.receiveShadow = true; island.add(meadow)
-    const fieldMat = makeMaterial(0xa2b886)
-    ;[[-19, -8, 8, 5], [18, 8, 9, 5], [-15, 12, 7, 4]].forEach(([x,z,w,d]) => {
-      const field = new THREE.Mesh(new THREE.PlaneGeometry(w, d), fieldMat); field.rotation.x = -Math.PI / 2; field.position.set(x, .03, z); island.add(field)
-    })
     const pathMat = makeMaterial(0xd4d0bf)
     // A full round plaza hides path joins and makes every route flow cleanly into the castle.
     const ring = new THREE.Mesh(new THREE.CircleGeometry(5.7, 40), pathMat); ring.rotation.x = -Math.PI / 2; ring.position.y = .07; ring.receiveShadow = true; island.add(ring)
