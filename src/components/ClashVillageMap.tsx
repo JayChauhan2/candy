@@ -266,6 +266,32 @@ export const ClashVillageMap = () => {
     addLandmarkPin('S2',7,-4.3,3.8);addLandmarkPin('S3',7,5.6,3.8)
     addLandmarkPin('O1',-10,4.7,4);addLandmarkPin('P1',7.5,-3,2.7);addLandmarkPin('P2',-7,2,2.7);addLandmarkPin('P3',5,-10,2.7);addLandmarkPin('P4',-14,-7,2.7)
     ;[[-2.1,6.5],[2.1,6.5],[-13,5],[-12,-8],[12,-5],[7,12]].forEach(([x,z],index)=>addLandmarkPin(`T${index+1}`,x,z,2.8))
+
+    // Only settlements and substantial civic buildings are upgradeable; props stay uncluttered.
+    const upgradeSparkles: { mesh: THREE.Mesh; started: number; phase: number; x:number; z:number }[] = []
+    const upgradeButtons: THREE.Sprite[] = []
+    const plusCanvas=document.createElement('canvas');plusCanvas.width=96;plusCanvas.height=96
+    const plusCtx=plusCanvas.getContext('2d')
+    if(plusCtx){plusCtx.fillStyle='#fff8d3';plusCtx.strokeStyle='#326b87';plusCtx.lineWidth=8;plusCtx.beginPath();plusCtx.arc(48,48,35,0,Math.PI*2);plusCtx.fill();plusCtx.stroke();plusCtx.fillStyle='#e78e30';plusCtx.beginPath();plusCtx.arc(48,48,27,0,Math.PI*2);plusCtx.fill();plusCtx.fillStyle='#fff7c8';plusCtx.fillRect(42,27,12,42);plusCtx.fillRect(27,42,42,12)}
+    const plusTexture=new THREE.CanvasTexture(plusCanvas)
+    const upgradeStructure = (button:THREE.Sprite) => {
+      if(button.userData.upgraded)return
+      button.userData.upgraded=true;button.visible=false
+      const { x,z,top,radius }=button.userData as {x:number;z:number;top:number;radius:number}
+      const addition=new THREE.Group();addition.position.set(x,.39,z);island.add(addition)
+      const collar=new THREE.Mesh(new THREE.TorusGeometry(radius,.11,5,12),makeMaterial(0xd5b768));collar.rotation.x=Math.PI/2;collar.position.y=.25;addition.add(collar)
+      const tower=new THREE.Mesh(new THREE.CylinderGeometry(.3,.38,.86,7),makeMaterial(0x9da89c));tower.position.set(radius*.58,top-1.08,-radius*.34);tower.castShadow=true;addition.add(tower)
+      const roof=new THREE.Mesh(new THREE.ConeGeometry(.48,.64,6),makeMaterial(0x507fa0));roof.position.set(radius*.58,top-.33,-radius*.34);roof.castShadow=true;addition.add(roof)
+      const pole=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.92,6),makeMaterial(0x765139));pole.position.set(radius*.58,top+.4,-radius*.34);addition.add(pole)
+      const banner=new THREE.Mesh(new THREE.PlaneGeometry(.46,.3),new THREE.MeshBasicMaterial({color:0xf0c14d,side:THREE.DoubleSide}));banner.position.set(radius*.8,top+.38,-radius*.34);addition.add(banner)
+      for(let i=0;i<12;i++){const sparkle=new THREE.Mesh(new THREE.OctahedronGeometry(.11+(i%3)*.025),makeMaterial(0xffe47a,.35));sparkle.position.set(x,.8,z);scene.add(sparkle);upgradeSparkles.push({mesh:sparkle,started:performance.now()*.001,phase:i/12*Math.PI*2,x,z})}
+    }
+    const addUpgradeButton = (id:string,x:number,z:number,top:number,radius=1.35) => {
+      const button=new THREE.Sprite(new THREE.SpriteMaterial({map:plusTexture,depthTest:false,depthWrite:false,transparent:true}));button.position.set(x,top,z);button.scale.set(.82,.82,1);button.userData={id,x,z,top,radius,upgraded:false};scene.add(button);upgradeButtons.push(button)
+    }
+    addUpgradeButton('A',0,0,11.25,4.7);addUpgradeButton('C',-20,-2,5.9);addUpgradeButton('D',10,-13,8.45);addUpgradeButton('E',-5.8,7.5,5.7);addUpgradeButton('F',12,11,5.2)
+    addUpgradeButton('H',14,2.2,5);addUpgradeButton('I',9,4.4,5.15);addUpgradeButton('J',-8.8,-7,4.9);addUpgradeButton('L',16,-12,6.3);addUpgradeButton('M',-5.1,17,6.3);addUpgradeButton('N',5.1,17,6.3)
+    homeSites.forEach(([x,z],index)=>addUpgradeButton(`H${index+1}`,x,z,4.9));addUpgradeButton('S2',7,-4.3,5);addUpgradeButton('O1',-10,4.7,5.15)
     const addTree = (x:number,z:number,scale=.85) => {
       const group = new THREE.Group(); group.position.set(x,.4,z); group.scale.setScalar(scale); island.add(group)
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929)); trunk.position.y=.62; trunk.castShadow=true;group.add(trunk)
@@ -344,9 +370,12 @@ export const ClashVillageMap = () => {
     let pointerX = 0, pointerY = 0, yaw = Math.atan2(26,22), height = 28, frame = 0
     const move = (event:PointerEvent) => { const rect=host.getBoundingClientRect(); pointerX = (event.clientX-rect.left) / rect.width - .5; pointerY = (event.clientY-rect.top) / rect.height - .5 }
     host.addEventListener('pointermove', move)
-    const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; yaw += ((Math.atan2(26,22) + pointerX*.6) - yaw)*.055; height += ((28 - pointerY*7) - height)*.055; island.rotation.y = Math.sin(time * .16) * .008; camera.position.set(Math.cos(yaw)*34,height,Math.sin(yaw)*34); camera.lookAt(0,.7,0); flag.rotation.z = Math.sin(time * 2.3) * .08; campfireFlames.forEach((flame,index)=>{const pulse=1+Math.sin(time*7+index)*.1;flame.scale.set(pulse,1+Math.sin(time*8+index)*.13,pulse)});campfireSmoke.forEach((smoke)=>{const life=(time*.19+smoke.phase)%1;const scale=.55+life*.95;smoke.puff.position.set(Math.sin(time*1.3+smoke.phase*9)*.18,1.45+life*3.9,Math.cos(time*1.1+smoke.phase*7)*.16);smoke.puff.scale.setScalar(scale);smoke.puff.rotation.y=time+smoke.phase*8;smoke.material.opacity=(1-life)*.3}); animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); windmillRotors.forEach((rotor,index)=>{rotor.rotation.z=time*(.75+index*.15)}); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*130; bird.group.position.y = bird.altitude + Math.sin(time*1.1+bird.phase)*.22; bird.group.position.z = bird.startZ + Math.sin(time*.32+bird.phase)*2.1; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.28 + Math.sin(time*4.1+bird.phase)*.38) }) }); renderer.render(scene, camera) }
+    const raycaster=new THREE.Raycaster()
+    const upgradeClick=(event:PointerEvent)=>{const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObjects(upgradeButtons,false)[0];if(hit)upgradeStructure(hit.object as THREE.Sprite)}
+    host.addEventListener('pointerdown',upgradeClick)
+    const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; yaw += ((Math.atan2(26,22) + pointerX*.6) - yaw)*.055; height += ((28 - pointerY*7) - height)*.055; island.rotation.y = Math.sin(time * .16) * .008; camera.position.set(Math.cos(yaw)*34,height,Math.sin(yaw)*34); camera.lookAt(0,.7,0); flag.rotation.z = Math.sin(time * 2.3) * .08; upgradeSparkles.forEach((sparkle)=>{const age=time-sparkle.started;if(age>1.45){sparkle.mesh.visible=false;return}const spread=.35+age*1.5;sparkle.mesh.visible=true;sparkle.mesh.position.set(sparkle.x+Math.cos(sparkle.phase)*spread,1.2+age*3.1+Math.sin(sparkle.phase*3)*.18,sparkle.z+Math.sin(sparkle.phase)*spread);sparkle.mesh.rotation.y=time*6;sparkle.mesh.scale.setScalar(1-age*.45)});campfireFlames.forEach((flame,index)=>{const pulse=1+Math.sin(time*7+index)*.1;flame.scale.set(pulse,1+Math.sin(time*8+index)*.13,pulse)});campfireSmoke.forEach((smoke)=>{const life=(time*.19+smoke.phase)%1;const scale=.55+life*.95;smoke.puff.position.set(Math.sin(time*1.3+smoke.phase*9)*.18,1.45+life*3.9,Math.cos(time*1.1+smoke.phase*7)*.16);smoke.puff.scale.setScalar(scale);smoke.puff.rotation.y=time+smoke.phase*8;smoke.material.opacity=(1-life)*.3}); animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); windmillRotors.forEach((rotor,index)=>{rotor.rotation.z=time*(.75+index*.15)}); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*130; bird.group.position.y = bird.altitude + Math.sin(time*1.1+bird.phase)*.22; bird.group.position.z = bird.startZ + Math.sin(time*.32+bird.phase)*2.1; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.28 + Math.sin(time*4.1+bird.phase)*.38) }) }); renderer.render(scene, camera) }
     animate()
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); host.removeEventListener('pointermove', move); renderer.dispose(); host.removeChild(renderer.domElement) }
+    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); host.removeEventListener('pointermove', move); host.removeEventListener('pointerdown',upgradeClick); renderer.dispose(); host.removeChild(renderer.domElement) }
   }, [])
   return <div ref={mountRef} className="clash-village-map" />
 }
