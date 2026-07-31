@@ -1,0 +1,19 @@
+{
+  "name": "candy-kingdom",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^6.0.3",
+    "vite": "^8.1.1",
+    "typescript": "~6.0.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {}
+}
