@@ -89,6 +89,10 @@ export const ClashVillageMap = () => {
       const mesh = new THREE.Mesh(new THREE.ConeGeometry(radius, height, 4), makeMaterial(color, .7))
       mesh.position.set(x, height / 2 + .38, z); mesh.rotation.y = Math.PI / 4; mesh.castShadow = true; island.add(mesh); return mesh
     }
+    const addGroundTuft = (x:number,z:number,scale=1) => {
+      const tuft=new THREE.Group();tuft.position.set(x,.12,z);tuft.rotation.y=(x*3.7+z*1.9)%Math.PI;island.add(tuft)
+      for(let i=0;i<4;i++){const blade=new THREE.Mesh(new THREE.ConeGeometry(.025+(i%2)*.012,(.2+i*.045)*scale,3),makeMaterial(0x91b989));blade.position.set((i-1.5)*.045,(.1+i*.022)*scale,(i%2-.5)*.06);blade.rotation.z=(i-1.5)*.12;tuft.add(blade)}
+    }
 
     // A proper, readable low-poly castle: broad curtain wall, gatehouse, keep, and four round towers.
     const stoneLight = 0xc7bdaa, stoneMid = 0xa89f91, stoneDark = 0x777a74, roofBlue = 0x718ba0
@@ -135,20 +139,20 @@ export const ClashVillageMap = () => {
     // Three small residential neighborhoods connected by the village paths.
     // Neighborhoods are deliberately spaced into west, east, rear, and entrance districts.
     const homeSites=[[-15,5,.88],[-13,7,.76],[-16,8,.78],[-14,-7,.82],[-16,-10,.76],
-      [14,-5,.9],[16,-3,.75],[18,-8,.78],[-5,-14,.8],[-1,-16,.9],[4,-16,.72],[15,12,.8],[18,14,.76]]
+      [14,-5,.9],[16,-3,.75],[18,-8,.78],[-5,-14,.8],[-1,-16,.9],[4,-16,.72],[15,12,.8],[10,16,.76]]
     homeSites.forEach(([x,z,s], index) => addHouse(x,z,index%2?0xe0bd78:0xd8a76a,index%3?0xc85b43:0x627492,s))
 
     // Open-front stable beside the castle's main exit, with two visible horses in their stalls.
-    const addHorseShed = (x:number,z:number) => {
-      const shed=new THREE.Group();shed.position.set(x,.38,z);island.add(shed)
+    const addHorseShed = (x:number,z:number,rotation=0) => {
+      const shed=new THREE.Group();shed.position.set(x,.38,z);shed.rotation.y=rotation;island.add(shed)
       const floor=new THREE.Mesh(new THREE.BoxGeometry(3.35,.18,2.65),makeMaterial(0x9b7b58));floor.position.y=.09;floor.receiveShadow=true;shed.add(floor)
       const back=new THREE.Mesh(new THREE.BoxGeometry(3.2,2.2,.18),makeMaterial(0xb18d63));back.position.set(0,1.2,-1.2);back.castShadow=true;shed.add(back)
       ;[[-1.42,-1.08], [1.42,-1.08], [-1.42,1.08], [1.42,1.08]].forEach(([px,pz])=>{const post=new THREE.Mesh(new THREE.CylinderGeometry(.11,.14,2.65,6),makeMaterial(0x72513a));post.position.set(px,1.33,pz);post.castShadow=true;shed.add(post)})
       const roof=new THREE.Mesh(new THREE.ConeGeometry(2.5,1.5,4),makeMaterial(0x6f8fa0));roof.position.y=3.12;roof.rotation.y=Math.PI/4;roof.castShadow=true;shed.add(roof)
       const makeHorse = (hx:number) => {const horse=new THREE.Group();horse.position.set(hx,.18,.12);shed.add(horse);const body=new THREE.Mesh(new THREE.SphereGeometry(.48,8,6),makeMaterial(0x8a5d43));body.scale.set(1.35,.78,.78);body.position.y=.64;horse.add(body);const neck=new THREE.Mesh(new THREE.CylinderGeometry(.17,.23,.58,6),makeMaterial(0x8a5d43));neck.position.set(.46,.95,0);neck.rotation.z=-.45;horse.add(neck);const head=new THREE.Mesh(new THREE.SphereGeometry(.22,7,6),makeMaterial(0x744832));head.position.set(.66,1.2,0);horse.add(head);for(const [lx,lz] of [[-.28,-.22],[-.28,.22],[.3,-.22],[.3,.22]]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.045,.055,.52,5),makeMaterial(0x543729));leg.position.set(lx,.28,lz);horse.add(leg)}}
-      makeHorse(-.65);makeHorse(.65)
+      makeHorse(-.65);makeHorse(.65);addGroundTuft(x-1.8,z-1.3,.9);addGroundTuft(x+1.8,z+1.25,.8)
     }
-    addHorseShed(15,-14)
+    addHorseShed(-5.8,7.5,Math.PI/2)
 
     const addStorage = (x:number, z:number, liquid:number) => {
       const group = new THREE.Group(); group.position.set(x, .38, z); island.add(group)
@@ -211,7 +215,7 @@ export const ClashVillageMap = () => {
 
     // Civic landmarks make the settlement read as a lived-in, defended civilization.
     const addWatchPost = (x:number,z:number) => {
-      const post=new THREE.Group();post.position.set(x,.38,z);island.add(post)
+      const post=new THREE.Group();post.position.set(x,.38,z);island.add(post);addGroundTuft(x-1,z-1,.85);addGroundTuft(x+1,z+.9,.78)
       const base=new THREE.Mesh(new THREE.CylinderGeometry(1.12,1.3,.36,8),makeMaterial(0x8e8a7d));base.position.y=.18;post.add(base)
       ;[[-.62,-.62],[.62,-.62],[-.62,.62],[.62,.62]].forEach(([px,pz])=>{const leg=new THREE.Mesh(new THREE.CylinderGeometry(.11,.15,2.65,6),makeMaterial(0x77543b));leg.position.set(px,1.65,pz);leg.castShadow=true;post.add(leg)})
       const platform=new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.1,.19,8),makeMaterial(0x8a664a));platform.position.y=2.82;post.add(platform)
@@ -231,10 +235,10 @@ export const ClashVillageMap = () => {
       for(let i=0;i<5;i++){const a=i*Math.PI*2/5;const fence=new THREE.Mesh(new THREE.BoxGeometry(.16,.65,.16),makeMaterial(0x7c583d));fence.position.set(Math.cos(a)*1.8,.33,Math.sin(a)*1.8);yard.add(fence)}
       ;[[-.48,0],[.55,.35]].forEach(([px,pz])=>{const dummy=new THREE.Group();dummy.position.set(px,.15,pz);yard.add(dummy);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.07,.09,1.2,6),makeMaterial(0x765139));pole.position.y=.6;dummy.add(pole);const target=new THREE.Mesh(new THREE.SphereGeometry(.28,7,6),makeMaterial(0xd7ba73));target.position.y=1.25;dummy.add(target)})
     }
-    const addSignpost = (x:number,z:number) => {const sign=new THREE.Group();sign.position.set(x,.38,z);island.add(sign);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.09,1.25,6),makeMaterial(0x755038));pole.position.y=.63;sign.add(pole);const arm=new THREE.Mesh(new THREE.BoxGeometry(.9,.25,.1),makeMaterial(0xceb16c));arm.position.set(.28,1.12,0);arm.rotation.y=.2;sign.add(arm)}
-    const addLantern = (x:number,z:number) => {const post=new THREE.Group();post.position.set(x,.38,z);island.add(post);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,1.35,6),makeMaterial(0x5e4b3b));pole.position.y=.68;post.add(pole);const light=new THREE.Mesh(new THREE.OctahedronGeometry(.16),makeMaterial(0xf2d77b,.35));light.position.y=1.42;post.add(light)}
-    addWatchPost(-5.1,20);addWatchPost(5.1,20);addWatchPost(-21,13);addWatchPost(20,-11)
-    addMarket(12,11);addTrainingYard(-5.8,7.5)
+    const addSignpost = (x:number,z:number) => {const sign=new THREE.Group();sign.position.set(x,.38,z);island.add(sign);addGroundTuft(x-.2,z+.18,.72);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.09,1.25,6),makeMaterial(0x755038));pole.position.y=.63;sign.add(pole);const arm=new THREE.Mesh(new THREE.BoxGeometry(.9,.25,.1),makeMaterial(0xceb16c));arm.position.set(.28,1.12,0);arm.rotation.y=.2;sign.add(arm)}
+    const addLantern = (x:number,z:number) => {const post=new THREE.Group();post.position.set(x,.38,z);island.add(post);addGroundTuft(x+.12,z-.12,.65);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,1.35,6),makeMaterial(0x5e4b3b));pole.position.y=.68;post.add(pole);const light=new THREE.Mesh(new THREE.OctahedronGeometry(.16),makeMaterial(0xf2d77b,.35));light.position.y=1.42;post.add(light)}
+    addWatchPost(-5.1,17);addWatchPost(5.1,17);addWatchPost(-18,12);addWatchPost(16,-12)
+    addMarket(12,11)
     addSignpost(7.5,-3);addSignpost(-7,2);addSignpost(5,-10);addSignpost(-14,-7)
     addLantern(-2.1,6.5);addLantern(2.1,6.5);addLantern(-13,5);addLantern(-12,-8);addLantern(12,-5);addLantern(7,12)
 
@@ -247,9 +251,9 @@ export const ClashVillageMap = () => {
       const pin=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),depthTest:false}));pin.position.set(x,y,z);pin.scale.set(1.05,1.05,1);scene.add(pin)
     }
     addLandmarkPin('A',0,0,9.8);addLandmarkPin('B',2.25,-12.15,3.5);addLandmarkPin('C',5,-11,4.7);addLandmarkPin('D',10,-13,7.2)
-    addLandmarkPin('E',15,-14,4.5);addLandmarkPin('F',12,11,4.1);addLandmarkPin('G',-5.8,7.5,3.3);addLandmarkPin('H',14,2.2,3.8)
-    addLandmarkPin('I',9,4.4,4);addLandmarkPin('J',-8.8,-7,3.8);addLandmarkPin('K',-21,13,5.2);addLandmarkPin('L',20,-11,5.2)
-    addLandmarkPin('M',-5.1,20,5.2);addLandmarkPin('N',5.1,20,5.2)
+    addLandmarkPin('E',-5.8,7.5,4.5);addLandmarkPin('F',12,11,4.1);addLandmarkPin('H',14,2.2,3.8)
+    addLandmarkPin('I',9,4.4,4);addLandmarkPin('J',-8.8,-7,3.8);addLandmarkPin('K',-18,12,5.2);addLandmarkPin('L',16,-12,5.2)
+    addLandmarkPin('M',-5.1,17,5.2);addLandmarkPin('N',5.1,17,5.2)
     homeSites.forEach(([x,z],index)=>addLandmarkPin(`H${index+1}`,x,z,3.7))
     addLandmarkPin('S1',-7.2,-4.4,3.8);addLandmarkPin('S2',7,-4.3,3.8);addLandmarkPin('S3',7,5.6,3.8)
     addLandmarkPin('O1',-10,4.7,4);addLandmarkPin('P1',7.5,-3,2.7);addLandmarkPin('P2',-7,2,2.7);addLandmarkPin('P3',5,-10,2.7);addLandmarkPin('P4',-14,-7,2.7)
