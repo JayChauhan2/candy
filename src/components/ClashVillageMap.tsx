@@ -207,7 +207,7 @@ export const ClashVillageMap = () => {
       ;[[0,-1.8,5.2,.13],[0,1.8,5.2,.13],[-2.6,0,.13,3.7],[2.6,0,.13,3.7]].forEach(([dx,dz,w,d])=>{const rail=new THREE.Mesh(new THREE.BoxGeometry(w,.14,d),railMat);rail.position.set(x+1.2+dx,.48,z-4+dz);rail.castShadow=true;island.add(rail)})
       for(let row=0;row<4;row++)for(let col=0;col<6;col++){const crop=new THREE.Mesh(new THREE.ConeGeometry(.11,.62,5),makeMaterial((row+col)%4?0x7ea459:0xd2ba4d));crop.position.set(x-.63+col*.72,.36,z-5.1+row*.72);island.add(crop)}
     }
-    addHut(-10,4.7,'farm',1.05); addHut(9,4.4,'forge',.98); addHut(-8.8,-7,'depot',.95); addFarmstead(5,-11); addWindmill(10,-13)
+    addHut(-10,4.7,'farm',1.05); addHut(9,4.4,'forge',.98); addHut(-8.8,-7,'depot',.95); addFarmstead(-20,-2); addWindmill(10,-13)
 
     // Civic landmarks make the settlement read as a lived-in, defended civilization.
     const addWatchPost = (x:number,z:number) => {
@@ -246,7 +246,7 @@ export const ClashVillageMap = () => {
       ctx.fillStyle='#394b58';ctx.font=`700 ${letter.length>1?27:42}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(letter,40,43)
       const pin=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),depthTest:false}));pin.position.set(x,y,z);pin.scale.set(1.05,1.05,1);scene.add(pin)
     }
-    addLandmarkPin('A',0,0,9.8);addLandmarkPin('B',2.25,-12.15,3.5);addLandmarkPin('C',5,-11,4.7);addLandmarkPin('D',10,-13,7.2)
+    addLandmarkPin('A',0,0,9.8);addLandmarkPin('B',2.25,-12.15,3.5);addLandmarkPin('C',-20,-2,4.7);addLandmarkPin('D',10,-13,7.2)
     addLandmarkPin('E',-5.8,7.5,4.5);addLandmarkPin('F',12,11,4.1);addLandmarkPin('H',14,2.2,3.8)
     addLandmarkPin('I',9,4.4,4);addLandmarkPin('J',-8.8,-7,3.8);addLandmarkPin('K',-18,12,5.2);addLandmarkPin('L',16,-12,5.2)
     addLandmarkPin('M',-5.1,17,5.2);addLandmarkPin('N',5.1,17,5.2)
