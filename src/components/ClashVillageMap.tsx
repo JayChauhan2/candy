@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
-const makeMaterial = (color: number, roughness = .8) => new THREE.MeshStandardMaterial({ color, roughness })
+const makeMaterial = (color: number, roughness = .8) => new THREE.MeshStandardMaterial({ color, roughness, flatShading: true })
 
 export const ClashVillageMap = () => {
   const mountRef = useRef<HTMLDivElement>(null)
@@ -93,29 +93,45 @@ export const ClashVillageMap = () => {
     flag.position.set(1,8.85,.45); flag.rotation.y = Math.PI / 2; island.add(flag)
 
     const addHouse = (x:number, z:number, tone:number, roofColor:number, scale=.9) => {
+      // Layered eaves and chimneys make each house read as folded paper architecture.
+      addBox(2.18*scale, .22*scale, 1.82*scale, 0xf0d898, x, z)
       addBox(2.05*scale, 1.9*scale, 1.7*scale, tone, x, z); addCone(1.75*scale, 1.45*scale, roofColor, x, z)
       addBox(.4*scale, .8*scale, .09, 0x704832, x, z - .9*scale)
+      const chimney = addBox(.28*scale,.72*scale,.28*scale,0x9b6e50,x+.55*scale,z+.25*scale);chimney.position.y=2.55*scale+.38
     }
     // Three small residential neighborhoods connected by the village paths.
     ;[[-15,5,.88],[-13,7,.76],[-16,8,.78], [14,-5,.9],[16,-3,.75],[13,-7,.78], [6,13,.8],[9,13,.9],[7,15,.72]].forEach(([x,z,s], index) => addHouse(x,z,index%2?0xe0bd78:0xd8a76a,index%3?0xc85b43:0x627492,s))
 
     const addStorage = (x:number, z:number, liquid:number) => {
       const group = new THREE.Group(); group.position.set(x, .38, z); island.add(group)
+      const plinth = new THREE.Mesh(new THREE.CylinderGeometry(1.6,1.78,.25,12),makeMaterial(0x786d60));plinth.position.y=.12;plinth.castShadow=true;group.add(plinth)
       const body = new THREE.Mesh(new THREE.CylinderGeometry(1.26, 1.48, 1.7, 12), makeMaterial(0x9d6a3d))
       body.position.y = .85; body.castShadow = true; group.add(body)
       const fill = new THREE.Mesh(new THREE.SphereGeometry(1.06, 16, 10), makeMaterial(liquid, .35))
       fill.scale.y = .55; fill.position.y = 1.62; group.add(fill)
-      const rim = new THREE.Mesh(new THREE.TorusGeometry(1.15, .12, 8, 16), makeMaterial(0x4a342a)); rim.position.y = 1.55; rim.rotation.x = Math.PI / 2; group.add(rim)
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(1.15, .12, 8, 12), makeMaterial(0x4a342a)); rim.position.y = 1.55; rim.rotation.x = Math.PI / 2; group.add(rim)
+      const paperBand = new THREE.Mesh(new THREE.TorusGeometry(1.36,.08,8,12),makeMaterial(0xe1b977));paperBand.rotation.x=Math.PI/2;paperBand.position.y=.98;group.add(paperBand)
+      for(let i=0;i<4;i++){const brace=new THREE.Mesh(new THREE.BoxGeometry(.13,.84,.13),makeMaterial(0x684832));const a=i*Math.PI/2;brace.position.set(Math.cos(a)*1.34,.95,Math.sin(a)*1.34);brace.rotation.z=Math.cos(a)*.28;group.add(brace)}
     }
     addStorage(-7.2, -4.4, 0xffd138); addStorage(7, -4.3, 0xe568d3); addStorage(7, 5.6, 0x6bc9ed)
 
     const addCannon = (x:number, z:number, rotation:number) => {
       const group = new THREE.Group(); group.position.set(x, .38, z); group.rotation.y = rotation; island.add(group)
-      const base = new THREE.Mesh(new THREE.CylinderGeometry(.76, .96, .5, 12), makeMaterial(0x8a9497)); base.castShadow = true; group.add(base)
-      const barrel = new THREE.Mesh(new THREE.CylinderGeometry(.25, .34, 1.75, 10), makeMaterial(0x3c4c53, .4)); barrel.rotation.z = Math.PI / 2; barrel.position.set(.72, .54, 0); barrel.castShadow = true; group.add(barrel)
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(.76, .98, .5, 10), makeMaterial(0x8a9497)); base.castShadow = true; group.add(base)
+      const carriage = new THREE.Mesh(new THREE.BoxGeometry(1.25,.42,.75),makeMaterial(0x85543b));carriage.position.y=.42;carriage.castShadow=true;group.add(carriage)
+      const barrel = new THREE.Mesh(new THREE.CylinderGeometry(.25, .34, 1.75, 8), makeMaterial(0x3c4c53, .4)); barrel.rotation.z = Math.PI / 2; barrel.position.set(.8,.68,0); barrel.castShadow = true; group.add(barrel)
+      ;[-.42,.42].forEach((wheelZ)=>{const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.18,10),makeMaterial(0x604335));wheel.rotation.x=Math.PI/2;wheel.position.set(-.18,.36,wheelZ);wheel.castShadow=true;group.add(wheel)})
+      const shield = new THREE.Mesh(new THREE.ConeGeometry(.52,.12,6),makeMaterial(0xd1a660));shield.rotation.x=Math.PI/2;shield.position.set(.1,.83,0);group.add(shield)
     }
     addCannon(-10, 4.7, .3); addCannon(9, 4.4, 2.8); addCannon(-8.8, -7, -.6)
-    const addTower = (x:number,z:number) => { addBox(1.3,3.55,1.3,0x92999d,x,z); addCone(1.2,1.55,0x536776,x,z) }
+    const addTower = (x:number,z:number) => {
+      const foot = new THREE.Mesh(new THREE.CylinderGeometry(1.05,1.24,.35,10),makeMaterial(0x747f87));foot.position.set(x,.55,z);foot.castShadow=true;island.add(foot)
+      const tower = new THREE.Mesh(new THREE.CylinderGeometry(.82,.98,3.2,10),makeMaterial(0xaeb5b7));tower.position.set(x,2.1,z);tower.castShadow=true;island.add(tower)
+      const trim = new THREE.Mesh(new THREE.TorusGeometry(.88,.09,7,10),makeMaterial(0x6d7780));trim.rotation.x=Math.PI/2;trim.position.set(x,3.5,z);island.add(trim)
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(1.04,1.7,6),makeMaterial(0xb95448));roof.position.set(x,4.5,z);roof.castShadow=true;island.add(roof)
+      const window=new THREE.Mesh(new THREE.PlaneGeometry(.28,.62),makeMaterial(0x355270));window.position.set(x,2.25,z-.83);island.add(window)
+      const pennant = new THREE.Mesh(new THREE.PlaneGeometry(.62,.38),new THREE.MeshBasicMaterial({color:0xf0b933,side:THREE.DoubleSide}));pennant.position.set(x+.3,5.45,z);pennant.rotation.y=Math.PI/2;island.add(pennant)
+    }
     addTower(-10, -.1); addTower(10, -.5); addTower(-1, 8.6)
     const addTree = (x:number,z:number,scale=.85) => {
       const group = new THREE.Group(); group.position.set(x,.4,z); group.scale.setScalar(scale); island.add(group)
