@@ -41,7 +41,8 @@ export const ClashVillageMap = () => {
       const field = new THREE.Mesh(new THREE.PlaneGeometry(w, d), fieldMat); field.rotation.x = -Math.PI / 2; field.position.set(x, .03, z); island.add(field)
     })
     const pathMat = makeMaterial(0xd4d0bf)
-    const ring = new THREE.Mesh(new THREE.RingGeometry(4.2, 5.3, 36), pathMat); ring.rotation.x = -Math.PI / 2; ring.position.y = .36; island.add(ring)
+    // A full round plaza hides path joins and makes every route flow cleanly into the castle.
+    const ring = new THREE.Mesh(new THREE.CircleGeometry(5.7, 40), pathMat); ring.rotation.x = -Math.PI / 2; ring.position.y = .07; ring.receiveShadow = true; island.add(ring)
     const addPath = (x1:number, z1:number, x2:number, z2:number, width = 1.1) => {
       const bend = (z2-z1)*.12
       const curve = new THREE.CatmullRomCurve3([
@@ -53,8 +54,13 @@ export const ClashVillageMap = () => {
       for(let i=2;i<12;i+=3){
         const t=i/12, point=curve.getPoint(t), tangent=curve.getTangent(t).normalize()
         const side=(i%2?1:-1), nx=-tangent.z*side, nz=tangent.x*side
-        const tuft=new THREE.Group();tuft.position.set(point.x+nx*(width*.62),.12,point.z+nz*(width*.62));island.add(tuft)
-        for(let blade=0;blade<3;blade++){const grass=new THREE.Mesh(new THREE.ConeGeometry(.045,.3+blade*.055,3),makeMaterial(blade===1?0x84a77d:0x6f9870));grass.position.set((blade-1)*.07,(.15+blade*.03),blade%2*.05);grass.rotation.z=(blade-1)*.16;tuft.add(grass)}
+        const tuft=new THREE.Group();tuft.position.set(point.x+nx*(width*.62),.12,point.z+nz*(width*.62));tuft.rotation.y=i*1.71;island.add(tuft)
+        const bladeCount=2+(i%4)
+        for(let blade=0;blade<bladeCount;blade++){
+          const height=.18+((i+blade*3)%5)*.055, spread=(blade-(bladeCount-1)/2)*.09
+          const grass=new THREE.Mesh(new THREE.ConeGeometry(.025+(blade%2)*.015,height,3),makeMaterial(0x91b989))
+          grass.position.set(spread,height/2,(blade%3-.8)*.045);grass.rotation.z=spread*1.8;tuft.add(grass)
+        }
       }
     }
     addPath(0, -4.6, 0, -13); addPath(4.8, 0, 12, 0); addPath(-4.8, 0, -12, 1); addPath(0, 4.6, -1, 11)
