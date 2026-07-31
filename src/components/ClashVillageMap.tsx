@@ -11,8 +11,8 @@ export const ClashVillageMap = () => {
     if (!host) return
 
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x78d6ed)
-    scene.fog = new THREE.Fog(0x78d6ed, 34, 78)
+    scene.background = new THREE.Color(0xa8c4c0)
+    scene.fog = new THREE.Fog(0xa8c4c0, 34, 78)
     const camera = new THREE.OrthographicCamera(-24, 24, 13.5, -13.5, .1, 120)
     camera.position.set(22, 28, 26)
     camera.lookAt(0, 0, 0)
@@ -23,8 +23,8 @@ export const ClashVillageMap = () => {
     renderer.outputColorSpace = THREE.SRGBColorSpace
     host.appendChild(renderer.domElement)
 
-    scene.add(new THREE.HemisphereLight(0xeafcff, 0x47782e, 2.2))
-    const sun = new THREE.DirectionalLight(0xfff0bb, 3.4)
+    scene.add(new THREE.HemisphereLight(0xf3f1e8, 0x557750, 2.1))
+    const sun = new THREE.DirectionalLight(0xfff4d4, 2.7)
     sun.position.set(-18, 26, 15); sun.castShadow = true
     sun.shadow.mapSize.set(1024, 1024)
     sun.shadow.camera.left = -27; sun.shadow.camera.right = 27; sun.shadow.camera.top = 27; sun.shadow.camera.bottom = -27
@@ -32,15 +32,15 @@ export const ClashVillageMap = () => {
 
     // A continuous countryside plane makes this a real kingdom, not a floating island.
     const island = new THREE.Group(); scene.add(island)
-    const countryside = new THREE.Mesh(new THREE.PlaneGeometry(130, 100), makeMaterial(0x75bd43))
+    const countryside = new THREE.Mesh(new THREE.PlaneGeometry(130, 100), makeMaterial(0x7fab7b))
     countryside.rotation.x = -Math.PI / 2; countryside.position.y = -.04; countryside.receiveShadow = true; island.add(countryside)
-    const meadow = new THREE.Mesh(new THREE.CircleGeometry(26, 48), makeMaterial(0x8bd04a))
+    const meadow = new THREE.Mesh(new THREE.CircleGeometry(26, 48), makeMaterial(0x91b989))
     meadow.rotation.x = -Math.PI / 2; meadow.scale.z = .76; meadow.position.y = .01; meadow.receiveShadow = true; island.add(meadow)
-    const fieldMat = makeMaterial(0xa5d35b)
+    const fieldMat = makeMaterial(0xa2b886)
     ;[[-19, -8, 8, 5], [18, 8, 9, 5], [-15, 12, 7, 4]].forEach(([x,z,w,d]) => {
       const field = new THREE.Mesh(new THREE.PlaneGeometry(w, d), fieldMat); field.rotation.x = -Math.PI / 2; field.position.set(x, .03, z); island.add(field)
     })
-    const pathMat = makeMaterial(0xe8c372)
+    const pathMat = makeMaterial(0xd4d0bf)
     const ring = new THREE.Mesh(new THREE.RingGeometry(4.2, 5.3, 36), pathMat); ring.rotation.x = -Math.PI / 2; ring.position.y = .36; island.add(ring)
     const addPath = (x1:number, z1:number, x2:number, z2:number, width = 1.1) => {
       const length = Math.hypot(x2 - x1, z2 - z1)
@@ -60,7 +60,7 @@ export const ClashVillageMap = () => {
     }
 
     // A proper, readable low-poly castle: broad curtain wall, gatehouse, keep, and four round towers.
-    const stoneLight = 0xd9d3ba, stoneMid = 0xaeb5b7, stoneDark = 0x747f87, roofBlue = 0x405b83
+    const stoneLight = 0xc7bdaa, stoneMid = 0xa89f91, stoneDark = 0x777a74, roofBlue = 0x718ba0
     const addCastleTower = (x:number, z:number, height:number) => {
       const tower = new THREE.Mesh(new THREE.CylinderGeometry(.98,1.1,height,10), makeMaterial(stoneMid))
       tower.position.set(x,height/2+.38,z); tower.castShadow=true;tower.receiveShadow=true;island.add(tower)
@@ -74,10 +74,10 @@ export const ClashVillageMap = () => {
     addBox(6.7,1.85,.7,stoneLight,0,-2.85); addBox(6.7,1.85,.7,stoneLight,0,2.85)
     addBox(.7,1.85,5.3,stoneLight,-3.0,0); addBox(.7,1.85,5.3,stoneLight,3.0,0)
     // The gatehouse pushes forward, so the entrance is legible from the isometric view.
-    addBox(3.15,2.85,1.25,stoneLight,0,-3.15)
-    const gate = new THREE.Mesh(new THREE.PlaneGeometry(1.25,1.62),makeMaterial(0x5a4030));gate.position.set(0,1.2,-3.79);island.add(gate)
-    const gateArch = new THREE.Mesh(new THREE.TorusGeometry(.68,.14,7,12,Math.PI), makeMaterial(stoneDark)); gateArch.rotation.z=Math.PI; gateArch.position.set(0,1.92,-3.8); island.add(gateArch)
-    for(let i=-.42;i<=.42;i+=.21){const bar=addBox(.07,1.35,.06,0xb8bdba,i,-3.83);bar.position.y=1.18}
+    addBox(3.15,2.85,1.25,stoneLight,0,3.15)
+    const gate = new THREE.Mesh(new THREE.PlaneGeometry(1.25,1.62),makeMaterial(0x5a4030));gate.position.set(0,1.2,3.79);gate.rotation.y=Math.PI;island.add(gate)
+    const gateArch = new THREE.Mesh(new THREE.TorusGeometry(.68,.14,7,12,Math.PI), makeMaterial(stoneDark)); gateArch.rotation.z=Math.PI; gateArch.rotation.y=Math.PI; gateArch.position.set(0,1.92,3.8); island.add(gateArch)
+    for(let i=-.42;i<=.42;i+=.21){const bar=addBox(.07,1.35,.06,0xb8bdba,i,3.83);bar.position.y=1.18}
     // Tall central keep, stepped behind the wall rather than capped by one giant roof.
     addBox(4.25,4.75,3.8,stoneLight,0,.45)
     addBox(3.65,.42,3.25,stoneMid,0,4.9)
@@ -86,8 +86,9 @@ export const ClashVillageMap = () => {
     ;[-1.35,-.55,.55,1.35].forEach((z) => { const left=addBox(.42,.52,.43,stoneMid,-2.12,z);left.position.y=5.14;const right=addBox(.42,.52,.43,stoneMid,2.12,z);right.position.y=5.14 })
     addCastleTower(-3.05,-2.85,4.35);addCastleTower(3.05,-2.85,4.35);addCastleTower(-3.05,2.85,4.05);addCastleTower(3.05,2.85,4.05)
     // Narrow blue slit windows and gold banners add color without breaking the low-poly language.
-    ;[-1.25,0,1.25].forEach((x) => { const window=addBox(.34,.88,.06,0x355270,x,-1.48);window.position.y=3.3 })
-    ;[-2.16,2.16].forEach((x) => { const banner = new THREE.Mesh(new THREE.PlaneGeometry(.65,1.35), new THREE.MeshBasicMaterial({ color: 0xf0b933, side: THREE.DoubleSide })); banner.position.set(x,3.35,-3.84); island.add(banner) })
+    ;[-1.25,0,1.25].forEach((x) => { const window=addBox(.34,.88,.06,0x577f9b,x,2.4);window.position.y=3.3 })
+    ;[-.8,.8].forEach((z) => { const window=addBox(.06,.72,.32,0x577f9b,2.16,z);window.position.y=3.35 })
+    ;[-2.16,2.16].forEach((x) => { const banner = new THREE.Mesh(new THREE.PlaneGeometry(.65,1.35), new THREE.MeshBasicMaterial({ color: 0xd1a650, side: THREE.DoubleSide })); banner.position.set(x,3.35,3.84); banner.rotation.y=Math.PI;island.add(banner) })
     const pole = addBox(.1, 3.8, .1, 0x835a30, 0, .45); pole.position.y = 7.05
     const flag = new THREE.Mesh(new THREE.PlaneGeometry(2.0, .92), new THREE.MeshBasicMaterial({ color: 0xf0b933, side: THREE.DoubleSide }))
     flag.position.set(1,8.85,.45); flag.rotation.y = Math.PI / 2; island.add(flag)
@@ -99,8 +100,8 @@ export const ClashVillageMap = () => {
       const walls = new THREE.Mesh(new THREE.CylinderGeometry(1.16,1.28,1.78,8),makeMaterial(tone));walls.position.y=1.02;walls.castShadow=true;home.add(walls)
       const eave = new THREE.Mesh(new THREE.TorusGeometry(1.22,.1,7,8),makeMaterial(0xf0d898));eave.rotation.x=Math.PI/2;eave.position.y=1.82;home.add(eave)
       const roof = new THREE.Mesh(new THREE.ConeGeometry(1.62,1.8,7),makeMaterial(roofColor));roof.position.y=2.8;roof.rotation.y=Math.PI/7;roof.castShadow=true;home.add(roof)
-      const door = new THREE.Mesh(new THREE.PlaneGeometry(.5,.9),makeMaterial(0x6a472f));door.position.set(0,.78,-1.3);home.add(door)
-      ;[-.48,.48].forEach((side)=>{const window=new THREE.Mesh(new THREE.CircleGeometry(.15,7),makeMaterial(0x4f82b8));window.position.set(side,1.22,-1.18);home.add(window)})
+      const door = new THREE.Mesh(new THREE.PlaneGeometry(.5,.9),makeMaterial(0x6a472f));door.position.set(0,.78,1.3);door.rotation.y=Math.PI;home.add(door)
+      ;[-.48,.48].forEach((side)=>{const frontWindow=new THREE.Mesh(new THREE.CircleGeometry(.15,7),makeMaterial(0x6f98ad));frontWindow.position.set(side,1.22,1.18);frontWindow.rotation.y=Math.PI;home.add(frontWindow);const sideWindow=new THREE.Mesh(new THREE.CircleGeometry(.15,7),makeMaterial(0x6f98ad));sideWindow.position.set(1.18,1.22,side);sideWindow.rotation.y=Math.PI/2;home.add(sideWindow)})
       const chimney = new THREE.Mesh(new THREE.CylinderGeometry(.16,.21,.68,6),makeMaterial(0x956952));chimney.position.set(.5,3.15,.08);home.add(chimney)
     }
     // Three small residential neighborhoods connected by the village paths.
