@@ -133,7 +133,11 @@ export const ClashVillageMap = () => {
       const chimney = new THREE.Mesh(new THREE.CylinderGeometry(.16,.21,.68,6),makeMaterial(0x956952));chimney.position.set(.5,3.15,.08);home.add(chimney)
     }
     // Three small residential neighborhoods connected by the village paths.
-    ;[[-15,5,.88],[-13,7,.76],[-16,8,.78],[-14,-7,.82],[-16,-10,.76], [14,-5,.9],[16,-3,.75],[13,-7,.78], [14,10,.8],[17,11,.76], [6,13,.8],[9,13,.9],[7,15,.72]].forEach(([x,z,s], index) => addHouse(x,z,index%2?0xe0bd78:0xd8a76a,index%3?0xc85b43:0x627492,s))
+    // Neighborhoods are deliberately spaced into west, east, rear, and entrance districts.
+    ;[[-15,5,.88],[-13,7,.76],[-16,8,.78],[-14,-7,.82],[-16,-10,.76],
+      [14,-5,.9],[16,-3,.75],[18,-8,.78],
+      [-5,-14,.8],[-1,-16,.9],[4,-16,.72],
+      [15,12,.8],[18,14,.76]].forEach(([x,z,s], index) => addHouse(x,z,index%2?0xe0bd78:0xd8a76a,index%3?0xc85b43:0x627492,s))
 
     // Open-front stable beside the castle's main exit, with two visible horses in their stalls.
     const addHorseShed = (x:number,z:number) => {
@@ -145,7 +149,7 @@ export const ClashVillageMap = () => {
       const makeHorse = (hx:number) => {const horse=new THREE.Group();horse.position.set(hx,.18,.12);shed.add(horse);const body=new THREE.Mesh(new THREE.SphereGeometry(.48,8,6),makeMaterial(0x8a5d43));body.scale.set(1.35,.78,.78);body.position.y=.64;horse.add(body);const neck=new THREE.Mesh(new THREE.CylinderGeometry(.17,.23,.58,6),makeMaterial(0x8a5d43));neck.position.set(.46,.95,0);neck.rotation.z=-.45;horse.add(neck);const head=new THREE.Mesh(new THREE.SphereGeometry(.22,7,6),makeMaterial(0x744832));head.position.set(.66,1.2,0);horse.add(head);for(const [lx,lz] of [[-.28,-.22],[-.28,.22],[.3,-.22],[.3,.22]]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.045,.055,.52,5),makeMaterial(0x543729));leg.position.set(lx,.28,lz);horse.add(leg)}}
       makeHorse(-.65);makeHorse(.65)
     }
-    addHorseShed(3.5,9.5)
+    addHorseShed(15,-14)
 
     const addStorage = (x:number, z:number, liquid:number) => {
       const group = new THREE.Group(); group.position.set(x, .38, z); island.add(group)
@@ -158,7 +162,7 @@ export const ClashVillageMap = () => {
       const paperBand = new THREE.Mesh(new THREE.TorusGeometry(1.36,.08,8,12),makeMaterial(0xe1b977));paperBand.rotation.x=Math.PI/2;paperBand.position.y=.98;group.add(paperBand)
       for(let i=0;i<4;i++){const brace=new THREE.Mesh(new THREE.BoxGeometry(.13,.84,.13),makeMaterial(0x684832));const a=i*Math.PI/2;brace.position.set(Math.cos(a)*1.34,.95,Math.sin(a)*1.34);brace.rotation.z=Math.cos(a)*.28;group.add(brace)}
     }
-    addStorage(-7.2, -4.4, 0xffd138); addStorage(7, -4.3, 0xe568d3); addStorage(7, 5.6, 0x6bc9ed)
+    addStorage(-7.2, -4.4, 0xffd138); addStorage(7, -4.3, 0xe568d3); addStorage(14, 2.2, 0x6bc9ed)
 
     // Individual blue-and-yellow landmark huts replace the generic box monuments.
     const addHut = (x:number, z:number, kind:'farm'|'forge'|'depot', scale=1) => {
@@ -230,8 +234,8 @@ export const ClashVillageMap = () => {
     }
     const addSignpost = (x:number,z:number) => {const sign=new THREE.Group();sign.position.set(x,.38,z);island.add(sign);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.09,1.25,6),makeMaterial(0x755038));pole.position.y=.63;sign.add(pole);const arm=new THREE.Mesh(new THREE.BoxGeometry(.9,.25,.1),makeMaterial(0xceb16c));arm.position.set(.28,1.12,0);arm.rotation.y=.2;sign.add(arm)}
     const addLantern = (x:number,z:number) => {const post=new THREE.Group();post.position.set(x,.38,z);island.add(post);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,1.35,6),makeMaterial(0x5e4b3b));pole.position.y=.68;post.add(pole);const light=new THREE.Mesh(new THREE.OctahedronGeometry(.16),makeMaterial(0xf2d77b,.35));light.position.y=1.42;post.add(light)}
-    addWatchPost(-4.1,16);addWatchPost(4.1,16);addWatchPost(-17,9);addWatchPost(16,-9)
-    addMarket(11,10.5);addTrainingYard(-5.8,7.5)
+    addWatchPost(-5.1,20);addWatchPost(5.1,20);addWatchPost(-21,13);addWatchPost(20,-11)
+    addMarket(12,11);addTrainingYard(-5.8,7.5)
     addSignpost(7.5,-3);addSignpost(-7,2);addSignpost(5,-10);addSignpost(-14,-7)
     addLantern(-2.1,6.5);addLantern(2.1,6.5);addLantern(-13,5);addLantern(-12,-8);addLantern(12,-5);addLantern(7,12)
     const addTree = (x:number,z:number,scale=.85) => {
