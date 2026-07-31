@@ -63,6 +63,12 @@ export const ClashVillageMap = () => {
     addBox(5.2, 3.8, 4.7, 0xd9d3ba, 0, 0); addCone(3.9, 3.1, 0x485c80, 0, 0)
     addBox(.92, 1.8, .16, 0x624333, 0, -2.41)
     ;[[-2.2,-1.9],[2.2,-1.9],[-2.2,1.9],[2.2,1.9]].forEach(([x,z]) => { addBox(.75,5,.75,0xb8b4a7,x,z); addCone(.74,1.5,0x5c7094,x,z) })
+    // Chunky masonry details keep the hero castle readable at gameplay distance.
+    ;[-2,-1,0,1,2].forEach((x) => addBox(.46,.45,.42,0xb8b4a7,x,2.44))
+    ;[-2,-1,0,1,2].forEach((x) => addBox(.46,.45,.42,0xb8b4a7,x,-2.44))
+    ;[-1.5,0,1.5].forEach((x) => { const window = addBox(.38,.72,.08,0x355270,x,-2.43); window.position.y=2.9 })
+    ;[-2.2,2.2].forEach((x) => { const banner = new THREE.Mesh(new THREE.PlaneGeometry(.6,1.2), new THREE.MeshBasicMaterial({ color: 0xf0b933, side: THREE.DoubleSide })); banner.position.set(x,3.9,-2.43); island.add(banner) })
+    const gateArch = new THREE.Mesh(new THREE.TorusGeometry(.78,.13,7,12,Math.PI), makeMaterial(0x8c8f91)); gateArch.rotation.z=Math.PI; gateArch.position.set(0,2.08,-2.44); island.add(gateArch)
     const pole = addBox(.1, 4, .1, 0x835a30, 0, 0); pole.position.y = 5
     const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.8, .86), new THREE.MeshBasicMaterial({ color: 0xffcf3e, side: THREE.DoubleSide }))
     flag.position.set(.92, 6.35, 0); flag.rotation.y = Math.PI / 2; island.add(flag)
@@ -101,26 +107,37 @@ export const ClashVillageMap = () => {
     for (let i=0;i<58;i++) { const angle=i*2.4, radius=17+(i%4)*2.3; const bush=new THREE.Mesh(new THREE.DodecahedronGeometry(.28+(i%4)*.05),makeMaterial(i%4?0x5ca639:0xf0d34d)); bush.position.set(Math.cos(angle)*radius,.24,Math.sin(angle)*radius*.74);bush.castShadow=true;island.add(bush) }
 
     // Small roaming sheep and deer keep the fields alive.
-    const animals: { group: THREE.Group; cx: number; cz: number; radius: number; phase: number; speed: number }[] = []
+    const animals: { group: THREE.Group; legs: THREE.Mesh[]; cx: number; cz: number; radius: number; phase: number; speed: number }[] = []
     const addAnimal = (cx:number, cz:number, type:'sheep'|'deer', phase:number) => {
       const group = new THREE.Group(); island.add(group)
       const body = new THREE.Mesh(new THREE.SphereGeometry(type === 'sheep' ? .44 : .36, 10, 8), makeMaterial(type === 'sheep' ? 0xf4ecd9 : 0x9b6740))
       body.scale.set(1.25,.82,.82); body.position.y=.55; body.castShadow=true;group.add(body)
       const head = new THREE.Mesh(new THREE.SphereGeometry(.2, 8, 6), makeMaterial(type === 'sheep' ? 0x76513d : 0x75472e));head.position.set(.48,.62,0);group.add(head)
-      for (const [x,z] of [[-.23,-.22],[-.23,.22],[.22,-.22],[.22,.22]]) { const leg=new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,.38,5),makeMaterial(0x50352a));leg.position.set(x,.2,z);group.add(leg) }
-      animals.push({ group, cx, cz, radius: 1.1 + (phase % 3) * .28, phase, speed: type === 'sheep' ? .45 : .62 })
+      const legs: THREE.Mesh[] = []
+      for (const [x,z] of [[-.23,-.22],[-.23,.22],[.22,-.22],[.22,.22]]) { const leg=new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,.38,5),makeMaterial(0x50352a));leg.position.set(x,.2,z);group.add(leg);legs.push(leg) }
+      animals.push({ group, legs, cx, cz, radius: 1.1 + (phase % 3) * .28, phase, speed: type === 'sheep' ? .45 : .62 })
     }
     addAnimal(-13,-9,'sheep',0); addAnimal(-13,-9,'sheep',2.1); addAnimal(12,9,'deer',.9); addAnimal(12,9,'deer',3.4)
+
+    // A few simple low-poly birds cross the open sky, flapping independently.
+    const birds: { group: THREE.Group; phase: number; speed: number; startX: number; startZ: number }[] = []
+    const addBird = (startX:number, startZ:number, phase:number) => {
+      const group = new THREE.Group(); group.position.set(startX, 10 + (phase % 2) * 1.2, startZ); scene.add(group)
+      const wingMat = new THREE.MeshBasicMaterial({ color: 0x34445a, side: THREE.DoubleSide })
+      const left = new THREE.Mesh(new THREE.PlaneGeometry(.72,.26),wingMat); left.position.x=-.34; left.rotation.z=.34;group.add(left)
+      const right = new THREE.Mesh(new THREE.PlaneGeometry(.72,.26),wingMat); right.position.x=.34; right.rotation.z=-.34;group.add(right)
+      birds.push({ group, phase, speed: .85 + (phase%3)*.08, startX, startZ })
+    }
+    addBird(-23,-10,0); addBird(-18,-13,1.4); addBird(-25,-6,2.8); addBird(-20,-3,4.1)
 
     const resize = () => { const { width, height } = host.getBoundingClientRect(); renderer.setSize(width, height, false); const aspect = width / height; camera.left = -20 * aspect; camera.right = 20 * aspect; camera.top = 12; camera.bottom = -12; camera.updateProjectionMatrix() }
     resize(); window.addEventListener('resize', resize)
     let pointerX = 0, pointerY = 0, frame = 0
     const move = (event:PointerEvent) => { pointerX = event.clientX / window.innerWidth - .5; pointerY = event.clientY / window.innerHeight - .5 }
     host.addEventListener('pointermove', move)
-    const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; island.rotation.y = Math.sin(time * .16) * .012 + pointerX * .035; camera.position.x = 22 + pointerX * 2.2; camera.position.y = 28 - pointerY * 1.2; camera.lookAt(0,0,0); flag.rotation.z = Math.sin(time * 2.3) * .08; animals.forEach((animal) => { const a = time * animal.speed + animal.phase; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = -a + Math.PI/2; animal.group.position.y += Math.abs(Math.sin(a*3))* .05 }); renderer.render(scene, camera) }
+    const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; island.rotation.y = Math.sin(time * .16) * .012 + pointerX * .035; camera.position.x = 22 + pointerX * 2.2; camera.position.y = 28 - pointerY * 1.2; camera.lookAt(0,0,0); flag.rotation.z = Math.sin(time * 2.3) * .08; animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*46; bird.group.position.z = bird.startZ + Math.sin(time + bird.phase)*1.2; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.2 + Math.sin(time*9+bird.phase)*.58) }) }); renderer.render(scene, camera) }
     animate()
     return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); host.removeEventListener('pointermove', move); renderer.dispose(); host.removeChild(renderer.domElement) }
   }, [])
   return <div ref={mountRef} className="clash-village-map" />
 }
-
