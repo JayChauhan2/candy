@@ -118,7 +118,8 @@ export const ClashVillageMap = () => {
     ;[-2.16,2.16].forEach((x) => { const banner = new THREE.Mesh(new THREE.PlaneGeometry(.65,1.35), new THREE.MeshBasicMaterial({ color: 0xd1a650, side: THREE.DoubleSide })); banner.position.set(x,3.35,3.84); banner.rotation.y=Math.PI;island.add(banner) })
     const pole = addBox(.1, 3.8, .1, 0x835a30, 0, .45); pole.position.y = 7.05
     const flag = new THREE.Mesh(new THREE.PlaneGeometry(2.0, .92), new THREE.MeshBasicMaterial({ color: 0xf0b933, side: THREE.DoubleSide }))
-    flag.position.set(1,8.85,.45); flag.rotation.y = Math.PI / 2; island.add(flag)
+    // The flag's inner edge starts at the pole instead of floating beside it.
+    flag.position.set(1,8.85,.45); island.add(flag)
 
     const addHouse = (x:number, z:number, tone:number, roofColor:number, scale=.9) => {
       // These are the residential cottages lining the paths, with a round paper-cut silhouette.
@@ -144,7 +145,7 @@ export const ClashVillageMap = () => {
       const makeHorse = (hx:number) => {const horse=new THREE.Group();horse.position.set(hx,.18,.12);shed.add(horse);const body=new THREE.Mesh(new THREE.SphereGeometry(.48,8,6),makeMaterial(0x8a5d43));body.scale.set(1.35,.78,.78);body.position.y=.64;horse.add(body);const neck=new THREE.Mesh(new THREE.CylinderGeometry(.17,.23,.58,6),makeMaterial(0x8a5d43));neck.position.set(.46,.95,0);neck.rotation.z=-.45;horse.add(neck);const head=new THREE.Mesh(new THREE.SphereGeometry(.22,7,6),makeMaterial(0x744832));head.position.set(.66,1.2,0);horse.add(head);for(const [lx,lz] of [[-.28,-.22],[-.28,.22],[.3,-.22],[.3,.22]]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.045,.055,.52,5),makeMaterial(0x543729));leg.position.set(lx,.28,lz);horse.add(leg)}}
       makeHorse(-.65);makeHorse(.65)
     }
-    addHorseShed(5.4,6.9)
+    addHorseShed(3.5,9.5)
 
     const addStorage = (x:number, z:number, liquid:number) => {
       const group = new THREE.Group(); group.position.set(x, .38, z); island.add(group)
@@ -229,7 +230,10 @@ export const ClashVillageMap = () => {
     }
     const addSignpost = (x:number,z:number) => {const sign=new THREE.Group();sign.position.set(x,.38,z);island.add(sign);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.09,1.25,6),makeMaterial(0x755038));pole.position.y=.63;sign.add(pole);const arm=new THREE.Mesh(new THREE.BoxGeometry(.9,.25,.1),makeMaterial(0xceb16c));arm.position.set(.28,1.12,0);arm.rotation.y=.2;sign.add(arm)}
     const addLantern = (x:number,z:number) => {const post=new THREE.Group();post.position.set(x,.38,z);island.add(post);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,1.35,6),makeMaterial(0x5e4b3b));pole.position.y=.68;post.add(pole);const light=new THREE.Mesh(new THREE.OctahedronGeometry(.16),makeMaterial(0xf2d77b,.35));light.position.y=1.42;post.add(light)}
-    addWatchPost(-4.1,16);addWatchPost(4.1,16);addMarket(11,10.5);addTrainingYard(-5.8,7.5);addSignpost(7.5,-3);addSignpost(-7,2);addLantern(-2.1,6.5);addLantern(2.1,6.5)
+    addWatchPost(-4.1,16);addWatchPost(4.1,16);addWatchPost(-17,9);addWatchPost(16,-9)
+    addMarket(11,10.5);addTrainingYard(-5.8,7.5)
+    addSignpost(7.5,-3);addSignpost(-7,2);addSignpost(5,-10);addSignpost(-14,-7)
+    addLantern(-2.1,6.5);addLantern(2.1,6.5);addLantern(-13,5);addLantern(-12,-8);addLantern(12,-5);addLantern(7,12)
     const addTree = (x:number,z:number,scale=.85) => {
       const group = new THREE.Group(); group.position.set(x,.4,z); group.scale.setScalar(scale); island.add(group)
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929)); trunk.position.y=.62; trunk.castShadow=true;group.add(trunk)
