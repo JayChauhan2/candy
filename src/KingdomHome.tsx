@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import battleIcon from './assets/battle.png'
+import coinIcon from './assets/coin.png'
+import gemIcon from './assets/gem.png'
 import journalIcon from './assets/journal.png'
 import shopIcon from './assets/shop.png'
+import starIcon from './assets/star.png'
 import troopsIcon from './assets/troops.png'
 import { ClashVillageMap } from './components/ClashVillageMap'
 import './kingdom-home.css'
@@ -52,9 +55,9 @@ export default function KingdomHome() {
           <span className="kh-crown">♛</span><span><b>18</b><em>KING TUBBY</em></span>
         </button>
         <div className="kh-resources">
-          <button className="kh-resource kh-gold" onClick={() => show('18,420 coins in the royal vault')}><span>●</span><small>COINS</small><b>18 420</b><strong>+</strong></button>
-          <button className="kh-resource kh-gems" onClick={() => show('Gem shop coming soon')}><span>◆</span><small>GEMS</small><b>1 280</b><strong>+</strong></button>
-          <button className="kh-resource kh-stars" onClick={() => show('74 Power Stars collected')}><span>★</span><small>STARS</small><b>74</b><strong>+</strong></button>
+          <button className="kh-resource kh-gold" onClick={() => show('18,420 coins in the royal vault')}><span><img src={coinIcon} alt="" /></span><small>COINS</small><b>18 420</b><strong>+</strong></button>
+          <button className="kh-resource kh-gems" onClick={() => show('Gem shop coming soon')}><span><img src={gemIcon} alt="" /></span><small>GEMS</small><b>1 280</b><strong>+</strong></button>
+          <button className="kh-resource kh-stars" onClick={() => show('74 Power Stars collected')}><span><img src={starIcon} alt="" /></span><small>STARS</small><b>74</b><strong>+</strong></button>
         </div>
         <div className="kh-header-actions">
           <button onClick={() => show('Music toggled')} aria-label="Toggle music">♫</button>
