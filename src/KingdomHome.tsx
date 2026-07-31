@@ -16,6 +16,7 @@ import './kingdom-home.css'
 import './icon-overrides.css'
 import './battle-picker.css'
 import './ruby-battle-map.css'
+import './leaderboard.css'
 
 type Notice = string | null
 
@@ -60,12 +61,34 @@ const BattlePicker = ({ onClose, onChoose }: { onClose: () => void; onChoose: (n
   </section>
 )
 
+const leaderboardEntries = [
+  ['1', 'NoraNimbus', 'Cloudberry Realm', '26 980', 'LV. 24', '+1 420'],
+  ['2', 'WaffleWarden', 'Golden Grove', '24 610', 'LV. 22', '+970'],
+  ['3', 'PixelPanda', 'Pinecone Province', '22 845', 'LV. 21', '+760'],
+  ['4', 'King Tubby', 'Toadstool Kingdom', '19 740', 'LV. 18', '+1 180'],
+  ['5', 'MossyMina', 'Mushroom March', '18 960', 'LV. 17', '+540'],
+  ['6', 'JellyJoust', 'Starfall Keep', '17 380', 'LV. 16', '+330'],
+]
+
+const Leaderboard = ({ onClose }: { onClose: () => void }) => (
+  <section className="leaderboard" aria-label="Kingdom leaderboard"><div className="leaderboard-card">
+    <button className="leaderboard-close" onClick={onClose} aria-label="Close leaderboard">×</button>
+    <header><span>♜</span><div><h2>KINGDOM LEAGUE</h2><p>PLAYER CIVILIZATION RANKINGS</p></div></header>
+    <div className="leaderboard-tabs"><span>THIS SEASON</span><span>POWER</span><span>FASTEST GROWTH</span></div>
+    <div className="leaderboard-list">{leaderboardEntries.map(([rank, player, realm, power, level, gain]) => <div className={`leaderboard-row${player === 'King Tubby' ? ' you' : ''}`} key={player}>
+      <span className="leaderboard-rank">{rank}</span><span className="leaderboard-player"><b>{player}</b><small>{realm}</small></span><span className="leaderboard-score"><b>{power} ★</b><small>{level}</small></span><span className="leaderboard-trend">{gain} ↑</span>
+    </div>)}</div>
+    <footer className="leaderboard-foot"><span>YOUR BEST: <b>#4</b></span><span>REFRESHES IN 3h 12m</span></footer>
+  </div></section>
+)
+
 export default function KingdomHome() {
   const [notice, setNotice] = useState<Notice>(null)
   const [battleLoading, setBattleLoading] = useState(false)
   const [battlePicker, setBattlePicker] = useState(false)
   const [battleOpponent, setBattleOpponent] = useState<string | null>(null)
   const [rubyBattleMap, setRubyBattleMap] = useState(false)
+  const [leaderboard, setLeaderboard] = useState(false)
   const [closingBattle, setClosingBattle] = useState(false)
   const show = (message: string) => {
     setNotice(message)
@@ -103,6 +126,7 @@ export default function KingdomHome() {
         </div>
         <div className="kh-header-actions">
           <button onClick={() => show('Music toggled')} aria-label="Toggle music">♫</button>
+          <button onClick={() => setLeaderboard(true)} aria-label="Open kingdom leaderboard">♜</button>
           <button onClick={() => show('Settings coming soon')} aria-label="Open settings">⚙</button>
         </div>
       </header>
@@ -143,6 +167,7 @@ export default function KingdomHome() {
       </nav>
       <div className={`kh-toast${notice ? ' visible' : ''}`} role="status">{notice}</div>
       {battlePicker && <BattlePicker onClose={() => setBattlePicker(false)} onChoose={chooseOpponent} />}
+      {leaderboard && <Leaderboard onClose={() => setLeaderboard(false)} />}
       {battleLoading && <BattleLoading closing={closingBattle} onBack={closeBattle} />}
       {rubyBattleMap && <RubyBattleMap onBack={() => { setRubyBattleMap(false); setBattleOpponent(null) }} />}
     </main>
