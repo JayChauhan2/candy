@@ -115,24 +115,30 @@ export const ClashVillageMap = () => {
     }
     addStorage(-7.2, -4.4, 0xffd138); addStorage(7, -4.3, 0xe568d3); addStorage(7, 5.6, 0x6bc9ed)
 
-    const addCannon = (x:number, z:number, rotation:number) => {
-      const group = new THREE.Group(); group.position.set(x, .38, z); group.rotation.y = rotation; island.add(group)
-      const base = new THREE.Mesh(new THREE.CylinderGeometry(.76, .98, .5, 10), makeMaterial(0x8a9497)); base.castShadow = true; group.add(base)
-      const carriage = new THREE.Mesh(new THREE.BoxGeometry(1.25,.42,.75),makeMaterial(0x85543b));carriage.position.y=.42;carriage.castShadow=true;group.add(carriage)
-      const barrel = new THREE.Mesh(new THREE.CylinderGeometry(.25, .34, 1.75, 8), makeMaterial(0x3c4c53, .4)); barrel.rotation.z = Math.PI / 2; barrel.position.set(.8,.68,0); barrel.castShadow = true; group.add(barrel)
-      ;[-.42,.42].forEach((wheelZ)=>{const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.18,10),makeMaterial(0x604335));wheel.rotation.x=Math.PI/2;wheel.position.set(-.18,.36,wheelZ);wheel.castShadow=true;group.add(wheel)})
-      const shield = new THREE.Mesh(new THREE.ConeGeometry(.52,.12,6),makeMaterial(0xd1a660));shield.rotation.x=Math.PI/2;shield.position.set(.1,.83,0);group.add(shield)
+    // Individual blue-and-yellow landmark huts replace the generic box monuments.
+    const addHut = (x:number, z:number, scale=1) => {
+      const group = new THREE.Group(); group.position.set(x,.38,z); group.scale.setScalar(scale); island.add(group)
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(1.48,1.66,.28,10),makeMaterial(0x8f7655));base.position.y=.14;base.castShadow=true;group.add(base)
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(1.22,1.42,1.9,10),makeMaterial(0xe0ba58));body.position.y=1.08;body.castShadow=true;group.add(body)
+      const belt = new THREE.Mesh(new THREE.TorusGeometry(1.26,.1,7,10),makeMaterial(0x3e6fa5));belt.rotation.x=Math.PI/2;belt.position.y=1.23;group.add(belt)
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(1.76,2.15,8),makeMaterial(0x396eaa));roof.position.y=2.98;roof.rotation.y=Math.PI/8;roof.castShadow=true;group.add(roof)
+      const roofBand = new THREE.Mesh(new THREE.TorusGeometry(1.32,.11,7,10),makeMaterial(0xf1ca50));roofBand.rotation.x=Math.PI/2;roofBand.position.y=2.05;group.add(roofBand)
+      const door = new THREE.Mesh(new THREE.PlaneGeometry(.56,.94),makeMaterial(0x65452e));door.position.set(0,.86,-1.43);group.add(door)
+      ;[-.55,.55].forEach((side)=>{const window=new THREE.Mesh(new THREE.CircleGeometry(.18,7),makeMaterial(0x467eb7));window.position.set(side,1.25,-1.3);group.add(window)})
+      const chimney = new THREE.Mesh(new THREE.CylinderGeometry(.18,.24,.85,6),makeMaterial(0x8b6349));chimney.position.set(.58,3.28,.18);chimney.castShadow=true;group.add(chimney)
     }
-    addCannon(-10, 4.7, .3); addCannon(9, 4.4, 2.8); addCannon(-8.8, -7, -.6)
-    const addTower = (x:number,z:number) => {
-      const foot = new THREE.Mesh(new THREE.CylinderGeometry(1.05,1.24,.35,10),makeMaterial(0x747f87));foot.position.set(x,.55,z);foot.castShadow=true;island.add(foot)
-      const tower = new THREE.Mesh(new THREE.CylinderGeometry(.82,.98,3.2,10),makeMaterial(0xaeb5b7));tower.position.set(x,2.1,z);tower.castShadow=true;island.add(tower)
-      const trim = new THREE.Mesh(new THREE.TorusGeometry(.88,.09,7,10),makeMaterial(0x6d7780));trim.rotation.x=Math.PI/2;trim.position.set(x,3.5,z);island.add(trim)
-      const roof = new THREE.Mesh(new THREE.ConeGeometry(1.04,1.7,6),makeMaterial(0xb95448));roof.position.set(x,4.5,z);roof.castShadow=true;island.add(roof)
-      const window=new THREE.Mesh(new THREE.PlaneGeometry(.28,.62),makeMaterial(0x355270));window.position.set(x,2.25,z-.83);island.add(window)
-      const pennant = new THREE.Mesh(new THREE.PlaneGeometry(.62,.38),new THREE.MeshBasicMaterial({color:0xf0b933,side:THREE.DoubleSide}));pennant.position.set(x+.3,5.45,z);pennant.rotation.y=Math.PI/2;island.add(pennant)
+    const windmillRotors: THREE.Group[] = []
+    const addWindmill = (x:number,z:number) => {
+      const group=new THREE.Group();group.position.set(x,.38,z);island.add(group)
+      const base=new THREE.Mesh(new THREE.CylinderGeometry(1.65,2.05,.34,10),makeMaterial(0x8d7658));base.position.y=.17;group.add(base)
+      const body=new THREE.Mesh(new THREE.CylinderGeometry(.88,1.38,4.3,8),makeMaterial(0xe0ba58));body.position.y=2.32;body.castShadow=true;group.add(body)
+      const roof=new THREE.Mesh(new THREE.ConeGeometry(1.38,1.75,8),makeMaterial(0x386ba3));roof.position.y=5.35;roof.castShadow=true;group.add(roof)
+      const door=new THREE.Mesh(new THREE.PlaneGeometry(.48,.95),makeMaterial(0x65452e));door.position.set(0,.88,-1.4);group.add(door)
+      const rotor=new THREE.Group();rotor.position.set(0,3.72,-.98);group.add(rotor);windmillRotors.push(rotor)
+      const hub=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,.24,8),makeMaterial(0x7a563d));hub.rotation.x=Math.PI/2;rotor.add(hub)
+      for(let i=0;i<4;i++){const angle=i*Math.PI/2;const blade=new THREE.Mesh(new THREE.BoxGeometry(.34,1.8,.08),makeMaterial(i%2?0xf1ca50:0x4d80b8));blade.position.set(Math.sin(angle)*.74,Math.cos(angle)*.74,0);blade.rotation.z=-angle;rotor.add(blade)}
     }
-    addTower(-10, -.1); addTower(10, -.5); addTower(-1, 8.6)
+    addHut(-10,4.7,1.05); addHut(9,4.4,.98); addHut(-8.8,-7,.95); addWindmill(11,-.7)
     const addTree = (x:number,z:number,scale=.85) => {
       const group = new THREE.Group(); group.position.set(x,.4,z); group.scale.setScalar(scale); island.add(group)
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929)); trunk.position.y=.62; trunk.castShadow=true;group.add(trunk)
@@ -155,22 +161,23 @@ export const ClashVillageMap = () => {
     addAnimal(-13,-9,'sheep',0); addAnimal(-13,-9,'sheep',2.1); addAnimal(12,9,'deer',.9); addAnimal(12,9,'deer',3.4)
 
     // A few simple low-poly birds cross the open sky, flapping independently.
-    const birds: { group: THREE.Group; phase: number; speed: number; startX: number; startZ: number }[] = []
+    const birds: { group: THREE.Group; phase: number; speed: number; startX: number; startZ: number; altitude: number }[] = []
     const addBird = (startX:number, startZ:number, phase:number) => {
-      const group = new THREE.Group(); group.position.set(startX, 10 + (phase % 2) * 1.2, startZ); scene.add(group)
+      const altitude = 10 + (phase % 3) * 1.25
+      const group = new THREE.Group(); group.position.set(startX, altitude, startZ); scene.add(group)
       const wingMat = new THREE.MeshBasicMaterial({ color: 0x34445a, side: THREE.DoubleSide })
       const left = new THREE.Mesh(new THREE.PlaneGeometry(.72,.26),wingMat); left.position.x=-.34; left.rotation.z=.34;group.add(left)
       const right = new THREE.Mesh(new THREE.PlaneGeometry(.72,.26),wingMat); right.position.x=.34; right.rotation.z=-.34;group.add(right)
-      birds.push({ group, phase, speed: .85 + (phase%3)*.08, startX, startZ })
+      birds.push({ group, phase, speed: .045 + (phase%3)*.009, startX, startZ, altitude })
     }
     addBird(-23,-10,0); addBird(-18,-13,1.4); addBird(-25,-6,2.8); addBird(-20,-3,4.1)
 
     const resize = () => { const { width, height } = host.getBoundingClientRect(); renderer.setSize(width, height, false); const aspect = width / height; camera.left = -20 * aspect; camera.right = 20 * aspect; camera.top = 12; camera.bottom = -12; camera.updateProjectionMatrix() }
     resize(); window.addEventListener('resize', resize)
-    let pointerX = 0, pointerY = 0, frame = 0
-    const move = (event:PointerEvent) => { pointerX = event.clientX / window.innerWidth - .5; pointerY = event.clientY / window.innerHeight - .5 }
+    let pointerX = 0, pointerY = 0, lookX = 0, lookZ = 0, frame = 0
+    const move = (event:PointerEvent) => { const rect=host.getBoundingClientRect(); pointerX = (event.clientX-rect.left) / rect.width - .5; pointerY = (event.clientY-rect.top) / rect.height - .5 }
     host.addEventListener('pointermove', move)
-    const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; island.rotation.y = Math.sin(time * .16) * .012 + pointerX * .035; camera.position.x = 22 + pointerX * 2.2; camera.position.y = 28 - pointerY * 1.2; camera.lookAt(0,0,0); flag.rotation.z = Math.sin(time * 2.3) * .08; animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*46; bird.group.position.z = bird.startZ + Math.sin(time + bird.phase)*1.2; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.2 + Math.sin(time*9+bird.phase)*.58) }) }); renderer.render(scene, camera) }
+    const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; lookX += (-pointerX*10-lookX)*.055; lookZ += (-pointerY*7-lookZ)*.055; island.rotation.y = Math.sin(time * .16) * .008 + pointerX * .02; camera.position.x = 22 + pointerX * 12; camera.position.z = 26 - pointerX * 9; camera.position.y = 28 - pointerY * 4; camera.lookAt(lookX,0,lookZ); flag.rotation.z = Math.sin(time * 2.3) * .08; animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); windmillRotors.forEach((rotor,index)=>{rotor.rotation.z=time*(.75+index*.15)}); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*54; bird.group.position.y = bird.altitude + Math.sin(time*1.1+bird.phase)*.22; bird.group.position.z = bird.startZ + Math.sin(time*.32+bird.phase)*2.1; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.28 + Math.sin(time*4.1+bird.phase)*.38) }) }); renderer.render(scene, camera) }
     animate()
     return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); host.removeEventListener('pointermove', move); renderer.dispose(); host.removeChild(renderer.domElement) }
   }, [])
