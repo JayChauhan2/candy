@@ -1,12 +1,17 @@
 import { useState } from 'react'
+import battleIcon from './assets/battle.png'
+import journalIcon from './assets/journal.png'
+import shopIcon from './assets/shop.png'
+import troopsIcon from './assets/troops.png'
 import { ClashVillageMap } from './components/ClashVillageMap'
 import './kingdom-home.css'
+import './icon-overrides.css'
 
 type Notice = string | null
 
-const HUDButton = ({ label, icon, notice, onClick }: { label: string; icon: string; notice?: string; onClick: () => void }) => (
+const HUDButton = ({ label, icon, image, notice, onClick }: { label: string; icon?: string; image?: string; notice?: string; onClick: () => void }) => (
   <button className="kh-dock-item" onClick={onClick} aria-label={label}>
-    <span className="kh-dock-icon">{icon}</span>
+    <span className="kh-dock-icon">{image ? <img src={image} alt="" /> : icon}</span>
     <b>{label}</b>
     {notice && <i>{notice}</i>}
   </button>
@@ -85,11 +90,11 @@ export default function KingdomHome() {
       </aside>
 
       <nav className="kh-dock" aria-label="Game actions">
-        <HUDButton label="SHOP" icon="⌂" onClick={() => show('Shop selected')} />
-        <HUDButton label="TROOPS" icon="♟" notice="3" onClick={() => show('Three troops are ready')} />
-        <button className="kh-battle" onClick={() => setBattleLoading(true)}><span>⚔</span><b>BATTLE!</b><small>TOAD RALLY</small></button>
+        <HUDButton label="SHOP" image={shopIcon} onClick={() => show('Shop selected')} />
+        <HUDButton label="TROOPS" image={troopsIcon} notice="3" onClick={() => show('Three troops are ready')} />
+        <button className="kh-battle" onClick={() => setBattleLoading(true)}><img className="kh-battle-icon" src={battleIcon} alt="" /><b>BATTLE!</b><small>TOAD RALLY</small></button>
         <HUDButton label="FRIENDS" icon="♛" notice="1" onClick={() => show('One friend request')} />
-        <HUDButton label="JOURNAL" icon="▤" onClick={() => show('Kingdom journal selected')} />
+        <HUDButton label="JOURNAL" image={journalIcon} onClick={() => show('Kingdom journal selected')} />
       </nav>
       <div className={`kh-toast${notice ? ' visible' : ''}`} role="status">{notice}</div>
       {battleLoading && <BattleLoading closing={closingBattle} onBack={closeBattle} />}
