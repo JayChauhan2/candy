@@ -66,6 +66,7 @@ export const ClashVillageMap = () => {
     addPath(0, -4.6, 0, -13); addPath(4.8, 0, 12, 0); addPath(-4.8, 0, -12, 1); addPath(0, 4.6, -1, 11)
     addPath(-12, 1, -15, 6, .8); addPath(12, 0, 15, -5, .8); addPath(-1, 11, 7, 13, .8)
     addPath(12,0,8,-10,.8); addPath(-12,1,-10,-8,.8); addPath(0,-13,7,-11,.85)
+    addPath(0,4.9,0,31,2.25)
 
     const addBox = (width:number, height:number, depth:number, color:number, x:number, z:number) => {
       const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), makeMaterial(color))
@@ -119,6 +120,18 @@ export const ClashVillageMap = () => {
     }
     // Three small residential neighborhoods connected by the village paths.
     ;[[-15,5,.88],[-13,7,.76],[-16,8,.78],[-14,-7,.82],[-16,-10,.76], [14,-5,.9],[16,-3,.75],[13,-7,.78], [14,10,.8],[17,11,.76], [6,13,.8],[9,13,.9],[7,15,.72]].forEach(([x,z,s], index) => addHouse(x,z,index%2?0xe0bd78:0xd8a76a,index%3?0xc85b43:0x627492,s))
+
+    // Open-front stable beside the castle's main exit, with two visible horses in their stalls.
+    const addHorseShed = (x:number,z:number) => {
+      const shed=new THREE.Group();shed.position.set(x,.38,z);island.add(shed)
+      const floor=new THREE.Mesh(new THREE.BoxGeometry(3.35,.18,2.65),makeMaterial(0x9b7b58));floor.position.y=.09;floor.receiveShadow=true;shed.add(floor)
+      const back=new THREE.Mesh(new THREE.BoxGeometry(3.2,2.2,.18),makeMaterial(0xb18d63));back.position.set(0,1.2,-1.2);back.castShadow=true;shed.add(back)
+      ;[[-1.42,-1.08], [1.42,-1.08], [-1.42,1.08], [1.42,1.08]].forEach(([px,pz])=>{const post=new THREE.Mesh(new THREE.CylinderGeometry(.11,.14,2.65,6),makeMaterial(0x72513a));post.position.set(px,1.33,pz);post.castShadow=true;shed.add(post)})
+      const roof=new THREE.Mesh(new THREE.ConeGeometry(2.5,1.5,4),makeMaterial(0x6f8fa0));roof.position.y=3.12;roof.rotation.y=Math.PI/4;roof.castShadow=true;shed.add(roof)
+      const makeHorse = (hx:number) => {const horse=new THREE.Group();horse.position.set(hx,.18,.12);shed.add(horse);const body=new THREE.Mesh(new THREE.SphereGeometry(.48,8,6),makeMaterial(0x8a5d43));body.scale.set(1.35,.78,.78);body.position.y=.64;horse.add(body);const neck=new THREE.Mesh(new THREE.CylinderGeometry(.17,.23,.58,6),makeMaterial(0x8a5d43));neck.position.set(.46,.95,0);neck.rotation.z=-.45;horse.add(neck);const head=new THREE.Mesh(new THREE.SphereGeometry(.22,7,6),makeMaterial(0x744832));head.position.set(.66,1.2,0);horse.add(head);for(const [lx,lz] of [[-.28,-.22],[-.28,.22],[.3,-.22],[.3,.22]]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.045,.055,.52,5),makeMaterial(0x543729));leg.position.set(lx,.28,lz);horse.add(leg)}}
+      makeHorse(-.65);makeHorse(.65)
+    }
+    addHorseShed(5.4,6.9)
 
     const addStorage = (x:number, z:number, liquid:number) => {
       const group = new THREE.Group(); group.position.set(x, .38, z); island.add(group)
@@ -195,11 +208,13 @@ export const ClashVillageMap = () => {
       const seed=forestIndex*17.41, angle=(i/treesPerBand)*Math.PI*2+band*.19
       const radius=21+band*2.85+Math.sin(seed)*.78, scale=.76+((i*7+band*3)%8)*.1
       const x=Math.cos(angle)*radius*1.18, z=Math.sin(angle)*radius*.9
+      // Leave a single wide woodland corridor aligned with the castle's forward exit road.
+      if(z>6 && Math.abs(x)<3.3) continue
       treeMatrix.position.set(x,.4+(.62*scale),z);treeMatrix.rotation.set(0,angle+.22,0);treeMatrix.scale.setScalar(scale);treeMatrix.updateMatrix();forestTrunks.setMatrixAt(forestIndex,treeMatrix.matrix)
       treeMatrix.position.set(x,.4+(1.85*scale),z);treeMatrix.scale.setScalar(scale);treeMatrix.updateMatrix();forestLeaves.setMatrixAt(forestIndex,treeMatrix.matrix)
       forestIndex++
     }
-    forestTrunks.instanceMatrix.needsUpdate=true;forestLeaves.instanceMatrix.needsUpdate=true;island.add(forestTrunks,forestLeaves)
+    forestTrunks.count=forestIndex;forestLeaves.count=forestIndex;forestTrunks.instanceMatrix.needsUpdate=true;forestLeaves.instanceMatrix.needsUpdate=true;island.add(forestTrunks,forestLeaves)
     for (let i=0;i<58;i++) { const angle=i*2.4, radius=17+(i%4)*2.3; const bush=new THREE.Mesh(new THREE.DodecahedronGeometry(.28+(i%4)*.05),makeMaterial(i%5?0x71986c:0xe9e8d5)); bush.position.set(Math.cos(angle)*radius,.24,Math.sin(angle)*radius*.74);bush.castShadow=true;island.add(bush) }
 
     // Shared stone well at the end of the upper-right village path.
