@@ -200,14 +200,13 @@ export const ClashVillageMap = () => {
       for(let i=0;i<4;i++){const angle=i*Math.PI/2;const blade=new THREE.Mesh(new THREE.BoxGeometry(.34,1.8,.08),makeMaterial(i%2?0xf1ca50:0x4d80b8));blade.position.set(Math.sin(angle)*.74,Math.cos(angle)*.74,0);blade.rotation.z=-angle;rotor.add(blade)}
     }
     const addFarmstead = (x:number,z:number) => {
-      addHut(x,z,'farm',1.18)
       const soil = new THREE.Mesh(new THREE.PlaneGeometry(5.1,3.6),makeMaterial(0x887052));soil.rotation.x=-Math.PI/2;soil.position.set(x+1.2,.08,z-4.0);island.add(soil)
       // Simple hand-built fence enclosing the crop plot.
       const railMat=makeMaterial(0x86634a)
       ;[[0,-1.8,5.2,.13],[0,1.8,5.2,.13],[-2.6,0,.13,3.7],[2.6,0,.13,3.7]].forEach(([dx,dz,w,d])=>{const rail=new THREE.Mesh(new THREE.BoxGeometry(w,.14,d),railMat);rail.position.set(x+1.2+dx,.48,z-4+dz);rail.castShadow=true;island.add(rail)})
       for(let row=0;row<4;row++)for(let col=0;col<6;col++){const crop=new THREE.Mesh(new THREE.ConeGeometry(.11,.62,5),makeMaterial((row+col)%4?0x7ea459:0xd2ba4d));crop.position.set(x-.63+col*.72,.36,z-5.1+row*.72);island.add(crop)}
     }
-    addHut(-10,4.7,'farm',1.05); addHut(9,4.4,'forge',.98); addHut(-8.8,-7,'depot',.95); addFarmstead(-20,-2); addWindmill(10,-13)
+    addHut(-10,4.7,'farm',1.05); addHut(9,4.4,'forge',.98); addHut(-8.8,-7,'depot',.95); addFarmstead(5,-11); addHut(-20,-2,'farm',1.18); addWindmill(10,-13)
 
     // Civic landmarks make the settlement read as a lived-in, defended civilization.
     const addWatchPost = (x:number,z:number) => {
