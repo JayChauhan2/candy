@@ -56,6 +56,14 @@ export default function KingdomHome() {
         <button onClick={() => show('Bob-omb Bonanza selected')} aria-label="Open event">›</button>
       </aside>
 
+      <aside className="kh-map-key" aria-label="Landmark key">
+        <b>MAP KEY</b>
+        <div><span>A</span> Castle <span>B</span> Well <span>C</span> Farm <span>D</span> Windmill</div>
+        <div><span>E</span> Stable <span>F</span> Market <span>G</span> Training yard</div>
+        <div><span>H</span> Blue storage <span>I</span> Forge <span>J</span> Depot</div>
+        <div><span>K–N</span> Watch posts</div>
+      </aside>
+
       <nav className="kh-dock" aria-label="Game actions">
         <HUDButton label="SHOP" icon="⌂" onClick={() => show('Shop selected')} />
         <HUDButton label="TROOPS" icon="♟" notice="3" onClick={() => show('Three troops are ready')} />
@@ -67,4 +75,3 @@ export default function KingdomHome() {
     </main>
   )
 }
-

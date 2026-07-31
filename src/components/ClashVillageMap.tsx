@@ -238,6 +238,19 @@ export const ClashVillageMap = () => {
     addMarket(12,11);addTrainingYard(-5.8,7.5)
     addSignpost(7.5,-3);addSignpost(-7,2);addSignpost(5,-10);addSignpost(-14,-7)
     addLantern(-2.1,6.5);addLantern(2.1,6.5);addLantern(-13,5);addLantern(-12,-8);addLantern(12,-5);addLantern(7,12)
+
+    // Floating letter pins let feedback refer to a precise landmark without ambiguity.
+    const addLandmarkPin = (letter:string,x:number,z:number,y:number) => {
+      const canvas=document.createElement('canvas');canvas.width=80;canvas.height=80
+      const ctx=canvas.getContext('2d');if(!ctx)return
+      ctx.fillStyle='#fffaf0';ctx.strokeStyle='#394b58';ctx.lineWidth=7;ctx.beginPath();ctx.arc(40,40,30,0,Math.PI*2);ctx.fill();ctx.stroke()
+      ctx.fillStyle='#394b58';ctx.font='700 42px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(letter,40,43)
+      const pin=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),depthTest:false}));pin.position.set(x,y,z);pin.scale.set(1.05,1.05,1);scene.add(pin)
+    }
+    addLandmarkPin('A',0,0,9.8);addLandmarkPin('B',2.25,-12.15,3.5);addLandmarkPin('C',5,-11,4.7);addLandmarkPin('D',10,-13,7.2)
+    addLandmarkPin('E',15,-14,4.5);addLandmarkPin('F',12,11,4.1);addLandmarkPin('G',-5.8,7.5,3.3);addLandmarkPin('H',14,2.2,3.8)
+    addLandmarkPin('I',9,4.4,4);addLandmarkPin('J',-8.8,-7,3.8);addLandmarkPin('K',-21,13,5.2);addLandmarkPin('L',20,-11,5.2)
+    addLandmarkPin('M',-5.1,20,5.2);addLandmarkPin('N',5.1,20,5.2)
     const addTree = (x:number,z:number,scale=.85) => {
       const group = new THREE.Group(); group.position.set(x,.4,z); group.scale.setScalar(scale); island.add(group)
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929)); trunk.position.y=.62; trunk.castShadow=true;group.add(trunk)
