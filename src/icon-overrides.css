@@ -20,6 +20,7 @@
 .battle-sky-shine{display:none}
 
 .kh-resource>span img{display:block;width:34px;height:34px;object-fit:contain}
+.kh-gold>span,.kh-gems>span,.kh-stars>span{background:transparent!important;clip-path:none!important;color:transparent!important;text-shadow:none!important}
 
 /* Every action control uses the same centered icon-over-label rhythm. */
 .kh-dock-item{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0}
