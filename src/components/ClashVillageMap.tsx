@@ -204,6 +204,32 @@ export const ClashVillageMap = () => {
       for(let row=0;row<4;row++)for(let col=0;col<6;col++){const crop=new THREE.Mesh(new THREE.ConeGeometry(.11,.62,5),makeMaterial((row+col)%4?0x7ea459:0xd2ba4d));crop.position.set(x-.63+col*.72,.36,z-5.1+row*.72);island.add(crop)}
     }
     addHut(-10,4.7,'farm',1.05); addHut(9,4.4,'forge',.98); addHut(-8.8,-7,'depot',.95); addFarmstead(5,-11); addWindmill(10,-13)
+
+    // Civic landmarks make the settlement read as a lived-in, defended civilization.
+    const addWatchPost = (x:number,z:number) => {
+      const post=new THREE.Group();post.position.set(x,.38,z);island.add(post)
+      const base=new THREE.Mesh(new THREE.CylinderGeometry(1.12,1.3,.36,8),makeMaterial(0x8e8a7d));base.position.y=.18;post.add(base)
+      ;[[-.62,-.62],[.62,-.62],[-.62,.62],[.62,.62]].forEach(([px,pz])=>{const leg=new THREE.Mesh(new THREE.CylinderGeometry(.11,.15,2.65,6),makeMaterial(0x77543b));leg.position.set(px,1.65,pz);leg.castShadow=true;post.add(leg)})
+      const platform=new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.1,.19,8),makeMaterial(0x8a664a));platform.position.y=2.82;post.add(platform)
+      const roof=new THREE.Mesh(new THREE.ConeGeometry(1.48,1.08,4),makeMaterial(0x6d91a1));roof.position.y=3.62;roof.rotation.y=Math.PI/4;roof.castShadow=true;post.add(roof)
+      const banner=new THREE.Mesh(new THREE.PlaneGeometry(.68,.46),new THREE.MeshBasicMaterial({color:0xd4ad50,side:THREE.DoubleSide}));banner.position.set(.38,4.35,0);banner.rotation.y=Math.PI/2;post.add(banner)
+    }
+    const addMarket = (x:number,z:number) => {
+      const market=new THREE.Group();market.position.set(x,.38,z);island.add(market)
+      const table=new THREE.Mesh(new THREE.BoxGeometry(2.65,.7,1.15),makeMaterial(0x8b674b));table.position.y=.65;market.add(table)
+      const canopy=new THREE.Mesh(new THREE.ConeGeometry(2.0,.62,4),makeMaterial(0x718fa3));canopy.position.y=2.52;canopy.rotation.y=Math.PI/4;market.add(canopy)
+      ;[[-1.1,-.45],[1.1,-.45],[-1.1,.45],[1.1,.45]].forEach(([px,pz])=>{const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,2.05,5),makeMaterial(0x765139));pole.position.set(px,1.3,pz);market.add(pole)})
+      ;[[-.65,0],[0,.12],[.65,-.08]].forEach(([px,pz],i)=>{const basket=new THREE.Mesh(new THREE.SphereGeometry(.22,7,5),makeMaterial(i===1?0xd1a650:0x9c7449));basket.scale.y=.6;basket.position.set(px,1.14,pz);market.add(basket)})
+    }
+    const addTrainingYard = (x:number,z:number) => {
+      const yard=new THREE.Group();yard.position.set(x,.38,z);island.add(yard)
+      const dirt=new THREE.Mesh(new THREE.CircleGeometry(2.05,12),makeMaterial(0xbda978));dirt.rotation.x=-Math.PI/2;dirt.position.y=.03;yard.add(dirt)
+      for(let i=0;i<5;i++){const a=i*Math.PI*2/5;const fence=new THREE.Mesh(new THREE.BoxGeometry(.16,.65,.16),makeMaterial(0x7c583d));fence.position.set(Math.cos(a)*1.8,.33,Math.sin(a)*1.8);yard.add(fence)}
+      ;[[-.48,0],[.55,.35]].forEach(([px,pz])=>{const dummy=new THREE.Group();dummy.position.set(px,.15,pz);yard.add(dummy);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.07,.09,1.2,6),makeMaterial(0x765139));pole.position.y=.6;dummy.add(pole);const target=new THREE.Mesh(new THREE.SphereGeometry(.28,7,6),makeMaterial(0xd7ba73));target.position.y=1.25;dummy.add(target)})
+    }
+    const addSignpost = (x:number,z:number) => {const sign=new THREE.Group();sign.position.set(x,.38,z);island.add(sign);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.09,1.25,6),makeMaterial(0x755038));pole.position.y=.63;sign.add(pole);const arm=new THREE.Mesh(new THREE.BoxGeometry(.9,.25,.1),makeMaterial(0xceb16c));arm.position.set(.28,1.12,0);arm.rotation.y=.2;sign.add(arm)}
+    const addLantern = (x:number,z:number) => {const post=new THREE.Group();post.position.set(x,.38,z);island.add(post);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,1.35,6),makeMaterial(0x5e4b3b));pole.position.y=.68;post.add(pole);const light=new THREE.Mesh(new THREE.OctahedronGeometry(.16),makeMaterial(0xf2d77b,.35));light.position.y=1.42;post.add(light)}
+    addWatchPost(-4.1,16);addWatchPost(4.1,16);addMarket(11,10.5);addTrainingYard(-5.8,7.5);addSignpost(7.5,-3);addSignpost(-7,2);addLantern(-2.1,6.5);addLantern(2.1,6.5)
     const addTree = (x:number,z:number,scale=.85) => {
       const group = new THREE.Group(); group.position.set(x,.4,z); group.scale.setScalar(scale); island.add(group)
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929)); trunk.position.y=.62; trunk.castShadow=true;group.add(trunk)
