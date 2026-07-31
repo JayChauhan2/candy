@@ -234,17 +234,19 @@ export const ClashVillageMap = () => {
     const campfireFlames: THREE.Mesh[] = []
     const addCampfire = (x:number,z:number) => {
       const fire=new THREE.Group();fire.position.set(x,.39,z);island.add(fire);addGroundTuft(x-1.15,z-.62,.7);addGroundTuft(x+1.1,z+.55,.6)
-      for(let i=0;i<8;i++){const a=i*Math.PI*2/8;const stone=new THREE.Mesh(new THREE.DodecahedronGeometry(.22,0),makeMaterial(i%2?0x8d887d:0xa6a091));stone.position.set(Math.cos(a)*.82,.19,Math.sin(a)*.82);stone.scale.set(1,.58,.8);fire.add(stone)}
-      ;[-.42,.42].forEach((offset,index)=>{const log=new THREE.Mesh(new THREE.CylinderGeometry(.12,.16,1.45,6),makeMaterial(0x71442f));log.rotation.z=Math.PI/2;log.rotation.y=index?Math.PI/2:0;log.position.set(0,.27,offset);fire.add(log)})
-      const outer=new THREE.Mesh(new THREE.ConeGeometry(.46,1.25,6),makeMaterial(0xe85c2e,.45));outer.position.y=.93;fire.add(outer);campfireFlames.push(outer)
-      const inner=new THREE.Mesh(new THREE.ConeGeometry(.24,.82,6),makeMaterial(0xffcf4d,.4));inner.position.set(.04,1.02,.02);fire.add(inner);campfireFlames.push(inner)
+      const ash=new THREE.Mesh(new THREE.CylinderGeometry(.72,.88,.12,10),makeMaterial(0x5b554c));ash.position.y=.08;fire.add(ash)
+      for(let i=0;i<8;i++){const a=i*Math.PI*2/8;const stone=new THREE.Mesh(new THREE.DodecahedronGeometry(.22,0),makeMaterial(i%2?0x8d887d:0xa6a091));stone.position.set(Math.cos(a)*.82,.18,Math.sin(a)*.82);stone.scale.set(1,.58,.8);fire.add(stone)}
+      ;[-.42,.42].forEach((offset,index)=>{const log=new THREE.Mesh(new THREE.CylinderGeometry(.12,.16,1.45,6),makeMaterial(0x71442f));log.rotation.z=Math.PI/2;log.rotation.y=index?Math.PI/2:0;log.position.set(0,.25,offset);fire.add(log)})
+      const ember=new THREE.Mesh(new THREE.SphereGeometry(.36,7,5),makeMaterial(0xff983d,.35));ember.scale.y=.32;ember.position.y=.34;fire.add(ember)
+      const outer=new THREE.Mesh(new THREE.ConeGeometry(.4,.76,6),makeMaterial(0xe85c2e,.45));outer.position.y=.69;fire.add(outer);campfireFlames.push(outer)
+      const inner=new THREE.Mesh(new THREE.ConeGeometry(.19,.48,6),makeMaterial(0xffdc63,.4));inner.position.set(.04,.72,.02);fire.add(inner);campfireFlames.push(inner)
       for(let i=0;i<4;i++){const smokeMat=new THREE.MeshStandardMaterial({color:0xd9dde0,roughness:1,flatShading:true,transparent:true,opacity:.34,depthWrite:false});const puff=new THREE.Mesh(new THREE.IcosahedronGeometry(.28+i*.035,1),smokeMat);fire.add(puff);campfireSmoke.push({puff,material:smokeMat,phase:i*.23,x,z})}
     }
     const addSignpost = (x:number,z:number) => {const sign=new THREE.Group();sign.position.set(x,.38,z);island.add(sign);addGroundTuft(x-.2,z+.18,.72);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.09,1.25,6),makeMaterial(0x755038));pole.position.y=.63;sign.add(pole);const arm=new THREE.Mesh(new THREE.BoxGeometry(.9,.25,.1),makeMaterial(0xceb16c));arm.position.set(.28,1.12,0);arm.rotation.y=.2;sign.add(arm)}
     const addLantern = (x:number,z:number) => {const post=new THREE.Group();post.position.set(x,.38,z);island.add(post);addGroundTuft(x+.12,z-.12,.65);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,1.35,6),makeMaterial(0x5e4b3b));pole.position.y=.68;post.add(pole);const light=new THREE.Mesh(new THREE.OctahedronGeometry(.16),makeMaterial(0xf2d77b,.35));light.position.y=1.42;post.add(light)}
     addWatchPost(-5.1,17);addWatchPost(5.1,17);addWatchPost(16,-12)
     addMarket(12,11)
-    addCampfire(-17.5,-4.4)
+    addCampfire(-12.3,-10.6)
     addSignpost(7.5,-3);addSignpost(-7,2);addSignpost(5,-10);addSignpost(-14,-7)
     addLantern(-2.1,6.5);addLantern(2.1,6.5);addLantern(-13,5);addLantern(-12,-8);addLantern(12,-5);addLantern(7,12)
 
@@ -258,7 +260,7 @@ export const ClashVillageMap = () => {
     }
     addLandmarkPin('A',0,0,9.8);addLandmarkPin('B',2.25,-12.15,3.5);addLandmarkPin('C',-20,-2,4.7);addLandmarkPin('D',10,-13,7.2)
     addLandmarkPin('E',-5.8,7.5,4.5);addLandmarkPin('F',12,11,4.1);addLandmarkPin('H',14,2.2,3.8)
-    addLandmarkPin('I',9,4.4,4);addLandmarkPin('J',-8.8,-7,3.8);addLandmarkPin('L',16,-12,5.2);addLandmarkPin('CF',-17.5,-4.4,4.2)
+    addLandmarkPin('I',9,4.4,4);addLandmarkPin('J',-8.8,-7,3.8);addLandmarkPin('L',16,-12,5.2);addLandmarkPin('CF',-12.3,-10.6,3.6)
     addLandmarkPin('M',-5.1,17,5.2);addLandmarkPin('N',5.1,17,5.2)
     homeSites.forEach(([x,z],index)=>addLandmarkPin(`H${index+1}`,x,z,3.7))
     addLandmarkPin('S1',-7.2,-4.4,3.8);addLandmarkPin('S2',7,-4.3,3.8);addLandmarkPin('S3',7,5.6,3.8)
