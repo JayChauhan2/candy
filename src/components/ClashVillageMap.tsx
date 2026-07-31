@@ -116,7 +116,7 @@ export const ClashVillageMap = () => {
     addStorage(-7.2, -4.4, 0xffd138); addStorage(7, -4.3, 0xe568d3); addStorage(7, 5.6, 0x6bc9ed)
 
     // Individual blue-and-yellow landmark huts replace the generic box monuments.
-    const addHut = (x:number, z:number, scale=1) => {
+    const addHut = (x:number, z:number, kind:'farm'|'forge'|'depot', scale=1) => {
       const group = new THREE.Group(); group.position.set(x,.38,z); group.scale.setScalar(scale); island.add(group)
       const base = new THREE.Mesh(new THREE.CylinderGeometry(1.48,1.66,.28,10),makeMaterial(0x8f7655));base.position.y=.14;base.castShadow=true;group.add(base)
       const body = new THREE.Mesh(new THREE.CylinderGeometry(1.22,1.42,1.9,10),makeMaterial(0xe0ba58));body.position.y=1.08;body.castShadow=true;group.add(body)
@@ -126,6 +126,19 @@ export const ClashVillageMap = () => {
       const door = new THREE.Mesh(new THREE.PlaneGeometry(.56,.94),makeMaterial(0x65452e));door.position.set(0,.86,-1.43);group.add(door)
       ;[-.55,.55].forEach((side)=>{const window=new THREE.Mesh(new THREE.CircleGeometry(.18,7),makeMaterial(0x467eb7));window.position.set(side,1.25,-1.3);group.add(window)})
       const chimney = new THREE.Mesh(new THREE.CylinderGeometry(.18,.24,.85,6),makeMaterial(0x8b6349));chimney.position.set(.58,3.28,.18);chimney.castShadow=true;group.add(chimney)
+      if (kind === 'farm') {
+        for (let row=0;row<3;row++) for(let col=0;col<3;col++){const crop=new THREE.Mesh(new THREE.ConeGeometry(.09,.52,5),makeMaterial(0xd9b83c));crop.position.set(-2.2+col*.43,.27,-.55+row*.42);group.add(crop)}
+        ;[[-1.85,-1.35],[-1.45,-1.2]].forEach(([bx,bz])=>{const bale=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,.46,8),makeMaterial(0xe5c55d));bale.rotation.z=Math.PI/2;bale.position.set(bx,.48,bz);group.add(bale)})
+      }
+      if (kind === 'forge') {
+        const anvil = new THREE.Mesh(new THREE.CylinderGeometry(.36,.22,.68,6),makeMaterial(0x48525a));anvil.position.set(-1.55,.66,-.5);group.add(anvil)
+        const fire = new THREE.Mesh(new THREE.ConeGeometry(.28,.65,6),makeMaterial(0xf29b35,.45));fire.position.set(-1.55,.74,-.5);group.add(fire)
+        ;[0,1,2].forEach((i)=>{const smoke=new THREE.Mesh(new THREE.DodecahedronGeometry(.15+i*.05),makeMaterial(0xd8e5e5));smoke.position.set(.58,4.05+i*.3,.18);group.add(smoke)})
+      }
+      if (kind === 'depot') {
+        ;[[-1.35,-.8],[-1.0,-.82],[-1.15,-.45]].forEach(([cx,cz])=>{const crate=new THREE.Mesh(new THREE.BoxGeometry(.38,.38,.38),makeMaterial(0x94613a));crate.position.set(cx,.38,cz);crate.rotation.y=.3;group.add(crate)})
+        const depotFlag=new THREE.Mesh(new THREE.PlaneGeometry(.74,.48),new THREE.MeshBasicMaterial({color:0x386ba3,side:THREE.DoubleSide}));depotFlag.position.set(-.94,2.95,.05);depotFlag.rotation.y=Math.PI/2;group.add(depotFlag)
+      }
     }
     const windmillRotors: THREE.Group[] = []
     const addWindmill = (x:number,z:number) => {
@@ -138,7 +151,7 @@ export const ClashVillageMap = () => {
       const hub=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,.24,8),makeMaterial(0x7a563d));hub.rotation.x=Math.PI/2;rotor.add(hub)
       for(let i=0;i<4;i++){const angle=i*Math.PI/2;const blade=new THREE.Mesh(new THREE.BoxGeometry(.34,1.8,.08),makeMaterial(i%2?0xf1ca50:0x4d80b8));blade.position.set(Math.sin(angle)*.74,Math.cos(angle)*.74,0);blade.rotation.z=-angle;rotor.add(blade)}
     }
-    addHut(-10,4.7,1.05); addHut(9,4.4,.98); addHut(-8.8,-7,.95); addWindmill(11,-.7)
+    addHut(-10,4.7,'farm',1.05); addHut(9,4.4,'forge',.98); addHut(-8.8,-7,'depot',.95); addWindmill(15,8)
     const addTree = (x:number,z:number,scale=.85) => {
       const group = new THREE.Group(); group.position.set(x,.4,z); group.scale.setScalar(scale); island.add(group)
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929)); trunk.position.y=.62; trunk.castShadow=true;group.add(trunk)
