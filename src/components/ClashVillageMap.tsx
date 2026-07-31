@@ -134,10 +134,9 @@ export const ClashVillageMap = () => {
     }
     // Three small residential neighborhoods connected by the village paths.
     // Neighborhoods are deliberately spaced into west, east, rear, and entrance districts.
-    ;[[-15,5,.88],[-13,7,.76],[-16,8,.78],[-14,-7,.82],[-16,-10,.76],
-      [14,-5,.9],[16,-3,.75],[18,-8,.78],
-      [-5,-14,.8],[-1,-16,.9],[4,-16,.72],
-      [15,12,.8],[18,14,.76]].forEach(([x,z,s], index) => addHouse(x,z,index%2?0xe0bd78:0xd8a76a,index%3?0xc85b43:0x627492,s))
+    const homeSites=[[-15,5,.88],[-13,7,.76],[-16,8,.78],[-14,-7,.82],[-16,-10,.76],
+      [14,-5,.9],[16,-3,.75],[18,-8,.78],[-5,-14,.8],[-1,-16,.9],[4,-16,.72],[15,12,.8],[18,14,.76]]
+    homeSites.forEach(([x,z,s], index) => addHouse(x,z,index%2?0xe0bd78:0xd8a76a,index%3?0xc85b43:0x627492,s))
 
     // Open-front stable beside the castle's main exit, with two visible horses in their stalls.
     const addHorseShed = (x:number,z:number) => {
@@ -244,13 +243,17 @@ export const ClashVillageMap = () => {
       const canvas=document.createElement('canvas');canvas.width=80;canvas.height=80
       const ctx=canvas.getContext('2d');if(!ctx)return
       ctx.fillStyle='#fffaf0';ctx.strokeStyle='#394b58';ctx.lineWidth=7;ctx.beginPath();ctx.arc(40,40,30,0,Math.PI*2);ctx.fill();ctx.stroke()
-      ctx.fillStyle='#394b58';ctx.font='700 42px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(letter,40,43)
+      ctx.fillStyle='#394b58';ctx.font=`700 ${letter.length>1?27:42}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(letter,40,43)
       const pin=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),depthTest:false}));pin.position.set(x,y,z);pin.scale.set(1.05,1.05,1);scene.add(pin)
     }
     addLandmarkPin('A',0,0,9.8);addLandmarkPin('B',2.25,-12.15,3.5);addLandmarkPin('C',5,-11,4.7);addLandmarkPin('D',10,-13,7.2)
     addLandmarkPin('E',15,-14,4.5);addLandmarkPin('F',12,11,4.1);addLandmarkPin('G',-5.8,7.5,3.3);addLandmarkPin('H',14,2.2,3.8)
     addLandmarkPin('I',9,4.4,4);addLandmarkPin('J',-8.8,-7,3.8);addLandmarkPin('K',-21,13,5.2);addLandmarkPin('L',20,-11,5.2)
     addLandmarkPin('M',-5.1,20,5.2);addLandmarkPin('N',5.1,20,5.2)
+    homeSites.forEach(([x,z],index)=>addLandmarkPin(`H${index+1}`,x,z,3.7))
+    addLandmarkPin('S1',-7.2,-4.4,3.8);addLandmarkPin('S2',7,-4.3,3.8);addLandmarkPin('S3',7,5.6,3.8)
+    addLandmarkPin('O1',-10,4.7,4);addLandmarkPin('P1',7.5,-3,2.7);addLandmarkPin('P2',-7,2,2.7);addLandmarkPin('P3',5,-10,2.7);addLandmarkPin('P4',-14,-7,2.7)
+    ;[[-2.1,6.5],[2.1,6.5],[-13,5],[-12,-8],[12,-5],[7,12]].forEach(([x,z],index)=>addLandmarkPin(`T${index+1}`,x,z,2.8))
     const addTree = (x:number,z:number,scale=.85) => {
       const group = new THREE.Group(); group.position.set(x,.4,z); group.scale.setScalar(scale); island.add(group)
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929)); trunk.position.y=.62; trunk.castShadow=true;group.add(trunk)
