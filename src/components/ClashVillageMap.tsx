@@ -49,6 +49,13 @@ export const ClashVillageMap = () => {
       ])
       const path = new THREE.Mesh(new THREE.TubeGeometry(curve,36,width*.48,8,false),pathMat)
       path.scale.y=.13; path.receiveShadow=true; island.add(path)
+      // Sparse, subdued tufts are only placed around the path edges to blend path and meadow.
+      for(let i=2;i<12;i+=3){
+        const t=i/12, point=curve.getPoint(t), tangent=curve.getTangent(t).normalize()
+        const side=(i%2?1:-1), nx=-tangent.z*side, nz=tangent.x*side
+        const tuft=new THREE.Group();tuft.position.set(point.x+nx*(width*.62),.12,point.z+nz*(width*.62));island.add(tuft)
+        for(let blade=0;blade<3;blade++){const grass=new THREE.Mesh(new THREE.ConeGeometry(.045,.3+blade*.055,3),makeMaterial(blade===1?0x84a77d:0x6f9870));grass.position.set((blade-1)*.07,(.15+blade*.03),blade%2*.05);grass.rotation.z=(blade-1)*.16;tuft.add(grass)}
+      }
     }
     addPath(0, -4.6, 0, -13); addPath(4.8, 0, 12, 0); addPath(-4.8, 0, -12, 1); addPath(0, 4.6, -1, 11)
     addPath(-12, 1, -15, 6, .8); addPath(12, 0, 15, -5, .8); addPath(-1, 11, 7, 13, .8)
@@ -74,8 +81,8 @@ export const ClashVillageMap = () => {
       for(let i=0;i<6;i++){const angle=i*Math.PI/3;const merlon=addBox(.34,.48,.34,stoneLight,x+Math.cos(angle)*.78,z+Math.sin(angle)*.78);merlon.position.y=height+.62}
     }
     // Foundation and curtain wall establish a convincing silhouette before the raised keep.
-    addBox(7.2,1.25,6.4,stoneDark,0,0)
-    addBox(6.7,1.85,.7,stoneLight,0,-2.85); addBox(6.7,1.85,.7,stoneLight,0,2.85)
+    const castleFooting = new THREE.Mesh(new THREE.CylinderGeometry(4.55,4.8,1.05,8),makeMaterial(stoneDark));castleFooting.position.y=.53;castleFooting.castShadow=true;castleFooting.receiveShadow=true;island.add(castleFooting)
+    addBox(6.7,1.85,.7,stoneLight,0,-2.85)
     addBox(.7,1.85,5.3,stoneLight,-3.0,0); addBox(.7,1.85,5.3,stoneLight,3.0,0)
     // Keep the road clear: the gate is only implied by the curtain-wall opening, with no projecting slab.
     // Tall central keep, stepped behind the wall rather than capped by one giant roof.
@@ -152,7 +159,7 @@ export const ClashVillageMap = () => {
       const body=new THREE.Mesh(new THREE.CylinderGeometry(.88,1.38,4.3,8),makeMaterial(0xe0ba58));body.position.y=2.32;body.castShadow=true;group.add(body)
       const roof=new THREE.Mesh(new THREE.ConeGeometry(1.38,1.75,8),makeMaterial(0x386ba3));roof.position.y=5.35;roof.castShadow=true;group.add(roof)
       const door=new THREE.Mesh(new THREE.PlaneGeometry(.48,.95),makeMaterial(0x65452e));door.position.set(0,.88,-1.4);group.add(door)
-      const rotor=new THREE.Group();rotor.position.set(0,3.72,-.98);group.add(rotor);windmillRotors.push(rotor)
+      const rotor=new THREE.Group();rotor.position.set(0,3.72,.98);group.add(rotor);windmillRotors.push(rotor)
       const hub=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,.24,8),makeMaterial(0x7a563d));hub.rotation.x=Math.PI/2;rotor.add(hub)
       for(let i=0;i<4;i++){const angle=i*Math.PI/2;const blade=new THREE.Mesh(new THREE.BoxGeometry(.34,1.8,.08),makeMaterial(i%2?0xf1ca50:0x4d80b8));blade.position.set(Math.sin(angle)*.74,Math.cos(angle)*.74,0);blade.rotation.z=-angle;rotor.add(blade)}
     }
@@ -184,7 +191,7 @@ export const ClashVillageMap = () => {
       const spindle=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,1.7,6),makeMaterial(0x724f35));spindle.rotation.z=Math.PI/2;spindle.position.y=1.88;group.add(spindle)
       const bucket=new THREE.Mesh(new THREE.CylinderGeometry(.14,.19,.26,7),makeMaterial(0x9b6b40));bucket.position.set(0,1.5,.14);group.add(bucket)
     }
-    addWell(0,-12.2)
+    addWell(2.25,-12.15)
 
     // Small roaming sheep and deer keep the fields alive.
     const animals: { group: THREE.Group; legs: THREE.Mesh[]; cx: number; cz: number; radius: number; phase: number; speed: number }[] = []
