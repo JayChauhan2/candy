@@ -16,6 +16,9 @@
   filter:drop-shadow(0 3px 0 #a52e2f);
 }
 
+.battle-loading{background:#718ba0}
+.battle-sky-shine{display:none}
+
 @media (max-width:820px){
   .kh-dock-icon img{width:37px;height:37px}
   .kh-battle-icon{width:36px;height:36px}
