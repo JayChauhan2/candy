@@ -1,14 +1,19 @@
 import { useState } from 'react'
 import battleIcon from './assets/battle.png'
 import coinIcon from './assets/coin.png'
+import emberforgeOpponent from './assets/emberforge.png'
+import frostpineOpponent from './assets/frostpine.png'
 import gemIcon from './assets/gem.png'
 import journalIcon from './assets/journal.png'
+import rubyOpponent from './assets/ruby.png'
 import shopIcon from './assets/shop.png'
 import starIcon from './assets/star.png'
+import sunstoneOpponent from './assets/sunstone.png'
 import troopsIcon from './assets/troops.png'
 import { ClashVillageMap } from './components/ClashVillageMap'
 import './kingdom-home.css'
 import './icon-overrides.css'
+import './battle-picker.css'
 
 type Notice = string | null
 
@@ -32,9 +37,31 @@ const BattleLoading = ({ closing, onBack }: { closing: boolean; onBack: () => vo
   </section>
 )
 
+const opponents = [
+  { name: 'Queen Marigold', realm: 'SUNSTONE KINGDOM', level: 17, image: sunstoneOpponent },
+  { name: 'Duke Bramble', realm: 'FROSTPINE REALM', level: 19, image: frostpineOpponent },
+  { name: 'Lord Cinder', realm: 'EMBERFORGE EMPIRE', level: 21, image: emberforgeOpponent },
+  { name: 'Empress Ruby', realm: 'CRIMSON JEWEL', level: 23, image: rubyOpponent },
+]
+
+const BattlePicker = ({ onClose, onChoose }: { onClose: () => void; onChoose: (name: string) => void }) => (
+  <section className="battle-picker" aria-label="Choose an opponent">
+    <div className="battle-picker-panel">
+      <button className="battle-picker-close" onClick={onClose} aria-label="Close battle menu">×</button>
+      <h2>CHOOSE YOUR RIVAL</h2><p>SELECT A KINGDOM TO CHALLENGE</p>
+      <div className="battle-opponents">
+        {opponents.map((opponent) => <button className="battle-opponent" key={opponent.name} onClick={() => onChoose(opponent.name)}>
+          <figure><img src={opponent.image} alt="" /></figure><b>{opponent.name}</b><small>{opponent.realm}</small><em>LV. {opponent.level}</em>
+        </button>)}
+      </div>
+    </div>
+  </section>
+)
+
 export default function KingdomHome() {
   const [notice, setNotice] = useState<Notice>(null)
   const [battleLoading, setBattleLoading] = useState(false)
+  const [battlePicker, setBattlePicker] = useState(false)
   const [closingBattle, setClosingBattle] = useState(false)
   const show = (message: string) => {
     setNotice(message)
@@ -43,6 +70,11 @@ export default function KingdomHome() {
   const closeBattle = () => {
     setClosingBattle(true)
     window.setTimeout(() => { setBattleLoading(false); setClosingBattle(false) }, 680)
+  }
+  const chooseOpponent = (name: string) => {
+    setBattlePicker(false)
+    setBattleLoading(true)
+    show(`Marching to face ${name}`)
   }
 
   return (
@@ -95,11 +127,12 @@ export default function KingdomHome() {
       <nav className="kh-dock" aria-label="Game actions">
         <HUDButton label="SHOP" image={shopIcon} onClick={() => show('Shop selected')} />
         <HUDButton label="TROOPS" image={troopsIcon} notice="3" onClick={() => show('Three troops are ready')} />
-        <button className="kh-battle" onClick={() => setBattleLoading(true)}><img className="kh-battle-icon" src={battleIcon} alt="" /><b>BATTLE!</b><small>TOAD RALLY</small></button>
+        <button className="kh-battle" onClick={() => setBattlePicker(true)}><img className="kh-battle-icon" src={battleIcon} alt="" /><b>BATTLE!</b><small>TOAD RALLY</small></button>
         <HUDButton label="FRIENDS" icon="♛" notice="1" onClick={() => show('One friend request')} />
         <HUDButton label="JOURNAL" image={journalIcon} onClick={() => show('Kingdom journal selected')} />
       </nav>
       <div className={`kh-toast${notice ? ' visible' : ''}`} role="status">{notice}</div>
+      {battlePicker && <BattlePicker onClose={() => setBattlePicker(false)} onChoose={chooseOpponent} />}
       {battleLoading && <BattleLoading closing={closingBattle} onBack={closeBattle} />}
     </main>
   )
