@@ -4,7 +4,6 @@ import coinIcon from './assets/coin.png'
 import emberforgeOpponent from './assets/emberforge-clean.png'
 import frostpineOpponent from './assets/frostpine-clean.png'
 import gemIcon from './assets/gem.png'
-import journalIcon from './assets/journal.png'
 import rubyOpponent from './assets/ruby-clean.png'
 import shopIcon from './assets/shop.png'
 import starIcon from './assets/star.png'
@@ -62,21 +61,21 @@ const BattlePicker = ({ onClose, onChoose }: { onClose: () => void; onChoose: (n
 )
 
 const leaderboardEntries = [
-  ['1', 'NoraNimbus', 'Cloudberry Realm', '26 980', 'LV. 24', '+1 420'],
-  ['2', 'WaffleWarden', 'Golden Grove', '24 610', 'LV. 22', '+970'],
-  ['3', 'PixelPanda', 'Pinecone Province', '22 845', 'LV. 21', '+760'],
-  ['4', 'King Tubby', 'Toadstool Kingdom', '19 740', 'LV. 18', '+1 180'],
-  ['5', 'MossyMina', 'Mushroom March', '18 960', 'LV. 17', '+540'],
-  ['6', 'JellyJoust', 'Starfall Keep', '17 380', 'LV. 16', '+330'],
+  ['1', 'NoraNimbus', 'Cloudberry Realm', '26 980'],
+  ['2', 'WaffleWarden', 'Golden Grove', '24 610'],
+  ['3', 'PixelPanda', 'Pinecone Province', '22 845'],
+  ['4', 'King Tubby', 'Toadstool Kingdom', '19 740'],
+  ['5', 'MossyMina', 'Mushroom March', '18 960'],
+  ['6', 'JellyJoust', 'Starfall Keep', '17 380'],
 ]
 
 const Leaderboard = ({ onClose }: { onClose: () => void }) => (
   <section className="leaderboard" aria-label="Kingdom leaderboard"><div className="leaderboard-card">
     <button className="leaderboard-close" onClick={onClose} aria-label="Close leaderboard">×</button>
-    <header><span>♜</span><div><h2>KINGDOM LEAGUE</h2><p>PLAYER CIVILIZATION RANKINGS</p></div></header>
+    <header><span>♜</span><div><h2>LEADERBOARD</h2><p>PLAYER CIVILIZATION RANKINGS</p></div></header>
     <div className="leaderboard-tabs"><span>THIS SEASON</span><span>POWER</span><span>FASTEST GROWTH</span></div>
-    <div className="leaderboard-list">{leaderboardEntries.map(([rank, player, realm, power, level, gain]) => <div className={`leaderboard-row${player === 'King Tubby' ? ' you' : ''}`} key={player}>
-      <span className="leaderboard-rank">{rank}</span><span className="leaderboard-player"><b>{player}</b><small>{realm}</small></span><span className="leaderboard-score"><b>{power} ★</b><small>{level}</small></span><span className="leaderboard-trend">{gain} ↑</span>
+    <div className="leaderboard-list">{leaderboardEntries.map(([rank, player, realm, power]) => <div className={`leaderboard-row${player === 'King Tubby' ? ' you' : ''}`} key={player}>
+      <span className="leaderboard-rank">{rank}</span><span className="leaderboard-player"><b>{player}</b><small>{realm}</small></span><span className="leaderboard-score"><b>{power} ★</b></span><button className="leaderboard-trend">VIEW</button>
     </div>)}</div>
     <footer className="leaderboard-foot"><span>YOUR BEST: <b>#4</b></span><span>REFRESHES IN 3h 12m</span></footer>
   </div></section>
@@ -163,7 +162,7 @@ export default function KingdomHome() {
         <HUDButton label="TROOPS" image={troopsIcon} notice="3" onClick={() => show('Three troops are ready')} />
         <button className="kh-battle" onClick={() => setBattlePicker(true)}><img className="kh-battle-icon" src={battleIcon} alt="" /><b>BATTLE!</b><small>TOAD RALLY</small></button>
         <HUDButton label="FRIENDS" icon="♛" notice="1" onClick={() => show('One friend request')} />
-        <HUDButton label="JOURNAL" image={journalIcon} onClick={() => show('Kingdom journal selected')} />
+        <HUDButton label="LEADERBOARD" icon="♜" onClick={() => setLeaderboard(true)} />
       </nav>
       <div className={`kh-toast${notice ? ' visible' : ''}`} role="status">{notice}</div>
       {battlePicker && <BattlePicker onClose={() => setBattlePicker(false)} onChoose={chooseOpponent} />}
