@@ -161,7 +161,7 @@ export const ClashVillageMap = () => {
       const paperBand = new THREE.Mesh(new THREE.TorusGeometry(1.36,.08,8,12),makeMaterial(0xe1b977));paperBand.rotation.x=Math.PI/2;paperBand.position.y=.98;group.add(paperBand)
       for(let i=0;i<4;i++){const brace=new THREE.Mesh(new THREE.BoxGeometry(.13,.84,.13),makeMaterial(0x684832));const a=i*Math.PI/2;brace.position.set(Math.cos(a)*1.34,.95,Math.sin(a)*1.34);brace.rotation.z=Math.cos(a)*.28;group.add(brace)}
     }
-    addStorage(-7.2, -4.4, 0xffd138); addStorage(7, -4.3, 0xe568d3); addStorage(14, 2.2, 0x6bc9ed)
+    addStorage(7, -4.3, 0xe568d3); addStorage(14, 2.2, 0x6bc9ed)
 
     // Individual blue-and-yellow landmark huts replace the generic box monuments.
     const addHut = (x:number, z:number, kind:'farm'|'forge'|'depot', scale=1) => {
@@ -263,7 +263,7 @@ export const ClashVillageMap = () => {
     addLandmarkPin('I',9,4.4,4);addLandmarkPin('J',-8.8,-7,3.8);addLandmarkPin('L',16,-12,5.2);addLandmarkPin('CF',-12.3,-10.6,3.6)
     addLandmarkPin('M',-5.1,17,5.2);addLandmarkPin('N',5.1,17,5.2)
     homeSites.forEach(([x,z],index)=>addLandmarkPin(`H${index+1}`,x,z,3.7))
-    addLandmarkPin('S1',-7.2,-4.4,3.8);addLandmarkPin('S2',7,-4.3,3.8);addLandmarkPin('S3',7,5.6,3.8)
+    addLandmarkPin('S2',7,-4.3,3.8);addLandmarkPin('S3',7,5.6,3.8)
     addLandmarkPin('O1',-10,4.7,4);addLandmarkPin('P1',7.5,-3,2.7);addLandmarkPin('P2',-7,2,2.7);addLandmarkPin('P3',5,-10,2.7);addLandmarkPin('P4',-14,-7,2.7)
     ;[[-2.1,6.5],[2.1,6.5],[-13,5],[-12,-8],[12,-5],[7,12]].forEach(([x,z],index)=>addLandmarkPin(`T${index+1}`,x,z,2.8))
     const addTree = (x:number,z:number,scale=.85) => {
