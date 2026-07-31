@@ -184,17 +184,22 @@ export const ClashVillageMap = () => {
       const leaves = new THREE.Mesh(new THREE.ConeGeometry(.92,2.45,8),makeMaterial(0x4f932f)); leaves.position.y=1.85;leaves.castShadow=true;group.add(leaves)
     }
     ;[[-19,-5,1],[-18,10,.9],[-7,15,.85],[2,18,.75],[19,4,.9],[20,-8,.8],[-6,-15,.75],[4,-16,.9],[-20,-13,.9],[18,14,.9]].forEach(([x,z,s])=>addTree(x,z,s))
-    // Dense forest wall: a large repeated tree field frames every map edge, leaving only the village clearing open.
-    for(let i=0;i<224;i++){
-      const side=i%4, row=Math.floor(i/4), lane=row%56
-      const wobble=Math.sin(i*13.17)*1.55, depth=(row%4)*.72+Math.abs(Math.cos(i*7.31))*.65
-      let x=0,z=0
-      if(side===0){x=-18-depth;z=-17+lane*.62+wobble}
-      if(side===1){x=18+depth;z=-17+lane*.62+wobble}
-      if(side===2){x=-22+lane*.8+wobble;z=-13-depth}
-      if(side===3){x=-22+lane*.8+wobble;z=13+depth}
-      addTree(x,z,1.08+(i%6)*.13)
+    // Instanced circular forest: twelve concentric bands continue past the view, never revealing a square map edge.
+    const forestBands = 12, treesPerBand = 68, forestCount = forestBands * treesPerBand
+    const forestTrunks = new THREE.InstancedMesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929),forestCount)
+    const forestLeaves = new THREE.InstancedMesh(new THREE.ConeGeometry(.92,2.45,8),makeMaterial(0x4f932f),forestCount)
+    forestTrunks.castShadow=true;forestLeaves.castShadow=true;forestTrunks.receiveShadow=true;forestLeaves.receiveShadow=true
+    const treeMatrix = new THREE.Object3D()
+    let forestIndex=0
+    for(let band=0;band<forestBands;band++) for(let i=0;i<treesPerBand;i++){
+      const seed=forestIndex*17.41, angle=(i/treesPerBand)*Math.PI*2+band*.19
+      const radius=21+band*2.85+Math.sin(seed)*.78, scale=.76+((i*7+band*3)%8)*.1
+      const x=Math.cos(angle)*radius*1.18, z=Math.sin(angle)*radius*.9
+      treeMatrix.position.set(x,.4+(.62*scale),z);treeMatrix.rotation.set(0,angle+.22,0);treeMatrix.scale.setScalar(scale);treeMatrix.updateMatrix();forestTrunks.setMatrixAt(forestIndex,treeMatrix.matrix)
+      treeMatrix.position.set(x,.4+(1.85*scale),z);treeMatrix.scale.setScalar(scale);treeMatrix.updateMatrix();forestLeaves.setMatrixAt(forestIndex,treeMatrix.matrix)
+      forestIndex++
     }
+    forestTrunks.instanceMatrix.needsUpdate=true;forestLeaves.instanceMatrix.needsUpdate=true;island.add(forestTrunks,forestLeaves)
     for (let i=0;i<58;i++) { const angle=i*2.4, radius=17+(i%4)*2.3; const bush=new THREE.Mesh(new THREE.DodecahedronGeometry(.28+(i%4)*.05),makeMaterial(i%5?0x71986c:0xe9e8d5)); bush.position.set(Math.cos(angle)*radius,.24,Math.sin(angle)*radius*.74);bush.castShadow=true;island.add(bush) }
 
     // Shared stone well at the end of the upper-right village path.
