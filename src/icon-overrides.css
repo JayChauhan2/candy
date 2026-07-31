@@ -21,10 +21,6 @@
 
 .kh-resource>span img{display:block;width:34px;height:34px;object-fit:contain}
 
-/* Resource art is intentionally free-standing, rather than sitting in three white cards. */
-.kh-resource{background:transparent;box-shadow:none;border:0;align-items:center}
-.kh-resource>span{background:transparent!important;box-shadow:none!important}
-
 /* Every action control uses the same centered icon-over-label rhythm. */
 .kh-dock-item{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0}
 .kh-dock-icon{margin:0 auto}
