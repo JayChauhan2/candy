@@ -57,11 +57,11 @@ export const ClashVillageMap = () => {
       for(let i=0;i<=28;i++){
         const t=i/28, point=curve.getPoint(t), tangent=curve.getTangent(t).normalize()
         const uneven=width*.5*(.84+Math.sin(i*2.41+seed*9)*.12+Math.sin(i*.77-seed)*.05)
-        left.push(new THREE.Vector2(point.x-tangent.z*uneven,point.z+tangent.x*uneven))
-        right.push(new THREE.Vector2(point.x+tangent.z*uneven,point.z-tangent.x*uneven))
+        left.push(new THREE.Vector2(point.x-tangent.z*uneven,-(point.z+tangent.x*uneven)))
+        right.push(new THREE.Vector2(point.x+tangent.z*uneven,-(point.z-tangent.x*uneven)))
       }
       const outline=new THREE.Shape();outline.moveTo(left[0].x,left[0].y);left.slice(1).forEach(p=>outline.lineTo(p.x,p.y));right.reverse().forEach(p=>outline.lineTo(p.x,p.y));outline.closePath()
-      const pathGeo=new THREE.ShapeGeometry(outline,1);pathGeo.rotateX(Math.PI/2)
+      const pathGeo=new THREE.ShapeGeometry(outline,1);pathGeo.rotateX(-Math.PI/2)
       const path = new THREE.Mesh(pathGeo,pathMat);path.position.y=.075;path.receiveShadow=true;island.add(path)
       // Sparse, subdued tufts are only placed around the path edges to blend path and meadow.
       for(let i=2;i<12;i+=3){
