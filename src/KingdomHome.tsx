@@ -83,15 +83,16 @@ const Leaderboard = ({ onClose }: { onClose: () => void }) => (
 )
 
 export default function KingdomHome() {
+  const rubyPreview = typeof window !== 'undefined' && window.location.hash === '#ruby'
   const [notice, setNotice] = useState<Notice>(null)
   const [noticeVisible, setNoticeVisible] = useState(false)
   const noticeHideTimer = useRef<number | null>(null)
   const noticeClearTimer = useRef<number | null>(null)
   const [battleLoading, setBattleLoading] = useState(false)
   const [battlePicker, setBattlePicker] = useState(false)
-  const [battleOpponent, setBattleOpponent] = useState<string | null>(null)
-  const [rubyBattleMap, setRubyBattleMap] = useState(false)
-  const [rubyIntroStarted, setRubyIntroStarted] = useState(false)
+  const [battleOpponent, setBattleOpponent] = useState<string | null>(rubyPreview ? 'Empress Ruby' : null)
+  const [rubyBattleMap, setRubyBattleMap] = useState(rubyPreview)
+  const [rubyIntroStarted, setRubyIntroStarted] = useState(rubyPreview)
   const [leaderboard, setLeaderboard] = useState(false)
   const [closingBattle, setClosingBattle] = useState(false)
   const [irisPhase, setIrisPhase] = useState<IrisPhase>('idle')

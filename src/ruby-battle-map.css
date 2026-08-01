@@ -17,3 +17,6 @@
 .ruby-ruler-thought b{margin-top:3px;font-size:14px;line-height:14px}
 .ruby-ruler-thought small{margin-top:6px;color:#f4c8ca;font-size:8px;letter-spacing:.55px}
 @media(max-width:700px){.ruby-commands{left:8px;right:auto;transform-origin:top left}.ruby-chat{left:auto;right:8px;bottom:8px;transform-origin:bottom right}.ruby-ruler-thought{right:8px;bottom:168px;transform:scale(.72);transform-origin:bottom right}}
+
+.ruby-turn-indicator{position:absolute;top:25px;right:26px;z-index:2;color:#ffe99b;font-size:31px;font-weight:800;letter-spacing:1px;line-height:1;text-shadow:0 3px #67243d,0 6px 10px #250d1bcc;pointer-events:none}
+@media(max-width:700px){.ruby-turn-indicator{top:16px;right:13px;font-size:20px}}
