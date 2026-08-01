@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import battleIcon from './assets/battle.png'
 import coinIcon from './assets/coin.png'
 import emberforgeOpponent from './assets/emberforge-clean.png'
@@ -84,6 +84,9 @@ const Leaderboard = ({ onClose }: { onClose: () => void }) => (
 
 export default function KingdomHome() {
   const [notice, setNotice] = useState<Notice>(null)
+  const [noticeVisible, setNoticeVisible] = useState(false)
+  const noticeHideTimer = useRef<number | null>(null)
+  const noticeClearTimer = useRef<number | null>(null)
   const [battleLoading, setBattleLoading] = useState(false)
   const [battlePicker, setBattlePicker] = useState(false)
   const [battleOpponent, setBattleOpponent] = useState<string | null>(null)
@@ -92,8 +95,12 @@ export default function KingdomHome() {
   const [closingBattle, setClosingBattle] = useState(false)
   const [irisPhase, setIrisPhase] = useState<IrisPhase>('idle')
   const show = (message: string) => {
+    if (noticeHideTimer.current) window.clearTimeout(noticeHideTimer.current)
+    if (noticeClearTimer.current) window.clearTimeout(noticeClearTimer.current)
     setNotice(message)
-    window.setTimeout(() => setNotice(null), 1900)
+    setNoticeVisible(true)
+    noticeHideTimer.current = window.setTimeout(() => setNoticeVisible(false), 1900)
+    noticeClearTimer.current = window.setTimeout(() => setNotice(null), 2160)
   }
   const closeBattle = () => {
     setClosingBattle(true)
@@ -174,7 +181,7 @@ export default function KingdomHome() {
         <HUDButton label="FRIENDS" icon="♛" notice="1" onClick={() => show('One friend request')} />
         <HUDButton label="LEADERBOARD" icon="♜" onClick={() => setLeaderboard(true)} />
       </nav>
-      <div className={`kh-toast${notice ? ' visible' : ''}`} role="status">{notice}</div>
+      <div className={`kh-toast${noticeVisible ? ' visible' : ''}`} role="status">{notice}</div>
       {battlePicker && <BattlePicker onClose={() => setBattlePicker(false)} onChoose={chooseOpponent} />}
       {leaderboard && <Leaderboard onClose={() => setLeaderboard(false)} />}
       {battleLoading && <BattleLoading closing={closingBattle} onBack={closeBattle} />}
