@@ -109,16 +109,18 @@ export default function KingdomHome() {
   const chooseOpponent = (name: string) => {
     setBattlePicker(false)
     setBattleOpponent(name)
-    if (name === 'Empress Ruby') setIrisPhase('closing')
-    else setBattleLoading(true)
+    setIrisPhase('closing')
     show(`Marching to face ${name}`)
   }
   useEffect(() => {
     if (irisPhase !== 'closing') return
-    const mountTimer = window.setTimeout(() => setRubyBattleMap(true), 620)
-    const openTimer = window.setTimeout(() => setIrisPhase('opening'), 760)
+    const mountTimer = window.setTimeout(() => {
+      if (battleOpponent === 'Empress Ruby') setRubyBattleMap(true)
+      else setBattleLoading(true)
+    }, 620)
+    const openTimer = window.setTimeout(() => setIrisPhase('opening'), 1620)
     return () => { window.clearTimeout(mountTimer); window.clearTimeout(openTimer) }
-  }, [irisPhase])
+  }, [battleOpponent, irisPhase])
   useEffect(() => {
     if (irisPhase !== 'opening') return
     const timer = window.setTimeout(() => setIrisPhase('idle'), 720)

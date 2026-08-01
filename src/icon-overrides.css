@@ -19,13 +19,14 @@
 .battle-loading{background:#718ba0}
 .battle-sky-shine{display:none}
 
-/* Classic cartoon iris: close on the home kingdom, swap screens while fully
-   covered, then open from the center onto the Ruby battlefield. */
-.battle-iris{position:absolute;inset:0;z-index:70;pointer-events:none;background:#718ba0;clip-path:circle(150% at 50% 50%);will-change:clip-path}
+/* Classic cartoon iris: blue exists outside a transparent circular window.
+   The window contracts to fully cover the screen, then expands again. */
+@property --iris-hole{syntax:'<length>';inherits:false;initial-value:150vmax}
+.battle-iris{--iris-hole:150vmax;position:absolute;inset:0;z-index:70;pointer-events:none;background:#718ba0;-webkit-mask-image:radial-gradient(circle at 50% 50%,transparent 0 var(--iris-hole),#000 calc(var(--iris-hole) + 1px));mask-image:radial-gradient(circle at 50% 50%,transparent 0 var(--iris-hole),#000 calc(var(--iris-hole) + 1px));will-change:--iris-hole}
 .battle-iris.closing{animation:battle-iris-close .62s cubic-bezier(.7,0,.35,1) both}
-.battle-iris.opening{clip-path:circle(0 at 50% 50%);animation:battle-iris-open .72s cubic-bezier(.25,.8,.3,1) both}
-@keyframes battle-iris-close{from{clip-path:circle(150% at 50% 50%)}to{clip-path:circle(0 at 50% 50%)}}
-@keyframes battle-iris-open{from{clip-path:circle(0 at 50% 50%)}to{clip-path:circle(150% at 50% 50%)}}
+.battle-iris.opening{--iris-hole:0px;animation:battle-iris-open .72s cubic-bezier(.25,.8,.3,1) both}
+@keyframes battle-iris-close{from{--iris-hole:150vmax}to{--iris-hole:0px}}
+@keyframes battle-iris-open{from{--iris-hole:0px}to{--iris-hole:150vmax}}
 
 .kh-resource>span img{display:block;width:34px;height:34px;object-fit:contain}
 .kh-gold>span,.kh-gems>span,.kh-stars>span{background:transparent!important;clip-path:none!important;color:transparent!important;text-shadow:none!important}
