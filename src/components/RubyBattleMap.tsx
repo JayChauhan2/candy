@@ -59,12 +59,17 @@ export const RubyBattleMap = ({ onBack }: { onBack: () => void }) => {
     const addTower = (parent: THREE.Group, x: number, z: number, height: number, wall: number, roof: number) => {
       const tower = new THREE.Mesh(new THREE.CylinderGeometry(.92, 1.08, height, 9), material(wall)); tower.position.set(x, height / 2 + .35, z); tower.castShadow = true; parent.add(tower)
       const cap = new THREE.Mesh(new THREE.ConeGeometry(1.2, 1.55, 7), material(roof)); cap.position.set(x, height + 1.1, z); cap.castShadow = true; parent.add(cap)
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(1, .09, 6, 9), material(0xe2b867)); rim.rotation.x = Math.PI / 2; rim.position.set(x, height + .2, z); parent.add(rim)
+      const slit = new THREE.Mesh(new THREE.PlaneGeometry(.18, .52), material(0xffd67a, 0xff9f48)); slit.position.set(x, height * .62 + .35, z + 1.085); parent.add(slit)
     }
     const addCottage = (parent: THREE.Group, x: number, z: number, wall: number, roof: number) => {
       const home = new THREE.Group(); home.position.set(x, .32, z); parent.add(home)
       const body = new THREE.Mesh(new THREE.CylinderGeometry(1.05, 1.2, 1.62, 8), material(wall)); body.position.y = .82; body.castShadow = true; home.add(body)
+      const eave = new THREE.Mesh(new THREE.TorusGeometry(1.12, .08, 6, 8), material(0xf2d797)); eave.rotation.x = Math.PI / 2; eave.position.y = 1.58; home.add(eave)
       const cap = new THREE.Mesh(new THREE.ConeGeometry(1.48, 1.62, 7), material(roof)); cap.position.y = 2.42; cap.castShadow = true; home.add(cap)
       const door = new THREE.Mesh(new THREE.PlaneGeometry(.42, .78), material(0x4b2b31)); door.position.set(0, .65, 1.08); door.rotation.y = Math.PI; home.add(door)
+      ;[-.42, .42].forEach(side => { const window = new THREE.Mesh(new THREE.CircleGeometry(.13, 7), material(0x77a5c0, 0x4e77a0)); window.position.set(side, 1.02, 1.0); window.rotation.y = Math.PI; home.add(window) })
+      const chimney = new THREE.Mesh(new THREE.CylinderGeometry(.13, .17, .62, 6), material(0x835e49)); chimney.position.set(.48, 2.72, .08); home.add(chimney)
     }
     const addRealm = (center: THREE.Vector3, enemy: boolean) => {
       const realm = new THREE.Group(); realm.position.copy(center); world.add(realm)
@@ -72,14 +77,20 @@ export const RubyBattleMap = ({ onBack }: { onBack: () => void }) => {
       land.rotation.x = -Math.PI / 2; land.scale.z = .7; land.position.y = .01; land.receiveShadow = true; realm.add(land)
       const plaza = new THREE.Mesh(new THREE.CircleGeometry(4.3, 32), material(0x4a2634)); plaza.rotation.x = -Math.PI / 2; plaza.position.y = .08; realm.add(plaza)
       if (enemy) {
+        const footing = new THREE.Mesh(new THREE.CylinderGeometry(4.9, 5.25, 1.1, 9), material(0x592d3a)); footing.position.y = .54; footing.castShadow = true; realm.add(footing)
         const palace = new THREE.Mesh(new THREE.BoxGeometry(4.6, 4.6, 4), material(0xac4654)); palace.position.set(0, 2.65, .2); palace.castShadow = true; realm.add(palace)
-        addTower(realm, -3.15, -2.9, 4.4, 0x9b3f4d, 0x631c37); addTower(realm, 3.15, -2.9, 4.4, 0x9b3f4d, 0x631c37)
+        const gate = new THREE.Mesh(new THREE.BoxGeometry(1.15, 1.7, .09), material(0x3a1c2b)); gate.position.set(0, 1.25, 2.23); realm.add(gate)
+        ;[-1.25, 0, 1.25].forEach(x => { const window = new THREE.Mesh(new THREE.CircleGeometry(.2, 7), material(0xffd36e, 0xffb63d)); window.position.set(x, 3.25, 2.25); realm.add(window) })
+        addTower(realm, -3.15, -2.9, 4.4, 0x9b3f4d, 0x631c37); addTower(realm, 3.15, -2.9, 4.4, 0x9b3f4d, 0x631c37); addTower(realm, -3.15, 2.9, 3.95, 0x9b3f4d, 0x631c37); addTower(realm, 3.15, 2.9, 3.95, 0x9b3f4d, 0x631c37)
         const jewel = new THREE.Mesh(new THREE.OctahedronGeometry(1.05), material(0xff4666, 0xff3554)); jewel.position.set(0, 6.15, .2); jewel.scale.y = 1.55; realm.add(jewel); crystals.push(jewel)
         ;[[-9, 6], [9, 5], [-10, -7]].forEach(([x, z]) => { const shard = new THREE.Mesh(new THREE.OctahedronGeometry(.55), material(0xe94461, 0xff2244)); shard.position.set(x, .9, z); shard.scale.y = 1.8; realm.add(shard); crystals.push(shard) })
         addCottage(realm, -9, -6, 0xa34655, 0x68203b); addCottage(realm, 8, 7, 0xa34655, 0x68203b)
       } else {
+        const footing = new THREE.Mesh(new THREE.CylinderGeometry(4.75, 5.05, 1.05, 9), material(0x777a74)); footing.position.y = .52; footing.castShadow = true; realm.add(footing)
         const keep = new THREE.Mesh(new THREE.BoxGeometry(4.4, 4.6, 3.8), material(0xd4c0a8)); keep.position.set(0, 2.65, .2); keep.castShadow = true; realm.add(keep)
-        addTower(realm, -3.1, -2.85, 4.2, 0xb4a99b, 0x6988a2); addTower(realm, 3.1, -2.85, 4.2, 0xb4a99b, 0x6988a2)
+        const gate = new THREE.Mesh(new THREE.BoxGeometry(1.08, 1.68, .08), material(0x694534)); gate.position.set(0, 1.22, 2.13); realm.add(gate)
+        ;[-1.2, 0, 1.2].forEach(x => { const window = new THREE.Mesh(new THREE.PlaneGeometry(.28, .72), material(0x5b88ad)); window.position.set(x, 3.2, 2.12); realm.add(window) })
+        addTower(realm, -3.1, -2.85, 4.2, 0xb4a99b, 0x6988a2); addTower(realm, 3.1, -2.85, 4.2, 0xb4a99b, 0x6988a2); addTower(realm, -3.1, 2.85, 3.85, 0xb4a99b, 0x6988a2); addTower(realm, 3.1, 2.85, 3.85, 0xb4a99b, 0x6988a2)
         ;[[-9, 6], [-10, -7], [9, 7], [10, -6]].forEach(([x, z], index) => addCottage(realm, x, z, index % 2 ? 0xe2b873 : 0xdba76f, index % 2 ? 0x647a96 : 0xc56548))
         const mill = new THREE.Group(); mill.position.set(8.7, .34, -9); realm.add(mill)
         const body = new THREE.Mesh(new THREE.CylinderGeometry(.9, 1.3, 3.7, 8), material(0xe2bd6c)); body.position.y = 1.85; mill.add(body)
