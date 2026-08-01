@@ -18,7 +18,7 @@ import './ruby-battle-map.css'
 import './leaderboard.css'
 
 type Notice = string | null
-type IrisPhase = 'idle' | 'closing' | 'opening'
+type IrisPhase = 'idle' | 'closing' | 'closed' | 'opening'
 
 const HUDButton = ({ label, icon, image, notice, onClick }: { label: string; icon?: string; image?: string; notice?: string; onClick: () => void }) => (
   <button className="kh-dock-item" onClick={onClick} aria-label={label}>
@@ -91,6 +91,7 @@ export default function KingdomHome() {
   const [battlePicker, setBattlePicker] = useState(false)
   const [battleOpponent, setBattleOpponent] = useState<string | null>(null)
   const [rubyBattleMap, setRubyBattleMap] = useState(false)
+  const [rubyIntroStarted, setRubyIntroStarted] = useState(false)
   const [leaderboard, setLeaderboard] = useState(false)
   const [closingBattle, setClosingBattle] = useState(false)
   const [irisPhase, setIrisPhase] = useState<IrisPhase>('idle')
@@ -109,17 +110,26 @@ export default function KingdomHome() {
   const chooseOpponent = (name: string) => {
     setBattlePicker(false)
     setBattleOpponent(name)
+    setRubyIntroStarted(false)
     setIrisPhase('closing')
     show(`Marching to face ${name}`)
   }
   useEffect(() => {
     if (irisPhase !== 'closing') return
-    const revealTimer = window.setTimeout(() => {
+    const closeTimer = window.setTimeout(() => setIrisPhase('closed'), 620)
+    return () => window.clearTimeout(closeTimer)
+  }, [irisPhase])
+  useEffect(() => {
+    if (irisPhase !== 'closed') return
+    const mountTimer = window.setTimeout(() => {
       if (battleOpponent === 'Empress Ruby') setRubyBattleMap(true)
       else setBattleLoading(true)
+    }, 0)
+    const revealTimer = window.setTimeout(() => {
+      if (battleOpponent === 'Empress Ruby') setRubyIntroStarted(true)
       setIrisPhase('opening')
-    }, 1620)
-    return () => window.clearTimeout(revealTimer)
+    }, 1000)
+    return () => { window.clearTimeout(mountTimer); window.clearTimeout(revealTimer) }
   }, [battleOpponent, irisPhase])
   useEffect(() => {
     if (irisPhase !== 'opening') return
@@ -183,7 +193,7 @@ export default function KingdomHome() {
       {battlePicker && <BattlePicker onClose={() => setBattlePicker(false)} onChoose={chooseOpponent} />}
       {leaderboard && <Leaderboard onClose={() => setLeaderboard(false)} />}
       {battleLoading && <BattleLoading closing={closingBattle} onBack={closeBattle} />}
-      {rubyBattleMap && <RubyBattleMap onBack={() => { setRubyBattleMap(false); setBattleOpponent(null) }} />}
+      {rubyBattleMap && <RubyBattleMap startIntro={rubyIntroStarted} onBack={() => { setRubyBattleMap(false); setRubyIntroStarted(false); setBattleOpponent(null) }} />}
       {irisPhase !== 'idle' && <div className={`battle-iris ${irisPhase}`} aria-hidden="true" />}
     </main>
   )

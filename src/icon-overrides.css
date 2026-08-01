@@ -24,6 +24,7 @@
 @property --iris-hole{syntax:'<length>';inherits:false;initial-value:150vmax}
 .battle-iris{--iris-hole:150vmax;position:absolute;inset:0;z-index:70;pointer-events:none;background:#718ba0;-webkit-mask-image:radial-gradient(circle at 50% 50%,transparent 0 var(--iris-hole),#000 calc(var(--iris-hole) + 1px));mask-image:radial-gradient(circle at 50% 50%,transparent 0 var(--iris-hole),#000 calc(var(--iris-hole) + 1px));will-change:--iris-hole}
 .battle-iris.closing{animation:battle-iris-close .62s cubic-bezier(.7,0,.35,1) both}
+.battle-iris.closed{--iris-hole:0px}
 .battle-iris.opening{--iris-hole:0px;animation:battle-iris-open .72s cubic-bezier(.25,.8,.3,1) both}
 @keyframes battle-iris-close{from{--iris-hole:150vmax}to{--iris-hole:0px}}
 @keyframes battle-iris-open{from{--iris-hole:0px}to{--iris-hole:150vmax}}
