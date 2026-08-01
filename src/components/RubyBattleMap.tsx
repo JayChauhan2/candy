@@ -14,7 +14,6 @@ export const RubyBattleMap = ({ onBack }: { onBack: () => void }) => {
     scene.add(new THREE.HemisphereLight(0xffd1ca,0x351526,2.2));const sun=new THREE.DirectionalLight(0xffb4a8,2.45);sun.position.set(-18,29,15);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-28;sun.shadow.camera.right=28;sun.shadow.camera.top=28;sun.shadow.camera.bottom=-28;scene.add(sun)
     const world=new THREE.Group();scene.add(world)
     const ground=new THREE.Mesh(new THREE.PlaneGeometry(130,100),material(0x562332));ground.rotation.x=-Math.PI/2;ground.position.y=-.05;ground.receiveShadow=true;world.add(ground)
-    const plateau=new THREE.Mesh(new THREE.CircleGeometry(27,48),material(0x903546));plateau.rotation.x=-Math.PI/2;plateau.scale.z=.76;plateau.position.y=.01;plateau.receiveShadow=true;world.add(plateau)
     const pathMat=material(0x4a2634)
     // The roads use irregular ribbon shapes, matching the lived-in paths of the home kingdom.
     const addPath=(x1:number,z1:number,x2:number,z2:number,width=1.15)=>{const dx=x2-x1,dz=z2-z1,distance=Math.hypot(dx,dz),bend=(.45+Math.abs(Math.sin(x1*4+z2))* .5)*Math.min(2.3,distance*.15);const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(x1,.06,z1),new THREE.Vector3(x1+dx*.3-dz/distance*bend,.06,z1+dz*.3+dx/distance*bend),new THREE.Vector3(x1+dx*.7+dz/distance*bend*.6,.06,z1+dz*.7-dx/distance*bend*.6),new THREE.Vector3(x2,.06,z2)]);const left:THREE.Vector2[]=[],right:THREE.Vector2[]=[];for(let i=0;i<=28;i++){const point=curve.getPoint(i/28),tangent=curve.getTangent(i/28).normalize(),edge=width*.5*(.86+Math.sin(i*2.3)*.11);left.push(new THREE.Vector2(point.x-tangent.z*edge,-point.z-tangent.x*edge));right.push(new THREE.Vector2(point.x+tangent.z*edge,-point.z+tangent.x*edge))}const shape=new THREE.Shape();shape.moveTo(left[0].x,left[0].y);left.slice(1).forEach(p=>shape.lineTo(p.x,p.y));right.reverse().forEach(p=>shape.lineTo(p.x,p.y));shape.closePath();const mesh=new THREE.Mesh(new THREE.ShapeGeometry(shape));mesh.geometry.rotateX(-Math.PI/2);mesh.material=pathMat;mesh.position.y=.075;mesh.receiveShadow=true;world.add(mesh)}
@@ -49,6 +48,12 @@ export const RubyBattleMap = ({ onBack }: { onBack: () => void }) => {
     // Ruby's complete realm is one movable unit. Shift it to the far side before creating your civilization
     // at the original, near-side position.
     const rubyRealm=new THREE.Group();world.children.slice().forEach(child=>{if(child!==ground)rubyRealm.add(child)});world.add(rubyRealm);rubyRealm.position.x=-47
+    // One continuous battlefield: these broken terrain fragments imply local geology
+    // without enclosing either civilization in a visible circular platform.
+    const addTerrainFragment=(points:[number,number][],color:number,y:number)=>{const shape=new THREE.Shape();shape.moveTo(points[0][0],-points[0][1]);points.slice(1).forEach(([x,z])=>shape.lineTo(x,-z));shape.closePath();const patch=new THREE.Mesh(new THREE.ShapeGeometry(shape),material(color));patch.geometry.rotateX(-Math.PI/2);patch.position.y=y;patch.receiveShadow=true;world.add(patch)}
+    addTerrainFragment([[-65,-16],[-51,-20],[-38,-15],[-34,-4],[-40,8],[-52,13],[-64,8],[-68,-5]],0x663040,.002)
+    addTerrainFragment([[-62,15],[-49,18],[-41,15],[-39,11],[-52,10],[-63,12]],0x733445,.006)
+    addTerrainFragment([[-58,-19],[-47,-22],[-39,-17],[-43,-13],[-55,-14]],0x743342,.006)
     // Build one home realm only. The previous preliminary green realm survived beneath
     // the crimson battlefield version and duplicated castles, paths, and trees.
     const homeX=0,homeZ=1,homeRoadMat=material(0xd4d0bf)
@@ -91,10 +96,11 @@ export const RubyBattleMap = ({ onBack }: { onBack: () => void }) => {
     addHomeLandmark(-10,4.7,'hut');addHomeLandmark(9,4.4,'hut');addHomeLandmark(-8.8,-7,'hut');addHomeLandmark(7,-4.3,'store');addHomeLandmark(14,2.2,'store');addHomeLandmark(-5.1,17,'post');addHomeLandmark(5.1,17,'post');addHomeLandmark(16,-12,'post')
     // The home kingdom is intentionally open within the Ruby battlefield; remove its old perimeter forest.
     world.children.slice().forEach(child=>{const mesh=child as THREE.Mesh,mat=mesh.material;if(mat instanceof THREE.MeshStandardMaterial&&(mat.color.getHex()===0xd4d0bf||([0x704929,0x4f932f,0x91b989].includes(mat.color.getHex())&&Math.hypot(mesh.position.x-homeX,(mesh.position.z-homeZ)/.76)<42)))world.remove(mesh)})
-    // Your civilization is now visibly inside Ruby's hostile territory: same light-crimson land language,
-    // with its own lighter route system carried directly into the no-man's-land between the two castles.
-    const homeRubyLand=new THREE.Mesh(new THREE.CircleGeometry(20,48),material(0xa34a58));homeRubyLand.rotation.x=-Math.PI/2;homeRubyLand.scale.z=.76;homeRubyLand.position.set(homeX,.145,homeZ);homeRubyLand.receiveShadow=true;world.add(homeRubyLand)
-    const borderLand=new THREE.Mesh(new THREE.CircleGeometry(16,40),material(0x7c3443));borderLand.rotation.x=-Math.PI/2;borderLand.scale.z=.62;borderLand.position.set(-23.5,.12,homeZ);borderLand.receiveShadow=true;world.add(borderLand)
+    // Cultivated ground appears in uneven field and scrub fragments that fade into
+    // the shared land; the unpainted center remains the neutral marching space.
+    addTerrainFragment([[-17,-14],[-8,-19],[5,-17],[13,-10],[10,-3],[-2,-5],[-12,-4]],0x704049,.01)
+    addTerrainFragment([[-15,7],[-8,15],[5,17],[15,12],[12,7],[2,6],[-7,4]],0x7d454b,.012)
+    addTerrainFragment([[-12,-1],[-5,4],[6,4],[12,1],[7,-2],[-3,-3]],0x673541,.008)
     const rubyHomePathMat=material(0x4a2634)
     const addRubyHomeRoad=(x1:number,z1:number,x2:number,z2:number,width=1.1)=>{const dx=x2-x1,dz=z2-z1,distance=Math.hypot(dx,dz),bend=(.45+Math.abs(Math.sin(x1*7+z2*3))*.55)*Math.min(2.3,distance*.14),curve=new THREE.CatmullRomCurve3([new THREE.Vector3(x1,.18,z1),new THREE.Vector3(x1+dx*.3-dz/distance*bend,.18,z1+dz*.3+dx/distance*bend),new THREE.Vector3(x1+dx*.7+dz/distance*bend*.62,.18,z1+dz*.7-dx/distance*bend*.62),new THREE.Vector3(x2,.18,z2)]),left:THREE.Vector2[]=[],right:THREE.Vector2[]=[];for(let i=0;i<=28;i++){const p=curve.getPoint(i/28),t=curve.getTangent(i/28).normalize(),edge=width*.5*(.85+Math.sin(i*2.4)*.11);left.push(new THREE.Vector2(p.x-t.z*edge,-p.z-t.x*edge));right.push(new THREE.Vector2(p.x+t.z*edge,-p.z+t.x*edge))}const shape=new THREE.Shape();shape.moveTo(left[0].x,left[0].y);left.slice(1).forEach(p=>shape.lineTo(p.x,p.y));right.reverse().forEach(p=>shape.lineTo(p.x,p.y));shape.closePath();const road=new THREE.Mesh(new THREE.ShapeGeometry(shape),rubyHomePathMat);road.geometry.rotateX(-Math.PI/2);road.position.y=.18;road.receiveShadow=true;world.add(road)}
     const homeRubyPlaza=new THREE.Mesh(new THREE.CircleGeometry(4.7,32),rubyHomePathMat);homeRubyPlaza.rotation.x=-Math.PI/2;homeRubyPlaza.position.set(homeX,.185,homeZ);world.add(homeRubyPlaza)
