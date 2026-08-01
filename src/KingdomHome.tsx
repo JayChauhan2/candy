@@ -115,14 +115,10 @@ export default function KingdomHome() {
   }
   useEffect(() => {
     if (irisPhase !== 'closing') return
-    const timer = window.setTimeout(() => { setBattleLoading(true); setIrisPhase('idle') }, 620)
-    return () => window.clearTimeout(timer)
+    const mountTimer = window.setTimeout(() => setRubyBattleMap(true), 620)
+    const openTimer = window.setTimeout(() => setIrisPhase('opening'), 760)
+    return () => { window.clearTimeout(mountTimer); window.clearTimeout(openTimer) }
   }, [irisPhase])
-  useEffect(() => {
-    if (!battleLoading || battleOpponent !== 'Empress Ruby') return
-    const timer = window.setTimeout(() => { setBattleLoading(false); setRubyBattleMap(true); setIrisPhase('opening') }, 1600)
-    return () => window.clearTimeout(timer)
-  }, [battleLoading, battleOpponent])
   useEffect(() => {
     if (irisPhase !== 'opening') return
     const timer = window.setTimeout(() => setIrisPhase('idle'), 720)
