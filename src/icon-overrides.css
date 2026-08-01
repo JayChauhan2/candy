@@ -31,6 +31,7 @@
 .kh-gold>span,.kh-gems>span,.kh-stars>span{background:transparent!important;clip-path:none!important;color:transparent!important;text-shadow:none!important}
 .kh-resource>span{position:absolute;left:7px;top:calc(50% + 6px);bottom:auto;margin:0;transform:translateY(-50%)}
 .kh-resource small,.kh-resource b{grid-column:2}
+.kh-resource b{grid-row:1/3;align-self:center}
 
 /* Every action control uses the same centered icon-over-label rhythm. */
 .kh-dock-item{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0}
