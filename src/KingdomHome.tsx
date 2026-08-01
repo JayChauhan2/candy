@@ -114,12 +114,12 @@ export default function KingdomHome() {
   }
   useEffect(() => {
     if (irisPhase !== 'closing') return
-    const mountTimer = window.setTimeout(() => {
+    const revealTimer = window.setTimeout(() => {
       if (battleOpponent === 'Empress Ruby') setRubyBattleMap(true)
       else setBattleLoading(true)
-    }, 620)
-    const openTimer = window.setTimeout(() => setIrisPhase('opening'), 1620)
-    return () => { window.clearTimeout(mountTimer); window.clearTimeout(openTimer) }
+      setIrisPhase('opening')
+    }, 1620)
+    return () => window.clearTimeout(revealTimer)
   }, [battleOpponent, irisPhase])
   useEffect(() => {
     if (irisPhase !== 'opening') return
