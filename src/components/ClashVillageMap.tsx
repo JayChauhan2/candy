@@ -3,12 +3,15 @@ import * as THREE from 'three'
 
 const makeMaterial = (color: number, roughness = .8) => new THREE.MeshStandardMaterial({ color, roughness, flatShading: true })
 
-export const ClashVillageMap = () => {
-  const mountRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const host = mountRef.current
-    if (!host) return
+/**
+ * Mounts the canonical home kingdom scene into a supplied host.
+ *
+ * Keeping the Three.js construction in this standalone controller is the first
+ * extraction step: React owns the mount/unmount lifecycle, while a future
+ * battle adapter can reuse this exact scene construction rather than rebuild
+ * an approximation of it.
+ */
+export const mountClashVillageScene = (host: HTMLDivElement) => {
 
     const scene = new THREE.Scene()
     scene.background = new THREE.Color(0xa8c4c0)
@@ -376,6 +379,16 @@ export const ClashVillageMap = () => {
     const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; yaw += ((Math.atan2(26,22) + pointerX*.6) - yaw)*.055; height += ((28 - pointerY*7) - height)*.055; island.rotation.y = Math.sin(time * .16) * .008; camera.position.set(Math.cos(yaw)*34,height,Math.sin(yaw)*34); camera.lookAt(0,.7,0); flag.rotation.z = Math.sin(time * 2.3) * .08; upgradeSparkles.forEach((sparkle)=>{const age=time-sparkle.started;if(age>1.45){sparkle.mesh.visible=false;return}const spread=.35+age*1.5;sparkle.mesh.visible=true;sparkle.mesh.position.set(sparkle.x+Math.cos(sparkle.phase)*spread,1.2+age*3.1+Math.sin(sparkle.phase*3)*.18,sparkle.z+Math.sin(sparkle.phase)*spread);sparkle.mesh.rotation.y=time*6;sparkle.mesh.scale.setScalar(1-age*.45)});campfireFlames.forEach((flame,index)=>{const pulse=1+Math.sin(time*7+index)*.1;flame.scale.set(pulse,1+Math.sin(time*8+index)*.13,pulse)});campfireSmoke.forEach((smoke)=>{const life=(time*.19+smoke.phase)%1;const scale=.55+life*.95;smoke.puff.position.set(Math.sin(time*1.3+smoke.phase*9)*.18,1.45+life*3.9,Math.cos(time*1.1+smoke.phase*7)*.16);smoke.puff.scale.setScalar(scale);smoke.puff.rotation.y=time+smoke.phase*8;smoke.material.opacity=(1-life)*.3}); animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); windmillRotors.forEach((rotor,index)=>{rotor.rotation.z=time*(.75+index*.15)}); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*130; bird.group.position.y = bird.altitude + Math.sin(time*1.1+bird.phase)*.22; bird.group.position.z = bird.startZ + Math.sin(time*.32+bird.phase)*2.1; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.28 + Math.sin(time*4.1+bird.phase)*.38) }) }); renderer.render(scene, camera) }
     animate()
     return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); host.removeEventListener('pointermove', move); host.removeEventListener('pointerdown',upgradeClick); renderer.dispose(); host.removeChild(renderer.domElement) }
+}
+
+export const ClashVillageMap = () => {
+  const mountRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const host = mountRef.current
+    if (!host) return
+    return mountClashVillageScene(host)
   }, [])
+
   return <div ref={mountRef} className="clash-village-map" />
 }
