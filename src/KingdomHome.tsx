@@ -150,8 +150,6 @@ export default function KingdomHome() {
 
       <section className="kh-kingdom-card">
         <span className="kh-flag">★</span><p>MY KINGDOM</p><h1>TOADSTOOL<br />KINGDOM</h1>
-        <div className="kh-castle" aria-hidden="true"><i /><i /><i /><b /></div>
-        <footer><span /> ALL SYSTEMS HAPPY!</footer>
       </section>
 
       <aside className="kh-event">

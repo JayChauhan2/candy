@@ -44,6 +44,11 @@
 .kh-gems{background:linear-gradient(180deg,#d56ce2 0%,#a62bb6 48%,#761a87 100%);border-color:#62236d;box-shadow:inset 0 2px 0 #f4a4fa,inset 0 -3px 0 #61126c,0 3px 0 #3c164099}
 .kh-stars{background:linear-gradient(180deg,#9baa55 0%,#6e7d38 46%,#526126 100%)}
 
+/* Keep the lower-left kingdom card focused on the kingdom name. */
+.kh-kingdom-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:19px 15px 14px}
+.kh-kingdom-card p{position:relative;margin:0 0 7px;font-size:13px;letter-spacing:1.8px}
+.kh-kingdom-card h1{position:relative;margin:0;font-size:38px;line-height:.88;letter-spacing:-1.4px;text-shadow:0 3px #ffa167}
+
 /* Every action control uses the same centered icon-over-label rhythm. */
 .kh-dock-item{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0}
 .kh-dock-icon{position:relative;margin:0 auto}
