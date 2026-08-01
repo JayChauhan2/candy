@@ -115,6 +115,10 @@ export const RubyBattleMap = ({ onBack, startIntro = true }: { onBack: () => voi
     // This catches the diagonal space exposed by the isometric camera while leaving
     // both settlements and their direct attack lane readable.
     for(let i=0;i<360;i++){const seed=Math.sin((i+1)*128.31)*43758.5453,seed2=Math.sin((i+1)*71.19)*24634.6345,x=-100+(seed-Math.floor(seed))*160,z=-55+(seed2-Math.floor(seed2))*110,insideRuby=x>-73&&x<-21&&Math.abs(z)<24,insideHome=x>-25&&x<25&&Math.abs(z-homeZ)<24,onMarch=x>-49&&x<-9&&Math.abs(z-homeZ)<12;if(insideRuby||insideHome||onMarch)continue;const size=1.34+((Math.sin(i*4.71)+1)*.56);addRubyTree(x,z,size,i%3)}
+    // A second, deeper woodland layer reaches the terrain edges. It gives the
+    // foreground forest actual depth from the isometric camera instead of leaving
+    // bare ground visible behind its first row of trees.
+    for(let i=0;i<300;i++){const seed=Math.sin((i+1)*211.17)*38573.244,seed2=Math.sin((i+1)*53.61)*18731.984,x=-108+(seed-Math.floor(seed))*216,z=-72+(seed2-Math.floor(seed2))*144,insideRuby=x>-75&&x<-19&&Math.abs(z)<26,insideHome=x>-27&&x<27&&Math.abs(z-homeZ)<26,onMarch=x>-51&&x<-7&&Math.abs(z-homeZ)<14;if(insideRuby||insideHome||onMarch)continue;const size=1.72+((Math.sin(i*5.39)+1)*.62);addRubyTree(x,z,size,(i*2+1)%3)}
     for(let i=0;i<95;i++){const angle=i*2.16,r=7+(i%9)*1.55;const shard=new THREE.Mesh(new THREE.ConeGeometry(.035+(i%3)*.018,.22+(i%4)*.08,4),material(i%5?0xa83e50:0xff5b6f));shard.position.set(Math.cos(angle)*r,.14,Math.sin(angle)*r*.74);shard.rotation.z=(i%4-1.5)*.25;world.add(shard)}
     for(let i=0;i<45;i++){const a=i*2.4,r=17+(i%5)*2.4;const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(.25+(i%4)*.09,0),material(i%4?0x6c2e3d:0xd84b59));rock.position.set(Math.cos(a)*r,.2,Math.sin(a)*r*.72);rock.rotation.y=i;world.add(rock)}
     const resize=()=>{const {width,height}=host.getBoundingClientRect(),half=13.5,aspect=width/height;camera.left=-half*aspect;camera.right=half*aspect;camera.top=half;camera.bottom=-half;renderer.setSize(width,height,false);camera.updateProjectionMatrix()};resize();window.addEventListener('resize',resize)
