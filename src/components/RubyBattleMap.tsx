@@ -69,7 +69,17 @@ export const RubyBattleMap = ({ onBack }: { onBack: () => void }) => {
     // village systems as the landing map, rather than treating the green realm as a small outpost.
     const homeBox=(w:number,h:number,d:number,c:number,x:number,z:number)=>{const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material(c));mesh.position.set(homeX+x,h/2+.38,homeZ+z);mesh.castShadow=true;world.add(mesh);return mesh}
     const homeTower=(x:number,z:number,h:number)=>{const tower=new THREE.Mesh(new THREE.CylinderGeometry(.98,1.1,h,10),material(0xa89f91));tower.position.set(homeX+x,h/2+.38,homeZ+z);tower.castShadow=true;world.add(tower);const roof=new THREE.Mesh(new THREE.ConeGeometry(1.18,1.75,8),material(0x718ba0));roof.position.set(homeX+x,h+1.22,homeZ+z);roof.castShadow=true;world.add(roof);const rim=new THREE.Mesh(new THREE.TorusGeometry(1.02,.1,6,10),material(0x777a74));rim.rotation.x=Math.PI/2;rim.position.set(homeX+x,h+.25,homeZ+z);world.add(rim)}
-    // Curtain walls give the copied castle its actual silhouette instead of a single keep.
+    // Rebuild the complete keep before its outer walls. The previous Ruby copy had
+    // only the wall fragments and towers, leaving the castle visibly hollow.
+    const homeFooting=new THREE.Mesh(new THREE.CylinderGeometry(4.55,4.8,1.05,8),material(0x777a74));homeFooting.position.set(homeX,.53,homeZ);homeFooting.castShadow=true;homeFooting.receiveShadow=true;world.add(homeFooting)
+    homeBox(4.25,4.75,3.8,0xc7bdaa,0,.45)
+    homeBox(3.65,.42,3.25,0xa89f91,0,4.9)
+    const homeGate=new THREE.Mesh(new THREE.PlaneGeometry(1.1,1.65),material(0x694534));homeGate.position.set(homeX,1.23,homeZ+2.37);homeGate.rotation.y=Math.PI;world.add(homeGate)
+    ;[-1.25,0,1.25].forEach(px=>{const window=new THREE.Mesh(new THREE.PlaneGeometry(.34,.88),material(0x577f9b));window.position.set(homeX+px,3.3,homeZ+2.38);window.rotation.y=Math.PI;world.add(window)})
+    ;[-2.16,2.16].forEach(px=>{const banner=new THREE.Mesh(new THREE.PlaneGeometry(.65,1.35),new THREE.MeshBasicMaterial({color:0xd1a650,side:THREE.DoubleSide}));banner.position.set(homeX+px,3.35,homeZ+3.84);banner.rotation.y=Math.PI;world.add(banner)})
+    const homePole=homeBox(.1,3.8,.1,0x835a30,0,.45);homePole.position.y=7.05
+    const homeFlag=new THREE.Mesh(new THREE.PlaneGeometry(2,.92),new THREE.MeshBasicMaterial({color:0xf0b933,side:THREE.DoubleSide}));homeFlag.position.set(homeX+1,8.85,homeZ+.45);world.add(homeFlag)
+    // Curtain walls complete the keep instead of replacing it.
     homeBox(6.7,1.85,.7,0xc7bdaa,0,-2.85);homeBox(.7,1.85,5.3,0xc7bdaa,-3,0);homeBox(.7,1.85,5.3,0xc7bdaa,3,0);homeBox(3.65,.42,3.25,0xa89f91,0,4.9)
     homeTower(-3.05,-2.85,4.35);homeTower(3.05,-2.85,4.35);homeTower(-3.05,2.85,4.05);homeTower(3.05,2.85,4.05)
     ;[-1.6,-.8,0,.8,1.6].forEach(px=>{const merlon=homeBox(.43,.52,.42,0xa89f91,px,-1.44);merlon.position.y=5.14;const rear=homeBox(.43,.52,.42,0xa89f91,px,2.36);rear.position.y=5.14})
