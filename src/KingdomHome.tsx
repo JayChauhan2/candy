@@ -18,6 +18,7 @@ import './ruby-battle-map.css'
 import './leaderboard.css'
 
 type Notice = string | null
+type IrisPhase = 'idle' | 'closing' | 'opening'
 
 const HUDButton = ({ label, icon, image, notice, onClick }: { label: string; icon?: string; image?: string; notice?: string; onClick: () => void }) => (
   <button className="kh-dock-item" onClick={onClick} aria-label={label}>
@@ -89,6 +90,7 @@ export default function KingdomHome() {
   const [rubyBattleMap, setRubyBattleMap] = useState(false)
   const [leaderboard, setLeaderboard] = useState(false)
   const [closingBattle, setClosingBattle] = useState(false)
+  const [irisPhase, setIrisPhase] = useState<IrisPhase>('idle')
   const show = (message: string) => {
     setNotice(message)
     window.setTimeout(() => setNotice(null), 1900)
@@ -100,14 +102,25 @@ export default function KingdomHome() {
   const chooseOpponent = (name: string) => {
     setBattlePicker(false)
     setBattleOpponent(name)
-    setBattleLoading(true)
+    if (name === 'Empress Ruby') setIrisPhase('closing')
+    else setBattleLoading(true)
     show(`Marching to face ${name}`)
   }
   useEffect(() => {
+    if (irisPhase !== 'closing') return
+    const timer = window.setTimeout(() => { setBattleLoading(true); setIrisPhase('idle') }, 620)
+    return () => window.clearTimeout(timer)
+  }, [irisPhase])
+  useEffect(() => {
     if (!battleLoading || battleOpponent !== 'Empress Ruby') return
-    const timer = window.setTimeout(() => { setBattleLoading(false); setRubyBattleMap(true) }, 1600)
+    const timer = window.setTimeout(() => { setBattleLoading(false); setRubyBattleMap(true); setIrisPhase('opening') }, 1600)
     return () => window.clearTimeout(timer)
   }, [battleLoading, battleOpponent])
+  useEffect(() => {
+    if (irisPhase !== 'opening') return
+    const timer = window.setTimeout(() => setIrisPhase('idle'), 720)
+    return () => window.clearTimeout(timer)
+  }, [irisPhase])
 
   return (
     <main className="kingdom-home" aria-label="Kingdom game home">
@@ -169,6 +182,7 @@ export default function KingdomHome() {
       {leaderboard && <Leaderboard onClose={() => setLeaderboard(false)} />}
       {battleLoading && <BattleLoading closing={closingBattle} onBack={closeBattle} />}
       {rubyBattleMap && <RubyBattleMap onBack={() => { setRubyBattleMap(false); setBattleOpponent(null) }} />}
+      {irisPhase !== 'idle' && <div className={`battle-iris ${irisPhase}`} aria-hidden="true" />}
     </main>
   )
 }
