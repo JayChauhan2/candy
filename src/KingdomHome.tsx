@@ -138,7 +138,6 @@ export default function KingdomHome() {
         </div>
         <div className="kh-header-actions">
           <button onClick={() => show('Music toggled')} aria-label="Toggle music">♫</button>
-          <button onClick={() => setLeaderboard(true)} aria-label="Open kingdom leaderboard">♜</button>
           <button onClick={() => show('Settings coming soon')} aria-label="Open settings">⚙</button>
         </div>
       </header>
