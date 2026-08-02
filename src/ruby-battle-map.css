@@ -13,7 +13,7 @@
 @media(max-width:700px){.ruby-commands{left:8px;right:auto;transform-origin:top left}.ruby-chat{left:auto;right:8px;bottom:8px;transform-origin:bottom right}.ruby-ruler-thought{right:8px;bottom:158px;transform:scale(.72);transform-origin:bottom right}}
 
 .ruby-turn-indicator{position:absolute;top:25px;right:26px;z-index:2;color:#ffe99b;font-size:31px;font-weight:800;letter-spacing:1px;line-height:1;text-shadow:0 3px #67243d,0 6px 10px #250d1bcc;pointer-events:none}
-.ruby-pan-coach{position:absolute;top:50%;left:50%;z-index:3;display:grid;justify-items:center;gap:12px;transform:translate(-50%,-50%);color:#ffe99b;pointer-events:none;text-shadow:0 3px #67243d,0 6px 10px #250d1bcc}
+.ruby-pan-coach{position:absolute;top:50%;left:50%;z-index:3;display:grid;justify-items:center;gap:12px;width:260px;text-align:center;transform:translate(-50%,-50%);color:#ffe99b;pointer-events:none;text-shadow:0 3px #67243d,0 6px 10px #250d1bcc}
 .ruby-pan-coach>b{color:#fff;font-size:26px;letter-spacing:1.4px;animation:ruby-pan-coach-pulse 1.05s ease-in-out infinite alternate}
 .ruby-pan-coach>div{position:relative;width:112px;height:92px}
 .ruby-pan-caret{position:absolute;color:#ffe99b;font-size:30px;font-style:normal;line-height:1;animation:ruby-pan-caret-pulse .92s ease-in-out infinite alternate}
