@@ -197,7 +197,8 @@ export default function KingdomHome() {
       </aside>
 
       <aside className="kh-builder" aria-label="Builder monument menu">
-        <header><b>MAP BUILDER</b><small>DRAG TO ADD</small><div className="kh-builder-tabs"><button className={builderTab === 'core' ? 'active' : ''} onClick={() => setBuilderTab('core')}>CORE</button><button className={builderTab === 'decor' ? 'active' : ''} onClick={() => setBuilderTab('decor')}>DECOR</button></div></header>
+        <header><b>MAP BUILDER</b><small>DRAG TO ADD</small></header>
+        <div className="kh-builder-tabs"><button className={builderTab === 'core' ? 'active' : ''} onClick={() => setBuilderTab('core')}>CORE</button><button className={builderTab === 'decor' ? 'active' : ''} onClick={() => setBuilderTab('decor')}>DECOR</button></div>
         <div className="kh-builder-list">
           {(builderTab === 'core' ? coreBuilderItems : decorBuilderItems).map((item) => <div key={item.type} draggable onDragStart={(event) => startBuilderDrag(event.dataTransfer,item.type)}><BuilderMonumentPreview type={item.type} /><b>{item.label}</b></div>)}
         </div>
