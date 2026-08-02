@@ -98,11 +98,14 @@ export default function KingdomHome() {
   const startBuilderDrag = (dataTransfer: DataTransfer, type: string) => {
     dataTransfer.setData('application/x-candy-monument', type)
     dataTransfer.effectAllowed = 'copy'
+    window.dispatchEvent(new CustomEvent('candy-builder-drag-start', { detail: type }))
     // The map supplies the placement preview; suppress the browser's large
     // default drag image of the Builder card so it cannot cover that preview.
-    const transparentDragImage = document.createElement('canvas')
-    transparentDragImage.width = 1; transparentDragImage.height = 1
+    const transparentDragImage = document.createElement('div')
+    transparentDragImage.style.cssText = 'position:fixed;left:-100px;top:-100px;width:1px;height:1px;opacity:0;pointer-events:none'
+    document.body.appendChild(transparentDragImage)
     dataTransfer.setDragImage(transparentDragImage, 0, 0)
+    window.setTimeout(() => transparentDragImage.remove(), 0)
   }
   const show = (message: string) => {
     if (noticeHideTimer.current) window.clearTimeout(noticeHideTimer.current)
