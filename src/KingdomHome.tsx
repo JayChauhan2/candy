@@ -169,14 +169,13 @@ export default function KingdomHome() {
         <button onClick={() => show('Bob-omb Bonanza selected')} aria-label="Open event">›</button>
       </aside>
 
-      <aside className="kh-map-key" aria-label="Landmark key">
-        <b>MAP KEY</b>
-        <div><span>A</span> Castle <span>B</span> Well <span>C</span> Farm <span>D</span> Windmill</div>
-        <div><span>E</span> Stable <span>F</span> Market</div>
-        <div><span>H</span> Blue storage <span>I</span> Forge <span>J</span> Depot</div>
-        <div><span>L–N</span> Watch posts <span>CF</span> Campfire</div>
-        <div><span>H1–H13</span> Homes <span>S2–S3</span> Stores</div>
-        <div><span>O1</span> Farm cottage <span>P1–P4</span> Signs <span>T1–T6</span> Lamps</div>
+      <aside className="kh-builder" aria-label="Builder monument menu">
+        <header><b>BUILDER</b><small>DRAG TO ADD</small></header>
+        <div className="kh-builder-list">
+          <div><span>♜</span><b>WATCHTOWER</b></div><div><span>⌂</span><b>GUILD HALL</b></div>
+          <div><span>✦</span><b>FOUNTAIN</b></div><div><span>⚒</span><b>FORGE</b></div>
+          <div><span>♧</span><b>GARDEN</b></div><div><span>⚑</span><b>BANNER POST</b></div>
+        </div>
       </aside>
 
       <nav className="kh-dock" aria-label="Game actions">

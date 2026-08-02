@@ -253,23 +253,6 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     addSignpost(7.5,-3);addSignpost(-7,2);addSignpost(5,-10);addSignpost(-14,-7)
     addLantern(-2.1,6.5);addLantern(2.1,6.5);addLantern(-13,5);addLantern(-12,-8);addLantern(12,-5);addLantern(7,12)
 
-    // Floating letter pins let feedback refer to a precise landmark without ambiguity.
-    const addLandmarkPin = (letter:string,x:number,z:number,y:number) => {
-      const canvas=document.createElement('canvas');canvas.width=80;canvas.height=80
-      const ctx=canvas.getContext('2d');if(!ctx)return
-      ctx.fillStyle='#fffaf0';ctx.strokeStyle='#394b58';ctx.lineWidth=7;ctx.beginPath();ctx.arc(40,40,30,0,Math.PI*2);ctx.fill();ctx.stroke()
-      ctx.fillStyle='#394b58';ctx.font=`700 ${letter.length>1?27:42}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(letter,40,43)
-      const pin=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),depthTest:false}));pin.position.set(x,y,z);pin.scale.set(1.05,1.05,1);scene.add(pin)
-    }
-    addLandmarkPin('A',0,0,9.8);addLandmarkPin('B',2.25,-12.15,3.5);addLandmarkPin('C',-20,-2,4.7);addLandmarkPin('D',10,-13,7.2)
-    addLandmarkPin('E',-5.8,7.5,4.5);addLandmarkPin('F',12,11,4.1);addLandmarkPin('H',14,2.2,3.8)
-    addLandmarkPin('I',9,4.4,4);addLandmarkPin('J',-8.8,-7,3.8);addLandmarkPin('L',16,-12,5.2);addLandmarkPin('CF',-12.3,-10.6,3.6)
-    addLandmarkPin('M',-5.1,17,5.2);addLandmarkPin('N',5.1,17,5.2)
-    homeSites.forEach(([x,z],index)=>addLandmarkPin(`H${index+1}`,x,z,3.7))
-    addLandmarkPin('S2',7,-4.3,3.8);addLandmarkPin('S3',7,5.6,3.8)
-    addLandmarkPin('O1',-10,4.7,4);addLandmarkPin('P1',7.5,-3,2.7);addLandmarkPin('P2',-7,2,2.7);addLandmarkPin('P3',5,-10,2.7);addLandmarkPin('P4',-14,-7,2.7)
-    ;[[-2.1,6.5],[2.1,6.5],[-13,5],[-12,-8],[12,-5],[7,12]].forEach(([x,z],index)=>addLandmarkPin(`T${index+1}`,x,z,2.8))
-
     // Only settlements and substantial civic buildings are upgradeable; props stay uncluttered.
     const upgradeSparkles: { mesh: THREE.Mesh; started: number; phase: number; x:number; z:number }[] = []
     const upgradeButtons: THREE.Sprite[] = []
