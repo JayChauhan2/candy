@@ -381,12 +381,12 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       return group
     }
 
-    // The home kingdom begins with one modest castle. Its green arrow uses the
-    // same upgrade effect as placed structures, then disappears once upgraded.
+    // The home kingdom begins with one modest castle. Its green plus matches
+    // the Coins control in the HUD, then disappears once upgraded.
     const starterCastle=placeBuilderMonument('castle',0,0)
     const castleUpgradeCanvas=document.createElement('canvas');castleUpgradeCanvas.width=96;castleUpgradeCanvas.height=96
     const castleUpgradeCtx=castleUpgradeCanvas.getContext('2d')
-    if(castleUpgradeCtx){castleUpgradeCtx.fillStyle='#39af52';castleUpgradeCtx.beginPath();castleUpgradeCtx.arc(48,48,34,0,Math.PI*2);castleUpgradeCtx.fill();castleUpgradeCtx.fillStyle='#ffffff';castleUpgradeCtx.font='700 54px Arial';castleUpgradeCtx.textAlign='center';castleUpgradeCtx.textBaseline='middle';castleUpgradeCtx.fillText('↑',48,51)}
+    if(castleUpgradeCtx){castleUpgradeCtx.fillStyle='#249141';castleUpgradeCtx.beginPath();castleUpgradeCtx.arc(48,48,36,0,Math.PI*2);castleUpgradeCtx.fill();castleUpgradeCtx.fillStyle='#4dc95b';castleUpgradeCtx.beginPath();castleUpgradeCtx.arc(48,48,30,0,Math.PI*2);castleUpgradeCtx.fill();castleUpgradeCtx.fillStyle='#ffffff';castleUpgradeCtx.fillRect(43,27,10,42);castleUpgradeCtx.fillRect(27,43,42,10)}
     const castleUpgradeButton=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(castleUpgradeCanvas),depthTest:false,depthWrite:false,transparent:true}))
     castleUpgradeButton.position.set(0,5.95,0);castleUpgradeButton.scale.set(1.05,1.05,1);castleUpgradeButton.userData={x:0,z:0,top:4.75,radius:2.2,upgraded:false,monument:starterCastle};scene.add(castleUpgradeButton);upgradeButtons.push(castleUpgradeButton)
 
