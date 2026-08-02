@@ -179,7 +179,7 @@ export default function KingdomHome() {
       </aside>
 
       <aside className="kh-builder" aria-label="Builder monument menu">
-        <header><b>BUILDER</b><small>DRAG TO ADD</small></header>
+        <header><b>MAP BUILDER</b><small>DRAG TO ADD</small></header>
         <div className="kh-builder-list">
           <div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'watchtower')}><BuilderMonumentPreview type="watchtower" /><b>WATCHTOWER</b></div><div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'guildhall')}><BuilderMonumentPreview type="guildhall" /><b>GUILD HALL</b></div>
           <div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'fountain')}><BuilderMonumentPreview type="fountain" /><b>FOUNTAIN</b></div><div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'forge')}><BuilderMonumentPreview type="forge" /><b>FORGE</b></div>
