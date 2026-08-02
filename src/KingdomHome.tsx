@@ -8,6 +8,7 @@ import shopIcon from './assets/shop.png'
 import sunstoneOpponent from './assets/sunstone-clean.png'
 import troopsIcon from './assets/troops.png'
 import { ClashVillageMap } from './components/ClashVillageMap'
+import { BuilderMonumentPreview } from './components/BuilderMonumentPreview'
 import { RubyBattleMap } from './components/RubyBattleMap'
 import './kingdom-home.css'
 import './icon-overrides.css'
@@ -172,9 +173,9 @@ export default function KingdomHome() {
       <aside className="kh-builder" aria-label="Builder monument menu">
         <header><b>BUILDER</b><small>DRAG TO ADD</small></header>
         <div className="kh-builder-list">
-          <div><span className="kh-builder-preview watchtower"><i /><em /></span><b>WATCHTOWER</b></div><div><span className="kh-builder-preview guildhall"><i /><em /></span><b>GUILD HALL</b></div>
-          <div><span className="kh-builder-preview fountain"><i /><em /></span><b>FOUNTAIN</b></div><div><span className="kh-builder-preview forge"><i /><em /></span><b>FORGE</b></div>
-          <div><span className="kh-builder-preview garden"><i /><em /></span><b>GARDEN</b></div><div><span className="kh-builder-preview bannerpost"><i /><em /></span><b>BANNER POST</b></div>
+          <div><BuilderMonumentPreview type="watchtower" /><b>WATCHTOWER</b></div><div><BuilderMonumentPreview type="guildhall" /><b>GUILD HALL</b></div>
+          <div><BuilderMonumentPreview type="fountain" /><b>FOUNTAIN</b></div><div><BuilderMonumentPreview type="forge" /><b>FORGE</b></div>
+          <div><BuilderMonumentPreview type="garden" /><b>GARDEN</b></div><div><BuilderMonumentPreview type="bannerpost" /><b>BANNER POST</b></div>
         </div>
       </aside>
 
