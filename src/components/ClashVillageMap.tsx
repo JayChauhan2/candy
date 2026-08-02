@@ -282,12 +282,12 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     upgradeButtons.forEach(button=>scene.remove(button))
     // Fill the buildable clearing with small, irregularly spaced grass clusters.
     // A deterministic scatter keeps the scene stable without forming a visible grid.
-    for(let i=0;i<84;i++){
+    for(let i=0;i<240;i++){
       const angle=i*2.39996323
-      const radius=Math.sqrt((i+.55)/84)*22.5
+      const radius=Math.sqrt((i+.55)/240)*24
       const x=Math.cos(angle)*radius*1.14+Math.sin(i*1.73)*.72
-      const z=Math.sin(angle)*radius*.78+Math.cos(i*1.21)*.55
-      addGroundTuft(x,z,.55+(i%6)*.09)
+      const z=Math.sin(angle)*radius*.82+Math.cos(i*1.21)*.55
+      addGroundTuft(x,z,.72+(i%7)*.075)
     }
     // Keep the middle open for building. The dense forest begins well outside
     // the clearing rather than scattering individual trees through it.
