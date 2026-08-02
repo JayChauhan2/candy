@@ -347,11 +347,16 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const builderTypes=['house','station','watchtower','guildhall','fountain','forge','garden','bannerpost','castle','cottage','stable','storage','farm','windmill','well','market','trainingyard','campfire','signpost','lantern'] as const
     type BuilderType=typeof builderTypes[number]
     const rotationButtons: THREE.Sprite[]=[]
+    const deleteButtons: THREE.Sprite[]=[]
     const rotationCanvas=document.createElement('canvas');rotationCanvas.width=96;rotationCanvas.height=96
     const rotationCtx=rotationCanvas.getContext('2d')
     if(rotationCtx){rotationCtx.fillStyle='#ffffff';rotationCtx.font='700 54px Arial';rotationCtx.textAlign='center';rotationCtx.textBaseline='middle';rotationCtx.fillText('↻',48,49)}
     const rotationTexture=new THREE.CanvasTexture(rotationCanvas)
-    const addRotationButton=(monument:THREE.Group,x:number,z:number,height:number)=>{const button=new THREE.Sprite(new THREE.SpriteMaterial({map:rotationTexture,depthTest:false,depthWrite:false,transparent:true}));button.position.set(x,height,z);button.scale.set(1.85,1.85,1);button.userData={monument,x,z};button.visible=false;scene.add(button);rotationButtons.push(button)}
+    const deleteCanvas=document.createElement('canvas');deleteCanvas.width=96;deleteCanvas.height=96
+    const deleteCtx=deleteCanvas.getContext('2d')
+    if(deleteCtx){deleteCtx.fillStyle='#e64b48';deleteCtx.font='700 68px Arial';deleteCtx.textAlign='center';deleteCtx.textBaseline='middle';deleteCtx.fillText('×',48,51)}
+    const deleteTexture=new THREE.CanvasTexture(deleteCanvas)
+    const addRotationButton=(monument:THREE.Group,x:number,z:number,height:number)=>{const button=new THREE.Sprite(new THREE.SpriteMaterial({map:rotationTexture,depthTest:false,depthWrite:false,transparent:true}));const remove=new THREE.Sprite(new THREE.SpriteMaterial({map:deleteTexture,depthTest:false,depthWrite:false,transparent:true}));button.position.set(x-1.18,height,z);remove.position.set(x+1.18,height,z);button.scale.set(2.25,2.25,1);remove.scale.set(2.25,2.25,1);button.userData={monument,x,z,deleteButton:remove};remove.userData={monument,rotationButton:button};button.visible=false;remove.visible=false;scene.add(button,remove);rotationButtons.push(button);deleteButtons.push(remove)}
     const placeBuilderMonument=(type:BuilderType,x:number,z:number,isPreview=false)=>{
       const group=new THREE.Group();group.position.set(x,.38,z);island.add(group)
       const add=(geometry:THREE.BufferGeometry,color:number,y=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.y=y;mesh.castShadow=true;group.add(mesh);return mesh}
@@ -404,7 +409,6 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       ;[-1.25,0,1.25].forEach(px=>{const window=box(.34,.88,.06,0x577f9b,px,2.4);window.position.y=3.3});[-.8,.8].forEach(pz=>{const window=box(.06,.72,.32,0x577f9b,2.16,pz);window.position.y=3.35})
       const pole=box(.1,3.8,.1,0x835a30,0,.45);pole.position.y=7.05
       const royalFlag=new THREE.Mesh(new THREE.PlaneGeometry(2,.92),new THREE.MeshBasicMaterial({color:0xf0b933,side:THREE.DoubleSide}));royalFlag.position.set(1,8.85,.45);castle.add(royalFlag)
-      addRotationButton(castle,x,z,12.1)
       return castle
     }
 
@@ -440,14 +444,15 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       const rect=host.getBoundingClientRect(); pointerX = (event.clientX-rect.left) / rect.width - .5; pointerY = (event.clientY-rect.top) / rect.height - .5
       raycaster.setFromCamera(new THREE.Vector2(pointerX*2,-pointerY*2),camera)
       const hit=raycaster.intersectObject(countryside,false)[0]
-      if(!hit){rotationButtons.forEach(button=>button.visible=false);return}
+      if(!hit){rotationButtons.forEach(button=>{button.visible=false;(button.userData.deleteButton as THREE.Sprite).visible=false});return}
       const point=island.worldToLocal(hit.point.clone())
-      rotationButtons.forEach(button=>{const {x,z}=button.userData as {x:number;z:number};button.visible=Math.hypot(point.x-x,point.z-z)<4.3})
+      const pointerNdc=new THREE.Vector2(pointerX*2,-pointerY*2), controlPosition=new THREE.Vector3()
+      rotationButtons.forEach(button=>{const {x,z,deleteButton}=button.userData as {x:number;z:number;deleteButton:THREE.Sprite};button.getWorldPosition(controlPosition).project(camera);const nearRotate=button.visible&&Math.hypot((controlPosition.x-pointerNdc.x)*rect.width*.5,(controlPosition.y-pointerNdc.y)*rect.height*.5)<96;deleteButton.getWorldPosition(controlPosition).project(camera);const nearDelete=button.visible&&Math.hypot((controlPosition.x-pointerNdc.x)*rect.width*.5,(controlPosition.y-pointerNdc.y)*rect.height*.5)<96;const visible=Math.hypot(point.x-x,point.z-z)<4.3||nearRotate||nearDelete;button.visible=visible;deleteButton.visible=visible})
     }
     host.addEventListener('pointermove', move)
-    const hideRotationButtons=()=>rotationButtons.forEach(button=>button.visible=false)
+    const hideRotationButtons=()=>rotationButtons.forEach(button=>{button.visible=false;(button.userData.deleteButton as THREE.Sprite).visible=false})
     host.addEventListener('pointerleave',hideRotationButtons)
-    const upgradeClick=(event:PointerEvent)=>{const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const rotateHit=raycaster.intersectObjects(rotationButtons,false)[0];if(rotateHit){const monument=rotateHit.object.userData.monument as THREE.Group;monument.rotation.y+=Math.PI/2;return}const hit=raycaster.intersectObjects(upgradeButtons,false)[0];if(hit)upgradeStructure(hit.object as THREE.Sprite)}
+    const upgradeClick=(event:PointerEvent)=>{const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const deleteHit=raycaster.intersectObjects(deleteButtons,false).find(hit=>hit.object.visible);if(deleteHit){const monument=deleteHit.object.userData.monument as THREE.Group;island.remove(monument);rotationButtons.filter(button=>button.userData.monument===monument).forEach(button=>scene.remove(button,button.userData.deleteButton as THREE.Sprite));for(let i=rotationButtons.length-1;i>=0;i--)if(rotationButtons[i].userData.monument===monument)rotationButtons.splice(i,1);for(let i=deleteButtons.length-1;i>=0;i--)if(deleteButtons[i].userData.monument===monument)deleteButtons.splice(i,1);return}const rotateHit=raycaster.intersectObjects(rotationButtons,false).find(hit=>hit.object.visible);if(rotateHit){const monument=rotateHit.object.userData.monument as THREE.Group;monument.rotation.y+=Math.PI/2;return}const hit=raycaster.intersectObjects(upgradeButtons,false)[0];if(hit)upgradeStructure(hit.object as THREE.Sprite)}
     const allowBuilderDrop=(event:DragEvent)=>{event.preventDefault();event.dataTransfer.dropEffect='copy';const type=(activeBuilderType||event.dataTransfer.getData('application/x-candy-monument')) as BuilderType;if(!builderTypes.includes(type))return;const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit)return;const point=island.worldToLocal(hit.point.clone());showDragPreview(type,point.x,point.z)}
     const dropBuilderMonument=(event:DragEvent)=>{event.preventDefault();const type=(activeBuilderType||event.dataTransfer.getData('application/x-candy-monument')) as BuilderType;if(!builderTypes.includes(type)){clearDragPreview();return}const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit){clearDragPreview();return}const point=island.worldToLocal(hit.point.clone());clearDragPreview();placeBuilderMonument(type,point.x,point.z);activeBuilderType=null}
     host.addEventListener('pointerdown',upgradeClick)
