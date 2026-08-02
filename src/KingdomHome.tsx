@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import battleIcon from './assets/battle.png'
-import coinIcon from './assets/coin.png'
 import emberforgeOpponent from './assets/emberforge-clean.png'
 import frostpineOpponent from './assets/frostpine-clean.png'
 import rubyOpponent from './assets/ruby-clean.png'
@@ -158,9 +157,6 @@ export default function KingdomHome() {
         <button className="kh-player" onClick={() => show('King Tubby — level 18')}>
           <span className="kh-crown">♛</span><span><b>18</b><em>KING TUBBY</em></span>
         </button>
-        <div className="kh-resources">
-          <button className="kh-resource kh-gold" onClick={() => show('18,420 coins in the royal vault')}><span><img src={coinIcon} alt="" /></span><b>18 420</b><strong>+</strong></button>
-        </div>
         <div className="kh-header-actions">
           <button onClick={() => show('Music toggled')} aria-label="Toggle music">♫</button>
           <button onClick={() => show('Settings coming soon')} aria-label="Open settings">⚙</button>
