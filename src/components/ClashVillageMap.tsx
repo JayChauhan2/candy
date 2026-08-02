@@ -385,7 +385,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     // The home kingdom begins with the full handcrafted castle: curtain walls,
     // gatehouse, four towers, windows, banners, and the tall royal flag.
     const buildKingdomCastle=(x:number,z:number)=>{
-      const castle=new THREE.Group();castle.position.set(x,0,z);island.add(castle)
+      const castle=new THREE.Group();castle.position.set(x,0,z);castle.scale.y=1.28;island.add(castle)
       const add=(geometry:THREE.BufferGeometry,color:number,y=0,px=0,pz=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.set(px,y,pz);mesh.castShadow=true;mesh.receiveShadow=true;castle.add(mesh);return mesh}
       const box=(width:number,height:number,depth:number,color:number,px:number,pz:number)=>add(new THREE.BoxGeometry(width,height,depth),color,height/2+.38,px,pz)
       const tower=(px:number,pz:number,height:number)=>{add(new THREE.CylinderGeometry(.98,1.1,height,10),stoneMid,height/2+.38,px,pz);add(new THREE.ConeGeometry(1.18,1.75,8),roofBlue,height+1.22,px,pz);const rim=add(new THREE.TorusGeometry(1.02,.1,6,10),stoneDark,height+.25,px,pz);rim.rotation.x=Math.PI/2}
@@ -402,7 +402,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       ;[-1.25,0,1.25].forEach(px=>{const window=box(.34,.88,.06,0x577f9b,px,2.4);window.position.y=3.3});[-.8,.8].forEach(pz=>{const window=box(.06,.72,.32,0x577f9b,2.16,pz);window.position.y=3.35})
       const pole=box(.1,3.8,.1,0x835a30,0,.45);pole.position.y=7.05
       const royalFlag=new THREE.Mesh(new THREE.PlaneGeometry(2,.92),new THREE.MeshBasicMaterial({color:0xf0b933,side:THREE.DoubleSide}));royalFlag.position.set(1,8.85,.45);castle.add(royalFlag)
-      addRotationButton(castle,x,z,9.55)
+      addRotationButton(castle,x,z,12.1)
       return castle
     }
 
