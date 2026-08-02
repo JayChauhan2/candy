@@ -347,7 +347,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const rotationButtons: THREE.Sprite[]=[]
     const rotationCanvas=document.createElement('canvas');rotationCanvas.width=96;rotationCanvas.height=96
     const rotationCtx=rotationCanvas.getContext('2d')
-    if(rotationCtx){rotationCtx.fillStyle='#fff8d3';rotationCtx.strokeStyle='#326b87';rotationCtx.lineWidth=8;rotationCtx.beginPath();rotationCtx.arc(48,48,35,0,Math.PI*2);rotationCtx.fill();rotationCtx.stroke();rotationCtx.fillStyle='#477cb2';rotationCtx.font='700 54px Arial';rotationCtx.textAlign='center';rotationCtx.textBaseline='middle';rotationCtx.fillText('↻',48,49)}
+    if(rotationCtx){rotationCtx.fillStyle='#ffffff';rotationCtx.font='700 54px Arial';rotationCtx.textAlign='center';rotationCtx.textBaseline='middle';rotationCtx.fillText('↻',48,49)}
     const rotationTexture=new THREE.CanvasTexture(rotationCanvas)
     const addRotationButton=(monument:THREE.Group,x:number,z:number,height:number)=>{const button=new THREE.Sprite(new THREE.SpriteMaterial({map:rotationTexture,depthTest:false,depthWrite:false,transparent:true}));button.position.set(x,height,z);button.scale.set(.76,.76,1);button.userData.monument=monument;scene.add(button);rotationButtons.push(button)}
     const placeBuilderMonument=(type:BuilderType,x:number,z:number)=>{
