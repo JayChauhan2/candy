@@ -103,6 +103,7 @@ export default function KingdomHome() {
   const [notice, setNotice] = useState<Notice>(null)
   const [noticeVisible, setNoticeVisible] = useState(false)
   const [builderTab, setBuilderTab] = useState<'core' | 'decor'>('core')
+  const [draggingBuilderItem, setDraggingBuilderItem] = useState<BuilderMonument | null>(null)
   const noticeHideTimer = useRef<number | null>(null)
   const noticeClearTimer = useRef<number | null>(null)
   const [battleLoading, setBattleLoading] = useState(false)
@@ -113,6 +114,7 @@ export default function KingdomHome() {
   const [closingBattle, setClosingBattle] = useState(false)
   const [irisPhase, setIrisPhase] = useState<IrisPhase>('idle')
   const startBuilderDrag = (dataTransfer: DataTransfer, type: string) => {
+    setDraggingBuilderItem(type as BuilderMonument)
     dataTransfer.setData('application/x-candy-monument', type)
     dataTransfer.effectAllowed = 'copy'
     window.dispatchEvent(new CustomEvent('candy-builder-drag-start', { detail: type }))
@@ -200,7 +202,7 @@ export default function KingdomHome() {
         <header><b>MAP BUILDER</b><small>DRAG TO ADD</small></header>
         <div className="kh-builder-tabs"><button className={builderTab === 'core' ? 'active' : ''} onClick={() => setBuilderTab('core')}>CORE</button><button className={builderTab === 'decor' ? 'active' : ''} onClick={() => setBuilderTab('decor')}>DECOR</button></div>
         <div className="kh-builder-list">
-          {(builderTab === 'core' ? coreBuilderItems : decorBuilderItems).map((item) => <div key={item.type} draggable onDragStart={(event) => startBuilderDrag(event.dataTransfer,item.type)}><BuilderMonumentPreview type={item.type} /><b>{item.label}</b></div>)}
+          {(builderTab === 'core' ? coreBuilderItems : decorBuilderItems).map((item) => <div key={item.type} className={draggingBuilderItem === item.type ? 'dragging' : ''} draggable onDragStart={(event) => startBuilderDrag(event.dataTransfer,item.type)} onDragEnd={() => setDraggingBuilderItem(null)}><BuilderMonumentPreview type={item.type} /><b>{item.label}</b></div>)}
         </div>
       </aside>
 
