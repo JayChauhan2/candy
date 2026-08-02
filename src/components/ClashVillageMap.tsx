@@ -343,6 +343,20 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       birds.push({ group, phase, speed: .018 + (phase%3)*.004, startX: -65, startZ, altitude })
     }
 
+    const builderTypes=['watchtower','guildhall','fountain','forge','garden','bannerpost'] as const
+    type BuilderType=typeof builderTypes[number]
+    const placeBuilderMonument=(type:BuilderType,x:number,z:number)=>{
+      const group=new THREE.Group();group.position.set(x,.38,z);island.add(group)
+      const add=(geometry:THREE.BufferGeometry,color:number,y=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.y=y;mesh.castShadow=true;group.add(mesh);return mesh}
+      add(new THREE.CylinderGeometry(1.45,1.62,.18,12),0x8f7658,.09)
+      if(type==='watchtower'){add(new THREE.CylinderGeometry(.62,.72,2.15,8),0xd7c18c,1.16);add(new THREE.ConeGeometry(.9,1.0,6),0xd65345,2.74)}
+      else if(type==='guildhall'){add(new THREE.BoxGeometry(2.2,1.3,1.65),0xe4c27d,.74);add(new THREE.ConeGeometry(1.72,.98,4),0x477cb2,1.87)}
+      else if(type==='fountain'){add(new THREE.CylinderGeometry(1.05,1.2,.35,12),0xa49d90,.3);add(new THREE.CylinderGeometry(.74,.87,.34,12),0x6fc8dc,.58);add(new THREE.ConeGeometry(.2,.86,6),0xddebf0,1.16)}
+      else if(type==='forge'){add(new THREE.CylinderGeometry(.94,1.1,1.32,8),0x744447,.75);add(new THREE.ConeGeometry(1.34,.86,6),0x3c2a35,1.84);const fire=add(new THREE.SphereGeometry(.34,7,6),0xff9d46,.72);fire.scale.y=.55;fire.position.z=1.08}
+      else if(type==='garden'){add(new THREE.CylinderGeometry(1.22,1.38,.24,10),0x657d46,.2);[[-.5,-.15],[.38,-.32],[.05,.48]].forEach(([px,pz],index)=>{const flower=add(new THREE.SphereGeometry(.34,7,6),index===1?0xf0cb51:0x8cbc57,1.0);flower.position.set(px,1.0,pz)})}
+      else{add(new THREE.CylinderGeometry(.08,.11,2.55,6),0x8f6847,1.34);const flag=new THREE.Mesh(new THREE.PlaneGeometry(1.04,.72),new THREE.MeshBasicMaterial({color:0xe25a4d,side:THREE.DoubleSide}));flag.position.set(.55,2.08,0);flag.rotation.y=Math.PI/2;group.add(flag)}
+    }
+
     const resize = () => {
       const { width, height } = host.getBoundingClientRect()
       const aspect = width / height
@@ -359,10 +373,14 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     host.addEventListener('pointermove', move)
     const raycaster=new THREE.Raycaster()
     const upgradeClick=(event:PointerEvent)=>{const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObjects(upgradeButtons,false)[0];if(hit)upgradeStructure(hit.object as THREE.Sprite)}
+    const allowBuilderDrop=(event:DragEvent)=>{event.preventDefault();event.dataTransfer.dropEffect='copy'}
+    const dropBuilderMonument=(event:DragEvent)=>{event.preventDefault();const type=event.dataTransfer.getData('application/x-candy-monument');if(!builderTypes.includes(type as BuilderType))return;const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit)return;const point=island.worldToLocal(hit.point.clone());placeBuilderMonument(type as BuilderType,point.x,point.z)}
     host.addEventListener('pointerdown',upgradeClick)
+    host.addEventListener('dragover',allowBuilderDrop)
+    host.addEventListener('drop',dropBuilderMonument)
     const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; yaw += ((Math.atan2(26,22) + pointerX*.6) - yaw)*.055; height += ((28 - pointerY*7) - height)*.055; island.rotation.y = Math.sin(time * .16) * .008; camera.position.set(Math.cos(yaw)*34,height,Math.sin(yaw)*34); camera.lookAt(0,.7,0); flag.rotation.z = Math.sin(time * 2.3) * .08; upgradeSparkles.forEach((sparkle)=>{const age=time-sparkle.started;if(age>1.45){sparkle.mesh.visible=false;return}const spread=.35+age*1.5;sparkle.mesh.visible=true;sparkle.mesh.position.set(sparkle.x+Math.cos(sparkle.phase)*spread,1.2+age*3.1+Math.sin(sparkle.phase*3)*.18,sparkle.z+Math.sin(sparkle.phase)*spread);sparkle.mesh.rotation.y=time*6;sparkle.mesh.scale.setScalar(1-age*.45)});campfireFlames.forEach((flame,index)=>{const pulse=1+Math.sin(time*7+index)*.1;flame.scale.set(pulse,1+Math.sin(time*8+index)*.13,pulse)});campfireSmoke.forEach((smoke)=>{const life=(time*.19+smoke.phase)%1;const scale=.55+life*.95;smoke.puff.position.set(Math.sin(time*1.3+smoke.phase*9)*.18,1.45+life*3.9,Math.cos(time*1.1+smoke.phase*7)*.16);smoke.puff.scale.setScalar(scale);smoke.puff.rotation.y=time+smoke.phase*8;smoke.material.opacity=(1-life)*.3}); animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); windmillRotors.forEach((rotor,index)=>{rotor.rotation.z=time*(.75+index*.15)}); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*130; bird.group.position.y = bird.altitude + Math.sin(time*1.1+bird.phase)*.22; bird.group.position.z = bird.startZ + Math.sin(time*.32+bird.phase)*2.1; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.28 + Math.sin(time*4.1+bird.phase)*.38) }) }); renderer.render(scene, camera) }
     animate()
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); host.removeEventListener('pointermove', move); host.removeEventListener('pointerdown',upgradeClick); renderer.dispose(); host.removeChild(renderer.domElement) }
+    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); host.removeEventListener('pointermove', move); host.removeEventListener('pointerdown',upgradeClick);host.removeEventListener('dragover',allowBuilderDrop);host.removeEventListener('drop',dropBuilderMonument); renderer.dispose(); host.removeChild(renderer.domElement) }
 }
 
 export const ClashVillageMap = () => {

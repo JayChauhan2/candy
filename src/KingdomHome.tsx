@@ -173,9 +173,9 @@ export default function KingdomHome() {
       <aside className="kh-builder" aria-label="Builder monument menu">
         <header><b>BUILDER</b><small>DRAG TO ADD</small></header>
         <div className="kh-builder-list">
-          <div><BuilderMonumentPreview type="watchtower" /><b>WATCHTOWER</b></div><div><BuilderMonumentPreview type="guildhall" /><b>GUILD HALL</b></div>
-          <div><BuilderMonumentPreview type="fountain" /><b>FOUNTAIN</b></div><div><BuilderMonumentPreview type="forge" /><b>FORGE</b></div>
-          <div><BuilderMonumentPreview type="garden" /><b>GARDEN</b></div><div><BuilderMonumentPreview type="bannerpost" /><b>BANNER POST</b></div>
+          <div draggable onDragStart={(event)=>{event.dataTransfer.setData('application/x-candy-monument','watchtower');event.dataTransfer.effectAllowed='copy'}}><BuilderMonumentPreview type="watchtower" /><b>WATCHTOWER</b></div><div draggable onDragStart={(event)=>{event.dataTransfer.setData('application/x-candy-monument','guildhall');event.dataTransfer.effectAllowed='copy'}}><BuilderMonumentPreview type="guildhall" /><b>GUILD HALL</b></div>
+          <div draggable onDragStart={(event)=>{event.dataTransfer.setData('application/x-candy-monument','fountain');event.dataTransfer.effectAllowed='copy'}}><BuilderMonumentPreview type="fountain" /><b>FOUNTAIN</b></div><div draggable onDragStart={(event)=>{event.dataTransfer.setData('application/x-candy-monument','forge');event.dataTransfer.effectAllowed='copy'}}><BuilderMonumentPreview type="forge" /><b>FORGE</b></div>
+          <div draggable onDragStart={(event)=>{event.dataTransfer.setData('application/x-candy-monument','garden');event.dataTransfer.effectAllowed='copy'}}><BuilderMonumentPreview type="garden" /><b>GARDEN</b></div><div draggable onDragStart={(event)=>{event.dataTransfer.setData('application/x-candy-monument','bannerpost');event.dataTransfer.effectAllowed='copy'}}><BuilderMonumentPreview type="bannerpost" /><b>BANNER POST</b></div>
         </div>
       </aside>
 

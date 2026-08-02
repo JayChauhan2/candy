@@ -14,7 +14,7 @@ export const BuilderMonumentPreview = ({ type }: { type: BuilderMonument }) => {
     const camera = new THREE.OrthographicCamera(-2.5,2.5,1.9,-1.9,.1,30)
     camera.position.set(4.4,4.5,6.2); camera.lookAt(0,1,0)
     const renderer = new THREE.WebGLRenderer({ alpha:true, antialias:true })
-    renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(58,44,false)
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(104,78,false)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     host.appendChild(renderer.domElement)
     scene.add(new THREE.HemisphereLight(0xfff4d1,0x56758b,2.3))
