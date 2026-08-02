@@ -318,7 +318,6 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       const spindle=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,1.7,6),makeMaterial(0x724f35));spindle.rotation.z=Math.PI/2;spindle.position.y=1.88;group.add(spindle)
       const bucket=new THREE.Mesh(new THREE.CylinderGeometry(.14,.19,.26,7),makeMaterial(0x9b6b40));bucket.position.set(0,1.5,.14);group.add(bucket)
     }
-    addWell(2.25,-12.15)
 
     // Small roaming sheep and deer keep the fields alive.
     const animals: { group: THREE.Group; legs: THREE.Mesh[]; cx: number; cz: number; radius: number; phase: number; speed: number }[] = []
@@ -345,16 +344,24 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
 
     const builderTypes=['watchtower','guildhall','fountain','forge','garden','bannerpost'] as const
     type BuilderType=typeof builderTypes[number]
+    const rotationButtons: THREE.Sprite[]=[]
+    const rotationCanvas=document.createElement('canvas');rotationCanvas.width=96;rotationCanvas.height=96
+    const rotationCtx=rotationCanvas.getContext('2d')
+    if(rotationCtx){rotationCtx.fillStyle='#fff8d3';rotationCtx.strokeStyle='#326b87';rotationCtx.lineWidth=8;rotationCtx.beginPath();rotationCtx.arc(48,48,35,0,Math.PI*2);rotationCtx.fill();rotationCtx.stroke();rotationCtx.fillStyle='#477cb2';rotationCtx.font='700 54px Arial';rotationCtx.textAlign='center';rotationCtx.textBaseline='middle';rotationCtx.fillText('↻',48,49)}
+    const rotationTexture=new THREE.CanvasTexture(rotationCanvas)
+    const addRotationButton=(monument:THREE.Group,x:number,z:number,height:number)=>{const button=new THREE.Sprite(new THREE.SpriteMaterial({map:rotationTexture,depthTest:false,depthWrite:false,transparent:true}));button.position.set(x,height,z);button.scale.set(.76,.76,1);button.userData.monument=monument;scene.add(button);rotationButtons.push(button)}
     const placeBuilderMonument=(type:BuilderType,x:number,z:number)=>{
       const group=new THREE.Group();group.position.set(x,.38,z);island.add(group)
       const add=(geometry:THREE.BufferGeometry,color:number,y=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.y=y;mesh.castShadow=true;group.add(mesh);return mesh}
       add(new THREE.CylinderGeometry(1.45,1.62,.18,12),0x8f7658,.09)
-      if(type==='watchtower'){add(new THREE.CylinderGeometry(.62,.72,2.15,8),0xd7c18c,1.16);add(new THREE.ConeGeometry(.9,1.0,6),0xd65345,2.74)}
-      else if(type==='guildhall'){add(new THREE.BoxGeometry(2.2,1.3,1.65),0xe4c27d,.74);add(new THREE.ConeGeometry(1.72,.98,4),0x477cb2,1.87)}
-      else if(type==='fountain'){add(new THREE.CylinderGeometry(1.05,1.2,.35,12),0xa49d90,.3);add(new THREE.CylinderGeometry(.74,.87,.34,12),0x6fc8dc,.58);add(new THREE.ConeGeometry(.2,.86,6),0xddebf0,1.16)}
-      else if(type==='forge'){add(new THREE.CylinderGeometry(.94,1.1,1.32,8),0x744447,.75);add(new THREE.ConeGeometry(1.34,.86,6),0x3c2a35,1.84);const fire=add(new THREE.SphereGeometry(.34,7,6),0xff9d46,.72);fire.scale.y=.55;fire.position.z=1.08}
-      else if(type==='garden'){add(new THREE.CylinderGeometry(1.22,1.38,.24,10),0x657d46,.2);[[-.5,-.15],[.38,-.32],[.05,.48]].forEach(([px,pz],index)=>{const flower=add(new THREE.SphereGeometry(.34,7,6),index===1?0xf0cb51:0x8cbc57,1.0);flower.position.set(px,1.0,pz)})}
-      else{add(new THREE.CylinderGeometry(.08,.11,2.55,6),0x8f6847,1.34);const flag=new THREE.Mesh(new THREE.PlaneGeometry(1.04,.72),new THREE.MeshBasicMaterial({color:0xe25a4d,side:THREE.DoubleSide}));flag.position.set(.55,2.08,0);flag.rotation.y=Math.PI/2;group.add(flag)}
+      let buttonHeight=3
+      if(type==='watchtower'){add(new THREE.CylinderGeometry(.62,.72,2.15,8),0xd7c18c,1.16);add(new THREE.ConeGeometry(.9,1.0,6),0xd65345,2.74);buttonHeight=4.15}
+      else if(type==='guildhall'){add(new THREE.BoxGeometry(2.2,1.3,1.65),0xe4c27d,.74);add(new THREE.ConeGeometry(1.72,.98,4),0x477cb2,1.87);buttonHeight=3.05}
+      else if(type==='fountain'){add(new THREE.CylinderGeometry(1.05,1.2,.35,12),0xa49d90,.3);add(new THREE.CylinderGeometry(.74,.87,.34,12),0x6fc8dc,.58);add(new THREE.ConeGeometry(.2,.86,6),0xddebf0,1.16);buttonHeight=2.35}
+      else if(type==='forge'){add(new THREE.CylinderGeometry(.94,1.1,1.32,8),0x744447,.75);add(new THREE.ConeGeometry(1.34,.86,6),0x3c2a35,1.84);const fire=add(new THREE.SphereGeometry(.34,7,6),0xff9d46,.72);fire.scale.y=.55;fire.position.z=1.08;buttonHeight=3.15}
+      else if(type==='garden'){add(new THREE.CylinderGeometry(1.22,1.38,.24,10),0x657d46,.2);[[-.5,-.15],[.38,-.32],[.05,.48]].forEach(([px,pz],index)=>{const flower=add(new THREE.SphereGeometry(.34,7,6),index===1?0xf0cb51:0x8cbc57,1.0);flower.position.set(px,1.0,pz)});buttonHeight=2.25}
+      else{add(new THREE.CylinderGeometry(.08,.11,2.55,6),0x8f6847,1.34);const flag=new THREE.Mesh(new THREE.PlaneGeometry(1.04,.72),new THREE.MeshBasicMaterial({color:0xe25a4d,side:THREE.DoubleSide}));flag.position.set(.55,2.08,0);flag.rotation.y=Math.PI/2;group.add(flag);buttonHeight=3.3}
+      addRotationButton(group,x,z,buttonHeight)
     }
 
     const resize = () => {
@@ -372,7 +379,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const move = (event:PointerEvent) => { const rect=host.getBoundingClientRect(); pointerX = (event.clientX-rect.left) / rect.width - .5; pointerY = (event.clientY-rect.top) / rect.height - .5 }
     host.addEventListener('pointermove', move)
     const raycaster=new THREE.Raycaster()
-    const upgradeClick=(event:PointerEvent)=>{const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObjects(upgradeButtons,false)[0];if(hit)upgradeStructure(hit.object as THREE.Sprite)}
+    const upgradeClick=(event:PointerEvent)=>{const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const rotateHit=raycaster.intersectObjects(rotationButtons,false)[0];if(rotateHit){const monument=rotateHit.object.userData.monument as THREE.Group;monument.rotation.y+=Math.PI/2;return}const hit=raycaster.intersectObjects(upgradeButtons,false)[0];if(hit)upgradeStructure(hit.object as THREE.Sprite)}
     const allowBuilderDrop=(event:DragEvent)=>{event.preventDefault();event.dataTransfer.dropEffect='copy'}
     const dropBuilderMonument=(event:DragEvent)=>{event.preventDefault();const type=event.dataTransfer.getData('application/x-candy-monument');if(!builderTypes.includes(type as BuilderType))return;const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit)return;const point=island.worldToLocal(hit.point.clone());placeBuilderMonument(type as BuilderType,point.x,point.z)}
     host.addEventListener('pointerdown',upgradeClick)
