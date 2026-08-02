@@ -342,7 +342,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       birds.push({ group, phase, speed: .018 + (phase%3)*.004, startX: -65, startZ, altitude })
     }
 
-    const builderTypes=['watchtower','guildhall','fountain','forge','garden','bannerpost'] as const
+    const builderTypes=['watchtower','guildhall','fountain','forge','garden','bannerpost','castle','cottage','stable','storage','farm','windmill','well','market','trainingyard','campfire','signpost','lantern'] as const
     type BuilderType=typeof builderTypes[number]
     const rotationButtons: THREE.Sprite[]=[]
     const rotationCanvas=document.createElement('canvas');rotationCanvas.width=96;rotationCanvas.height=96
@@ -360,7 +360,19 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       else if(type==='fountain'){add(new THREE.CylinderGeometry(1.05,1.2,.35,12),0xa49d90,.3);add(new THREE.CylinderGeometry(.74,.87,.34,12),0x6fc8dc,.58);add(new THREE.ConeGeometry(.2,.86,6),0xddebf0,1.16);buttonHeight=2.35}
       else if(type==='forge'){add(new THREE.CylinderGeometry(.94,1.1,1.32,8),0x744447,.75);add(new THREE.ConeGeometry(1.34,.86,6),0x3c2a35,1.84);const fire=add(new THREE.SphereGeometry(.34,7,6),0xff9d46,.72);fire.scale.y=.55;fire.position.z=1.08;buttonHeight=3.15}
       else if(type==='garden'){add(new THREE.CylinderGeometry(1.22,1.38,.24,10),0x657d46,.2);[[-.5,-.15],[.38,-.32],[.05,.48]].forEach(([px,pz],index)=>{const flower=add(new THREE.SphereGeometry(.34,7,6),index===1?0xf0cb51:0x8cbc57,1.0);flower.position.set(px,1.0,pz)});buttonHeight=2.25}
-      else{add(new THREE.CylinderGeometry(.08,.11,2.55,6),0x8f6847,1.34);const flag=new THREE.Mesh(new THREE.PlaneGeometry(1.04,.72),new THREE.MeshBasicMaterial({color:0xe25a4d,side:THREE.DoubleSide}));flag.position.set(.55,2.08,0);flag.rotation.y=Math.PI/2;group.add(flag);buttonHeight=3.3}
+      else if(type==='bannerpost'){add(new THREE.CylinderGeometry(.08,.11,2.55,6),0x8f6847,1.34);const flag=new THREE.Mesh(new THREE.PlaneGeometry(1.04,.72),new THREE.MeshBasicMaterial({color:0xe25a4d,side:THREE.DoubleSide}));flag.position.set(.55,2.08,0);flag.rotation.y=Math.PI/2;group.add(flag);buttonHeight=3.3}
+      else if(type==='castle'){add(new THREE.BoxGeometry(2.5,1.62,1.95),0xb7b3a8,.92);[-.98,.98].forEach(px=>{const tower=add(new THREE.CylinderGeometry(.44,.52,2.32,8),0xa39d92,1.28);tower.position.x=px;const roof=add(new THREE.ConeGeometry(.6,.74,6),0x6e91ad,2.8);roof.position.x=px});buttonHeight=4.15}
+      else if(type==='cottage'){add(new THREE.CylinderGeometry(.98,1.12,1.34,8),0xe0bd78,.76);add(new THREE.ConeGeometry(1.36,1.24,7),0xc85b43,1.98);buttonHeight=3.05}
+      else if(type==='stable'){add(new THREE.BoxGeometry(2.5,.18,1.75),0x9b7b58,.18);const back=add(new THREE.BoxGeometry(2.3,1.48,.16),0xb18d63,.92);back.position.z=-.78;add(new THREE.ConeGeometry(1.76,.8,4),0x6f8fa0,1.86);buttonHeight=3.0}
+      else if(type==='storage'){add(new THREE.CylinderGeometry(1.04,1.22,1.42,10),0x9d6a3d,.81);const fill=add(new THREE.SphereGeometry(.95,10,7),0xe568d3,1.46);fill.scale.y=.55;buttonHeight=2.75}
+      else if(type==='farm'){add(new THREE.BoxGeometry(2.6,.14,1.95),0x887052,.15);for(let i=0;i<5;i++){const crop=add(new THREE.ConeGeometry(.11,.58,5),i%2?0x7ea459:0xd2ba4d,.48);crop.position.set(-.85+i*.42,.48,-.18)}buttonHeight=1.9}
+      else if(type==='windmill'){add(new THREE.CylinderGeometry(.72,1.06,2.72,8),0xe0ba58,1.51);add(new THREE.ConeGeometry(1.06,1.18,6),0x386ba3,3.45);for(let i=0;i<4;i++){const blade=add(new THREE.BoxGeometry(.18,1.3,.08),i%2?0xf1ca50:0x4d80b8,2.35);blade.rotation.z=-i*Math.PI/2;blade.position.set(Math.sin(i*Math.PI/2)*.54,2.35+Math.cos(i*Math.PI/2)*.54,.76)}buttonHeight=4.25}
+      else if(type==='well'){add(new THREE.CylinderGeometry(.84,1,.58,10),0xb9b4a8,.44);add(new THREE.ConeGeometry(1.22,.75,4),0x7a94a7,1.8);buttonHeight=2.6}
+      else if(type==='market'){add(new THREE.BoxGeometry(2.2,.58,1.08),0x8b674b,.55);add(new THREE.ConeGeometry(1.64,.56,4),0x718fa3,1.9);buttonHeight=2.85}
+      else if(type==='trainingyard'){add(new THREE.CylinderGeometry(1.56,1.56,.13,12),0xbda978,.13);for(let i=0;i<4;i++){const post=add(new THREE.CylinderGeometry(.07,.09,1.12,5),0x765139,.65);post.position.set(Math.cos(i*Math.PI/2)*1.18,.65,Math.sin(i*Math.PI/2)*1.18)}buttonHeight=2.1}
+      else if(type==='campfire'){add(new THREE.CylinderGeometry(.7,.84,.13,10),0x5b554c,.13);add(new THREE.ConeGeometry(.44,.94,6),0xe85c2e,.62);add(new THREE.ConeGeometry(.2,.6,6),0xffdc63,.78);buttonHeight=2.15}
+      else if(type==='signpost'){add(new THREE.CylinderGeometry(.06,.09,1.5,6),0x755038,.81);const arm=add(new THREE.BoxGeometry(1.12,.25,.1),0xceb16c,1.23);arm.position.x=.28;arm.rotation.y=.2;buttonHeight=2.35}
+      else{add(new THREE.CylinderGeometry(.045,.06,1.55,6),0x5e4b3b,.84);add(new THREE.OctahedronGeometry(.19),0xf2d77b,1.62);buttonHeight=2.4}
       addRotationButton(group,x,z,buttonHeight)
     }
 
