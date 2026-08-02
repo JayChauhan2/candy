@@ -66,7 +66,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       for(let i=2;i<12;i+=3){
         const t=i/12, point=curve.getPoint(t), tangent=curve.getTangent(t).normalize()
         const side=(i%2?1:-1), nx=-tangent.z*side, nz=tangent.x*side
-        const tuft=new THREE.Group();tuft.position.set(point.x+nx*(width*.62),.12,point.z+nz*(width*.62));tuft.rotation.y=i*1.71;island.add(tuft)
+        const tuft=new THREE.Group();tuft.userData.keepGrass=true;tuft.position.set(point.x+nx*(width*.62),.12,point.z+nz*(width*.62));tuft.rotation.y=i*1.71;island.add(tuft)
         const bladeCount=2+(i%4)
         for(let blade=0;blade<bladeCount;blade++){
           const height=.18+((i+blade*3)%5)*.055, spread=(blade-(bladeCount-1)/2)*.09
@@ -89,7 +89,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       mesh.position.set(x, height / 2 + .38, z); mesh.rotation.y = Math.PI / 4; mesh.castShadow = true; island.add(mesh); return mesh
     }
     const addGroundTuft = (x:number,z:number,scale=1) => {
-      const tuft=new THREE.Group();tuft.position.set(x,.12,z);tuft.rotation.y=(x*3.7+z*1.9)%Math.PI;island.add(tuft)
+      const tuft=new THREE.Group();tuft.userData.keepGrass=true;tuft.position.set(x,.12,z);tuft.rotation.y=(x*3.7+z*1.9)%Math.PI;island.add(tuft)
       for(let i=0;i<4;i++){const blade=new THREE.Mesh(new THREE.ConeGeometry(.025+(i%2)*.012,(.2+i*.045)*scale,3),makeMaterial(0x91b989));blade.position.set((i-1.5)*.045,(.1+i*.022)*scale,(i%2-.5)*.06);blade.rotation.z=(i-1.5)*.12;tuft.add(blade)}
     }
 
@@ -278,6 +278,10 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     addUpgradeButton('A',0,0,11.25,4.7);addUpgradeButton('C',-20,-2,5.9);addUpgradeButton('D',10,-13,8.45);addUpgradeButton('E',-5.8,7.5,5.7);addUpgradeButton('F',12,11,5.2)
     addUpgradeButton('H',14,2.2,5);addUpgradeButton('I',9,4.4,5.15);addUpgradeButton('J',-8.8,-7,4.9);addUpgradeButton('L',16,-12,6.3);addUpgradeButton('M',-5.1,17,6.3);addUpgradeButton('N',5.1,17,6.3)
     homeSites.forEach(([x,z],index)=>addUpgradeButton(`H${index+1}`,x,z,4.9));addUpgradeButton('S2',7,-4.3,5);addUpgradeButton('O1',-10,4.7,5.15)
+    // The Builder starts with an empty landscape. Keep its terrain and grass
+    // details, but clear all prebuilt paths, monuments, and upgrade markers.
+    island.children.slice().forEach(child=>{if(child!==countryside&&child!==meadow&&!child.userData.keepGrass)island.remove(child)})
+    upgradeButtons.forEach(button=>scene.remove(button))
     const addTree = (x:number,z:number,scale=.85) => {
       const group = new THREE.Group(); group.position.set(x,.4,z); group.scale.setScalar(scale); island.add(group)
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929)); trunk.position.y=.62; trunk.castShadow=true;group.add(trunk)
@@ -302,7 +306,6 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       forestIndex++
     }
     forestTrunks.count=forestIndex;forestLeaves.count=forestIndex;forestTrunks.instanceMatrix.needsUpdate=true;forestLeaves.instanceMatrix.needsUpdate=true;island.add(forestTrunks,forestLeaves)
-    for (let i=0;i<58;i++) { const angle=i*2.4, radius=17+(i%4)*2.3; const bush=new THREE.Mesh(new THREE.DodecahedronGeometry(.28+(i%4)*.05),makeMaterial(i%5?0x71986c:0xe9e8d5)); bush.position.set(Math.cos(angle)*radius,.24,Math.sin(angle)*radius*.74);bush.castShadow=true;island.add(bush) }
 
     // Shared stone well at the end of the upper-right village path.
     const addWell = (x:number,z:number) => {
@@ -328,7 +331,6 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       for (const [x,z] of [[-.23,-.22],[-.23,.22],[.22,-.22],[.22,.22]]) { const leg=new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,.38,5),makeMaterial(0x50352a));leg.position.set(x,.2,z);group.add(leg);legs.push(leg) }
       animals.push({ group, legs, cx, cz, radius: 1.1 + (phase % 3) * .28, phase, speed: type === 'sheep' ? .45 : .62 })
     }
-    addAnimal(-13,-9,'sheep',0); addAnimal(-13,-9,'sheep',2.1); addAnimal(12,9,'deer',.9); addAnimal(12,9,'deer',3.4)
 
     // A few simple low-poly birds cross the open sky, flapping independently.
     const birds: { group: THREE.Group; phase: number; speed: number; startX: number; startZ: number; altitude: number }[] = []
@@ -340,7 +342,6 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       const right = new THREE.Mesh(new THREE.PlaneGeometry(.72,.26),wingMat); right.position.x=.34; right.rotation.z=-.34;group.add(right)
       birds.push({ group, phase, speed: .018 + (phase%3)*.004, startX: -65, startZ, altitude })
     }
-    addBird(-23,-10,0); addBird(-18,-13,1.4); addBird(-25,-6,2.8); addBird(-20,-3,4.1)
 
     const resize = () => {
       const { width, height } = host.getBoundingClientRect()
