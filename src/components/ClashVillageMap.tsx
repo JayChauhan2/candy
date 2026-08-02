@@ -384,14 +384,34 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       return group
     }
 
-    // The home kingdom begins with one modest castle. Its green plus matches
-    // the Coins control in the HUD, then disappears once upgraded.
-    const starterCastle=placeBuilderMonument('castle',0,0)
+    // The home kingdom begins with the full handcrafted castle: curtain walls,
+    // gatehouse, four towers, windows, banners, and the tall royal flag.
+    const buildKingdomCastle=(x:number,z:number)=>{
+      const castle=new THREE.Group();castle.position.set(x,0,z);island.add(castle)
+      const add=(geometry:THREE.BufferGeometry,color:number,y=0,px=0,pz=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.set(px,y,pz);mesh.castShadow=true;mesh.receiveShadow=true;castle.add(mesh);return mesh}
+      const box=(width:number,height:number,depth:number,color:number,px:number,pz:number)=>add(new THREE.BoxGeometry(width,height,depth),color,height/2+.38,px,pz)
+      const tower=(px:number,pz:number,height:number)=>{add(new THREE.CylinderGeometry(.98,1.1,height,10),stoneMid,height/2+.38,px,pz);add(new THREE.ConeGeometry(1.18,1.75,8),roofBlue,height+1.22,px,pz);const rim=add(new THREE.TorusGeometry(1.02,.1,6,10),stoneDark,height+.25,px,pz);rim.rotation.x=Math.PI/2;for(let i=0;i<6;i++){const a=i*Math.PI/3;box(.34,.48,.34,stoneLight,px+Math.cos(a)*.78,pz+Math.sin(a)*.78).position.y=height+.62}}
+      add(new THREE.CylinderGeometry(4.55,4.8,1.05,8),stoneDark,.53)
+      box(6.7,1.85,.7,stoneLight,0,-2.85);box(.7,1.85,5.3,stoneLight,-3,0);box(.7,1.85,5.3,stoneLight,3,0)
+      box(4.25,4.75,3.8,stoneLight,0,.45);box(3.65,.42,3.25,stoneMid,0,4.9)
+      ;[-1.6,-.8,0,.8,1.6].forEach(px=>{box(.43,.52,.42,stoneMid,px,-1.44).position.y=5.14;box(.43,.52,.42,stoneMid,px,2.36).position.y=5.14})
+      ;[-1.35,-.55,.55,1.35].forEach(pz=>{box(.42,.52,.43,stoneMid,-2.12,pz).position.y=5.14;box(.42,.52,.43,stoneMid,2.12,pz).position.y=5.14})
+      tower(-3.05,-2.85,4.35);tower(3.05,-2.85,4.35);tower(-3.05,2.85,4.05);tower(3.05,2.85,4.05)
+      ;[-1.25,0,1.25].forEach(px=>{const window=box(.34,.88,.06,0x577f9b,px,2.4);window.position.y=3.3});[-.8,.8].forEach(pz=>{const window=box(.06,.72,.32,0x577f9b,2.16,pz);window.position.y=3.35})
+      ;[-2.16,2.16].forEach(px=>{const banner=new THREE.Mesh(new THREE.PlaneGeometry(.65,1.35),new THREE.MeshBasicMaterial({color:0xd1a650,side:THREE.DoubleSide}));banner.position.set(px,3.35,3.84);banner.rotation.y=Math.PI;castle.add(banner)})
+      const pole=box(.1,3.8,.1,0x835a30,0,.45);pole.position.y=7.05
+      const royalFlag=new THREE.Mesh(new THREE.PlaneGeometry(2,.92),new THREE.MeshBasicMaterial({color:0xf0b933,side:THREE.DoubleSide}));royalFlag.position.set(1,8.85,.45);castle.add(royalFlag)
+      addRotationButton(castle,x,z,9.55)
+      return castle
+    }
+
+    // Its green plus matches the former Coins control and disappears once upgraded.
+    const starterCastle=buildKingdomCastle(0,0)
     const castleUpgradeCanvas=document.createElement('canvas');castleUpgradeCanvas.width=96;castleUpgradeCanvas.height=96
     const castleUpgradeCtx=castleUpgradeCanvas.getContext('2d')
     if(castleUpgradeCtx){castleUpgradeCtx.fillStyle='#249141';castleUpgradeCtx.beginPath();castleUpgradeCtx.arc(48,48,36,0,Math.PI*2);castleUpgradeCtx.fill();castleUpgradeCtx.fillStyle='#4dc95b';castleUpgradeCtx.beginPath();castleUpgradeCtx.arc(48,48,30,0,Math.PI*2);castleUpgradeCtx.fill();castleUpgradeCtx.fillStyle='#ffffff';castleUpgradeCtx.fillRect(43,27,10,42);castleUpgradeCtx.fillRect(27,43,42,10)}
     const castleUpgradeButton=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(castleUpgradeCanvas),depthTest:false,depthWrite:false,transparent:true}))
-    castleUpgradeButton.position.set(0,5.95,0);castleUpgradeButton.scale.set(1.05,1.05,1);castleUpgradeButton.userData={x:0,z:0,top:4.75,radius:2.2,upgraded:false,monument:starterCastle};scene.add(castleUpgradeButton);upgradeButtons.push(castleUpgradeButton)
+    castleUpgradeButton.position.set(0,10.8,0);castleUpgradeButton.scale.set(1.05,1.05,1);castleUpgradeButton.userData={x:0,z:0,top:9.55,radius:4.7,upgraded:false,monument:starterCastle};scene.add(castleUpgradeButton);upgradeButtons.push(castleUpgradeButton)
 
     const raycaster=new THREE.Raycaster()
     let activeBuilderType:BuilderType|null=null
