@@ -91,7 +91,6 @@ export default function KingdomHome() {
   const [battleOpponent, setBattleOpponent] = useState<string | null>(rubyPreview ? 'Empress Ruby' : null)
   const [rubyBattleMap, setRubyBattleMap] = useState(rubyPreview)
   const [rubyIntroStarted, setRubyIntroStarted] = useState(rubyPreview)
-  const [leaderboard, setLeaderboard] = useState(false)
   const [closingBattle, setClosingBattle] = useState(false)
   const [irisPhase, setIrisPhase] = useState<IrisPhase>('idle')
   const startBuilderDrag = (dataTransfer: DataTransfer, type: string) => {
@@ -194,15 +193,14 @@ export default function KingdomHome() {
       </aside>
 
       <nav className="kh-dock" aria-label="Game actions">
-        <HUDButton label="SHOP" image={shopIcon} onClick={() => show('Shop selected')} />
-        <HUDButton label="TROOPS" image={troopsIcon} notice="3" onClick={() => show('Three troops are ready')} />
+        <HUDButton label="SHOP" image={shopIcon} onClick={() => show('Shop coming soon')} />
+        <HUDButton label="TROOPS" image={troopsIcon} notice="3" onClick={() => show('Troops coming soon')} />
         <button className="kh-battle" onClick={() => setBattlePicker(true)}><img className="kh-battle-icon" src={battleIcon} alt="" /><b>BATTLE!</b><small>TOAD RALLY</small></button>
-        <HUDButton label="FRIENDS" icon="♛" notice="1" onClick={() => show('One friend request')} />
-        <HUDButton label="LEADERBOARD" icon="♜" onClick={() => setLeaderboard(true)} />
+        <HUDButton label="FRIENDS" icon="♛" notice="1" onClick={() => show('Friends coming soon')} />
+        <HUDButton label="LEADERBOARD" icon="♜" onClick={() => show('Leaderboard coming soon')} />
       </nav>
       <div className={`kh-toast${noticeVisible ? ' visible' : ''}`} role="status">{notice}</div>
       {battlePicker && <BattlePicker onClose={() => setBattlePicker(false)} onChoose={chooseOpponent} />}
-      {leaderboard && <Leaderboard onClose={() => setLeaderboard(false)} />}
       {battleLoading && <BattleLoading closing={closingBattle} onBack={closeBattle} />}
       {rubyBattleMap && <RubyBattleMap startIntro={rubyIntroStarted} onBack={() => { setRubyBattleMap(false); setRubyIntroStarted(false); setBattleOpponent(null) }} />}
       {irisPhase !== 'idle' && <div className={`battle-iris ${irisPhase}`} aria-hidden="true" />}
