@@ -354,7 +354,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     if(rotationCtx){rotationCtx.fillStyle='#ffffff';rotationCtx.font='700 54px Arial';rotationCtx.textAlign='center';rotationCtx.textBaseline='middle';rotationCtx.fillText('↻',48,49)}
     const rotationTexture=new THREE.CanvasTexture(rotationCanvas)
     const addRotationButton=(monument:THREE.Group,x:number,z:number,height:number)=>{const button=new THREE.Sprite(new THREE.SpriteMaterial({map:rotationTexture,depthTest:false,depthWrite:false,transparent:true}));button.position.set(x,height,z);button.scale.set(1.35,1.35,1);button.userData={monument,x,z};button.visible=false;scene.add(button);rotationButtons.push(button)}
-    const placeBuilderMonument=(type:BuilderType,x:number,z:number)=>{
+    const placeBuilderMonument=(type:BuilderType,x:number,z:number,isPreview=false)=>{
       const group=new THREE.Group();group.position.set(x,.38,z);island.add(group)
       const add=(geometry:THREE.BufferGeometry,color:number,y=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.y=y;mesh.castShadow=true;group.add(mesh);return mesh}
       add(new THREE.CylinderGeometry(1.45,1.62,.18,12),0x8f7658,.09)
@@ -377,7 +377,10 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       else if(type==='campfire'){add(new THREE.CylinderGeometry(.7,.84,.13,10),0x5b554c,.13);add(new THREE.ConeGeometry(.44,.94,6),0xe85c2e,.62);add(new THREE.ConeGeometry(.2,.6,6),0xffdc63,.78);buttonHeight=2.15}
       else if(type==='signpost'){add(new THREE.CylinderGeometry(.06,.09,1.5,6),0x755038,.81);const arm=add(new THREE.BoxGeometry(1.12,.25,.1),0xceb16c,1.23);arm.position.x=.28;arm.rotation.y=.2;buttonHeight=2.35}
       else{add(new THREE.CylinderGeometry(.045,.06,1.55,6),0x5e4b3b,.84);add(new THREE.OctahedronGeometry(.19),0xf2d77b,1.62);buttonHeight=2.4}
-      addRotationButton(group,x,z,buttonHeight)
+      if(isPreview){
+        const previewWhite=new THREE.Color(0xffffff)
+        group.traverse(node=>{if(node instanceof THREE.Mesh){node.castShadow=false;const materials=Array.isArray(node.material)?node.material:[node.material];materials.forEach(material=>{material.transparent=true;material.opacity=.48;material.depthWrite=false;if(material instanceof THREE.MeshStandardMaterial){material.color.lerp(previewWhite,.3);material.emissive.set(0xffffff);material.emissiveIntensity=.1}else if(material instanceof THREE.MeshBasicMaterial){material.color.lerp(previewWhite,.3)}material.needsUpdate=true})}})
+      }else addRotationButton(group,x,z,buttonHeight)
       return group
     }
 
@@ -391,6 +394,15 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     castleUpgradeButton.position.set(0,5.95,0);castleUpgradeButton.scale.set(1.05,1.05,1);castleUpgradeButton.userData={x:0,z:0,top:4.75,radius:2.2,upgraded:false,monument:starterCastle};scene.add(castleUpgradeButton);upgradeButtons.push(castleUpgradeButton)
 
     const raycaster=new THREE.Raycaster()
+    let activeBuilderType:BuilderType|null=null
+    let dragPreview:THREE.Group|null=null
+    let dragPreviewType:BuilderType|null=null
+    const clearDragPreview=()=>{if(!dragPreview)return;island.remove(dragPreview);dragPreview.traverse(node=>{if(node instanceof THREE.Mesh){node.geometry.dispose();const materials=Array.isArray(node.material)?node.material:[node.material];materials.forEach(material=>material.dispose())}});dragPreview=null;dragPreviewType=null}
+    const showDragPreview=(type:BuilderType,x:number,z:number)=>{if(dragPreviewType!==type){clearDragPreview();dragPreview=placeBuilderMonument(type,x,z,true);dragPreviewType=type}else if(dragPreview)dragPreview.position.set(x,.38,z)}
+    const trackBuilderDragStart=(event:DragEvent)=>{const type=event.dataTransfer?.getData('application/x-candy-monument');activeBuilderType=builderTypes.includes(type as BuilderType)?type as BuilderType:null}
+    const endBuilderDrag=()=>{activeBuilderType=null;clearDragPreview()}
+    window.addEventListener('dragstart',trackBuilderDragStart)
+    window.addEventListener('dragend',endBuilderDrag)
     const resize = () => {
       const { width, height } = host.getBoundingClientRect()
       const aspect = width / height
@@ -415,14 +427,14 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const hideRotationButtons=()=>rotationButtons.forEach(button=>button.visible=false)
     host.addEventListener('pointerleave',hideRotationButtons)
     const upgradeClick=(event:PointerEvent)=>{const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const rotateHit=raycaster.intersectObjects(rotationButtons,false)[0];if(rotateHit){const monument=rotateHit.object.userData.monument as THREE.Group;monument.rotation.y+=Math.PI/2;return}const hit=raycaster.intersectObjects(upgradeButtons,false)[0];if(hit)upgradeStructure(hit.object as THREE.Sprite)}
-    const allowBuilderDrop=(event:DragEvent)=>{event.preventDefault();event.dataTransfer.dropEffect='copy'}
-    const dropBuilderMonument=(event:DragEvent)=>{event.preventDefault();const type=event.dataTransfer.getData('application/x-candy-monument');if(!builderTypes.includes(type as BuilderType))return;const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit)return;const point=island.worldToLocal(hit.point.clone());placeBuilderMonument(type as BuilderType,point.x,point.z)}
+    const allowBuilderDrop=(event:DragEvent)=>{event.preventDefault();event.dataTransfer.dropEffect='copy';const type=(activeBuilderType||event.dataTransfer.getData('application/x-candy-monument')) as BuilderType;if(!builderTypes.includes(type))return;const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit)return;const point=island.worldToLocal(hit.point.clone());showDragPreview(type,point.x,point.z)}
+    const dropBuilderMonument=(event:DragEvent)=>{event.preventDefault();const type=(activeBuilderType||event.dataTransfer.getData('application/x-candy-monument')) as BuilderType;if(!builderTypes.includes(type)){clearDragPreview();return}const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit){clearDragPreview();return}const point=island.worldToLocal(hit.point.clone());clearDragPreview();placeBuilderMonument(type,point.x,point.z);activeBuilderType=null}
     host.addEventListener('pointerdown',upgradeClick)
     host.addEventListener('dragover',allowBuilderDrop)
     host.addEventListener('drop',dropBuilderMonument)
     const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; yaw += ((Math.atan2(26,22) + pointerX*.6) - yaw)*.055; height += ((28 - pointerY*7) - height)*.055; island.rotation.y = Math.sin(time * .16) * .008; camera.position.set(Math.cos(yaw)*34,height,Math.sin(yaw)*34); camera.lookAt(0,.7,0); flag.rotation.z = Math.sin(time * 2.3) * .08; upgradeSparkles.forEach((sparkle)=>{const age=time-sparkle.started;if(age>1.45){sparkle.mesh.visible=false;return}const spread=.35+age*1.5;sparkle.mesh.visible=true;sparkle.mesh.position.set(sparkle.x+Math.cos(sparkle.phase)*spread,1.2+age*3.1+Math.sin(sparkle.phase*3)*.18,sparkle.z+Math.sin(sparkle.phase)*spread);sparkle.mesh.rotation.y=time*6;sparkle.mesh.scale.setScalar(1-age*.45)});campfireFlames.forEach((flame,index)=>{const pulse=1+Math.sin(time*7+index)*.1;flame.scale.set(pulse,1+Math.sin(time*8+index)*.13,pulse)});campfireSmoke.forEach((smoke)=>{const life=(time*.19+smoke.phase)%1;const scale=.55+life*.95;smoke.puff.position.set(Math.sin(time*1.3+smoke.phase*9)*.18,1.45+life*3.9,Math.cos(time*1.1+smoke.phase*7)*.16);smoke.puff.scale.setScalar(scale);smoke.puff.rotation.y=time+smoke.phase*8;smoke.material.opacity=(1-life)*.3}); animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); windmillRotors.forEach((rotor,index)=>{rotor.rotation.z=time*(.75+index*.15)}); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*130; bird.group.position.y = bird.altitude + Math.sin(time*1.1+bird.phase)*.22; bird.group.position.z = bird.startZ + Math.sin(time*.32+bird.phase)*2.1; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.28 + Math.sin(time*4.1+bird.phase)*.38) }) }); renderer.render(scene, camera) }
     animate()
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); host.removeEventListener('pointermove', move);host.removeEventListener('pointerleave',hideRotationButtons); host.removeEventListener('pointerdown',upgradeClick);host.removeEventListener('dragover',allowBuilderDrop);host.removeEventListener('drop',dropBuilderMonument); renderer.dispose(); host.removeChild(renderer.domElement) }
+    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize);window.removeEventListener('dragstart',trackBuilderDragStart);window.removeEventListener('dragend',endBuilderDrag);clearDragPreview(); host.removeEventListener('pointermove', move);host.removeEventListener('pointerleave',hideRotationButtons); host.removeEventListener('pointerdown',upgradeClick);host.removeEventListener('dragover',allowBuilderDrop);host.removeEventListener('drop',dropBuilderMonument); renderer.dispose(); host.removeChild(renderer.domElement) }
 }
 
 export const ClashVillageMap = () => {
