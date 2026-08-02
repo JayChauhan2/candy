@@ -282,12 +282,8 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     // details, but clear all prebuilt paths, monuments, and upgrade markers.
     island.children.slice().forEach(child=>{if(child!==countryside&&child!==meadow&&!child.userData.keepGrass)island.remove(child)})
     upgradeButtons.forEach(button=>scene.remove(button))
-    const addTree = (x:number,z:number,scale=.85) => {
-      const group = new THREE.Group(); group.position.set(x,.4,z); group.scale.setScalar(scale); island.add(group)
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929)); trunk.position.y=.62; trunk.castShadow=true;group.add(trunk)
-      const leaves = new THREE.Mesh(new THREE.ConeGeometry(.92,2.45,8),makeMaterial(0x4f932f)); leaves.position.y=1.85;leaves.castShadow=true;group.add(leaves)
-    }
-    ;[[-19,-5,1],[-18,10,.9],[-7,15,.85],[2,18,.75],[19,4,.9],[20,-8,.8],[-6,-15,.75],[4,-16,.9],[-20,-13,.9],[18,14,.9]].forEach(([x,z,s])=>addTree(x,z,s))
+    // Keep the middle open for building. The dense forest begins well outside
+    // the clearing rather than scattering individual trees through it.
     // Instanced circular forest: twelve concentric bands continue past the view, never revealing a square map edge.
     const forestBands = 12, treesPerBand = 68, forestCount = forestBands * treesPerBand
     const forestTrunks = new THREE.InstancedMesh(new THREE.CylinderGeometry(.16,.25,1.25,7),makeMaterial(0x704929),forestCount)
@@ -297,7 +293,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     let forestIndex=0
     for(let band=0;band<forestBands;band++) for(let i=0;i<treesPerBand;i++){
       const seed=forestIndex*17.41, angle=(i/treesPerBand)*Math.PI*2+band*.19
-      const radius=21+band*2.85+Math.sin(seed)*.78, scale=.76+((i*7+band*3)%8)*.1
+      const radius=26+band*2.85+Math.sin(seed)*.78, scale=.76+((i*7+band*3)%8)*.1
       const x=Math.cos(angle)*radius*1.18, z=Math.sin(angle)*radius*.9
       // Leave a single wide woodland corridor aligned with the castle's forward exit road.
       if(z>6 && Math.abs(x)<3.3) continue
