@@ -13,4 +13,11 @@
 @media(max-width:700px){.ruby-commands{left:8px;right:auto;transform-origin:top left}.ruby-chat{left:auto;right:8px;bottom:8px;transform-origin:bottom right}.ruby-ruler-thought{right:8px;bottom:158px;transform:scale(.72);transform-origin:bottom right}}
 
 .ruby-turn-indicator{position:absolute;top:25px;right:26px;z-index:2;color:#ffe99b;font-size:31px;font-weight:800;letter-spacing:1px;line-height:1;text-shadow:0 3px #67243d,0 6px 10px #250d1bcc;pointer-events:none}
+.ruby-pan-coach{position:absolute;top:50%;left:50%;z-index:3;display:grid;justify-items:center;gap:12px;transform:translate(-50%,-50%);color:#ffe99b;pointer-events:none;text-shadow:0 3px #67243d,0 6px 10px #250d1bcc}
+.ruby-pan-coach>b{font-size:26px;letter-spacing:1.4px;animation:ruby-pan-coach-pulse 1.05s ease-in-out infinite alternate}
+.ruby-pan-coach>div{position:relative;width:112px;height:92px}
+.ruby-pan-caret{position:absolute;color:#ffe99b;font-size:30px;font-style:normal;line-height:1;animation:ruby-pan-caret-pulse .92s ease-in-out infinite alternate}
+.ruby-pan-caret.up{top:0;left:50%;transform:translateX(-50%)}.ruby-pan-caret.right{top:50%;right:0;transform:translateY(-50%);animation-delay:.18s}.ruby-pan-caret.down{bottom:0;left:50%;transform:translateX(-50%);animation-delay:.36s}.ruby-pan-caret.left{top:50%;left:0;transform:translateY(-50%);animation-delay:.54s}
+.ruby-pan-mouse{position:absolute;top:50%;left:50%;width:27px;height:39px;border:3px solid #ffe99b;border-radius:15px;transform:translate(-50%,-50%);box-shadow:0 3px #67243d}.ruby-pan-mouse:before{content:"";position:absolute;top:0;left:50%;width:3px;height:13px;background:#ffe99b;transform:translateX(-50%)}.ruby-pan-mouse:after{content:"☝";position:absolute;right:-18px;bottom:-17px;color:#fff5c8;font-size:23px;text-shadow:0 2px #67243d;animation:ruby-pan-hand 1.05s ease-in-out infinite alternate}
+@keyframes ruby-pan-coach-pulse{from{transform:scale(.9);opacity:.72}to{transform:scale(1.08);opacity:1}}@keyframes ruby-pan-caret-pulse{from{opacity:.45}to{opacity:1}}@keyframes ruby-pan-hand{from{transform:translate(-3px,-2px)}to{transform:translate(4px,3px)}}
 @media(max-width:700px){.ruby-turn-indicator{top:16px;right:13px;font-size:20px}}
