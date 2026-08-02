@@ -3,10 +3,8 @@ import battleIcon from './assets/battle.png'
 import coinIcon from './assets/coin.png'
 import emberforgeOpponent from './assets/emberforge-clean.png'
 import frostpineOpponent from './assets/frostpine-clean.png'
-import gemIcon from './assets/gem.png'
 import rubyOpponent from './assets/ruby-clean.png'
 import shopIcon from './assets/shop.png'
-import starIcon from './assets/star.png'
 import sunstoneOpponent from './assets/sunstone-clean.png'
 import troopsIcon from './assets/troops.png'
 import { ClashVillageMap } from './components/ClashVillageMap'
@@ -149,8 +147,6 @@ export default function KingdomHome() {
         </button>
         <div className="kh-resources">
           <button className="kh-resource kh-gold" onClick={() => show('18,420 coins in the royal vault')}><span><img src={coinIcon} alt="" /></span><b>18 420</b><strong>+</strong></button>
-          <button className="kh-resource kh-gems" onClick={() => show('Gem shop coming soon')}><span><img src={gemIcon} alt="" /></span><b>1 280</b><strong>+</strong></button>
-          <button className="kh-resource kh-stars" onClick={() => show('74 Power Stars collected')}><span><img src={starIcon} alt="" /></span><b>74</b><strong>+</strong></button>
         </div>
         <div className="kh-header-actions">
           <button onClick={() => show('Music toggled')} aria-label="Toggle music">♫</button>
