@@ -172,9 +172,9 @@ export default function KingdomHome() {
       <aside className="kh-builder" aria-label="Builder monument menu">
         <header><b>BUILDER</b><small>DRAG TO ADD</small></header>
         <div className="kh-builder-list">
-          <div><span>♜</span><b>WATCHTOWER</b></div><div><span>⌂</span><b>GUILD HALL</b></div>
-          <div><span>✦</span><b>FOUNTAIN</b></div><div><span>⚒</span><b>FORGE</b></div>
-          <div><span>♧</span><b>GARDEN</b></div><div><span>⚑</span><b>BANNER POST</b></div>
+          <div><span className="kh-builder-preview watchtower"><i /><em /></span><b>WATCHTOWER</b></div><div><span className="kh-builder-preview guildhall"><i /><em /></span><b>GUILD HALL</b></div>
+          <div><span className="kh-builder-preview fountain"><i /><em /></span><b>FOUNTAIN</b></div><div><span className="kh-builder-preview forge"><i /><em /></span><b>FORGE</b></div>
+          <div><span className="kh-builder-preview garden"><i /><em /></span><b>GARDEN</b></div><div><span className="kh-builder-preview bannerpost"><i /><em /></span><b>BANNER POST</b></div>
         </div>
       </aside>
 
