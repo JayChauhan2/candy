@@ -408,7 +408,9 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const resize = () => {
       const { width, height } = host.getBoundingClientRect()
       const aspect = width / height
-      const halfHeight = 13.5
+      // Laptop-sized desktop viewports need a little more breathing room than
+      // wide external monitors, otherwise the map reads unnecessarily zoomed in.
+      const halfHeight = width <= 1700 ? 16 : 13.5
       // Matching the horizontal and vertical world-unit scale prevents the old tall/stretchy look.
       camera.left = -halfHeight * aspect; camera.right = halfHeight * aspect
       camera.top = halfHeight; camera.bottom = -halfHeight
