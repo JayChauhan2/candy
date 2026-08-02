@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 
-export type BuilderMonument = 'watchtower' | 'guildhall' | 'fountain' | 'forge' | 'garden' | 'bannerpost' | 'castle' | 'cottage' | 'stable' | 'storage' | 'farm' | 'windmill' | 'well' | 'market' | 'trainingyard' | 'campfire' | 'signpost' | 'lantern'
+export type BuilderMonument = 'house' | 'station' | 'watchtower' | 'guildhall' | 'fountain' | 'forge' | 'garden' | 'bannerpost' | 'castle' | 'cottage' | 'stable' | 'storage' | 'farm' | 'windmill' | 'well' | 'market' | 'trainingyard' | 'campfire' | 'signpost' | 'lantern'
 
 const makeMaterial = (color:number) => new THREE.MeshStandardMaterial({ color, roughness:.78, flatShading:true })
 
@@ -38,7 +38,13 @@ export const BuilderMonumentPreview = ({ type }: { type: BuilderMonument }) => {
     const monument = new THREE.Group(); scene.add(monument)
     const add = (geometry:THREE.BufferGeometry,color:number,x=0,y=0,z=0) => { const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.set(x,y,z);monument.add(mesh);return mesh }
     add(new THREE.CylinderGeometry(1.42,1.55,.16,12),0x907c58,0,.08,0)
-    if(type==='watchtower'){
+    if(type==='house'){
+      add(new THREE.CylinderGeometry(1.0,1.14,1.38,8),0xe0bd78,0,.78,0);add(new THREE.ConeGeometry(1.4,1.25,7),0xc85b43,0,2.08,0)
+      add(new THREE.BoxGeometry(.46,.72,.08),0x71483a,0,.44,.94)
+    }else if(type==='station'){
+      add(new THREE.BoxGeometry(2.55,.16,1.85),0x916f50,0,.16,0);add(new THREE.BoxGeometry(2.32,1.55,.16),0xb18d63,0,.9,-.78);add(new THREE.ConeGeometry(1.82,.82,4),0x477cb2,0,1.95,0)
+      ;[-.9,.9].forEach(x=>{add(new THREE.CylinderGeometry(.07,.09,2.15,5),0x765139,x,1.22,.7);const flag=add(new THREE.PlaneGeometry(.42,.52),0xe25a4d,x+.22,1.78,.7);flag.rotation.y=Math.PI/2})
+    }else if(type==='watchtower'){
       add(new THREE.CylinderGeometry(.58,.68,1.95,8),0xd6c08a,0,1.06,0);add(new THREE.ConeGeometry(.86,.94,6),0xd65345,0,2.47,0)
       add(new THREE.BoxGeometry(.18,.58,.08),0x70483a,0,.63,.64)
     }else if(type==='guildhall'){

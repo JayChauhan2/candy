@@ -344,7 +344,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       birds.push({ group, phase, speed: .018 + (phase%3)*.004, startX: -65, startZ, altitude })
     }
 
-    const builderTypes=['watchtower','guildhall','fountain','forge','garden','bannerpost','castle','cottage','stable','storage','farm','windmill','well','market','trainingyard','campfire','signpost','lantern'] as const
+    const builderTypes=['house','station','watchtower','guildhall','fountain','forge','garden','bannerpost','castle','cottage','stable','storage','farm','windmill','well','market','trainingyard','campfire','signpost','lantern'] as const
     type BuilderType=typeof builderTypes[number]
     const rotationButtons: THREE.Sprite[]=[]
     const rotationCanvas=document.createElement('canvas');rotationCanvas.width=96;rotationCanvas.height=96
@@ -357,7 +357,9 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       const add=(geometry:THREE.BufferGeometry,color:number,y=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.y=y;mesh.castShadow=true;group.add(mesh);return mesh}
       add(new THREE.CylinderGeometry(1.45,1.62,.18,12),0x8f7658,.09)
       let buttonHeight=3
-      if(type==='watchtower'){add(new THREE.CylinderGeometry(.62,.72,2.15,8),0xd7c18c,1.16);add(new THREE.ConeGeometry(.9,1.0,6),0xd65345,2.74);buttonHeight=4.15}
+      if(type==='house'){add(new THREE.CylinderGeometry(1.02,1.16,1.42,8),0xe0bd78,.8);add(new THREE.ConeGeometry(1.42,1.28,7),0xc85b43,2.12);const door=add(new THREE.BoxGeometry(.48,.74,.08),0x71483a,.45);door.position.z=.98;buttonHeight=3.2}
+      else if(type==='station'){add(new THREE.BoxGeometry(2.65,.18,1.95),0x916f50,.18);const back=add(new THREE.BoxGeometry(2.4,1.58,.16),0xb18d63,.95);back.position.z=-.86;add(new THREE.ConeGeometry(1.88,.84,4),0x477cb2,1.98);[-.95,.95].forEach(px=>{const pole=add(new THREE.CylinderGeometry(.07,.09,2.18,5),0x765139,1.28);pole.position.set(px,1.28,.78);const flag=new THREE.Mesh(new THREE.PlaneGeometry(.44,.54),new THREE.MeshBasicMaterial({color:0xe25a4d,side:THREE.DoubleSide}));flag.position.set(px+.22,1.84,.78);flag.rotation.y=Math.PI/2;group.add(flag)});buttonHeight=3.7}
+      else if(type==='watchtower'){add(new THREE.CylinderGeometry(.62,.72,2.15,8),0xd7c18c,1.16);add(new THREE.ConeGeometry(.9,1.0,6),0xd65345,2.74);buttonHeight=4.15}
       else if(type==='guildhall'){add(new THREE.BoxGeometry(2.2,1.3,1.65),0xe4c27d,.74);add(new THREE.ConeGeometry(1.72,.98,4),0x477cb2,1.87);buttonHeight=3.05}
       else if(type==='fountain'){add(new THREE.CylinderGeometry(1.05,1.2,.35,12),0xa49d90,.3);add(new THREE.CylinderGeometry(.74,.87,.34,12),0x6fc8dc,.58);add(new THREE.ConeGeometry(.2,.86,6),0xddebf0,1.16);buttonHeight=2.35}
       else if(type==='forge'){add(new THREE.CylinderGeometry(.94,1.1,1.32,8),0x744447,.75);add(new THREE.ConeGeometry(1.34,.86,6),0x3c2a35,1.84);const fire=add(new THREE.SphereGeometry(.34,7,6),0xff9d46,.72);fire.scale.y=.55;fire.position.z=1.08;buttonHeight=3.15}

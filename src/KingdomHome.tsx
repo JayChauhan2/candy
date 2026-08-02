@@ -7,7 +7,7 @@ import shopIcon from './assets/shop.png'
 import sunstoneOpponent from './assets/sunstone-clean.png'
 import troopsIcon from './assets/troops.png'
 import { ClashVillageMap } from './components/ClashVillageMap'
-import { BuilderMonumentPreview } from './components/BuilderMonumentPreview'
+import { BuilderMonumentPreview, type BuilderMonument } from './components/BuilderMonumentPreview'
 import { RubyBattleMap } from './components/RubyBattleMap'
 import './kingdom-home.css'
 import './icon-overrides.css'
@@ -17,6 +17,24 @@ import './leaderboard.css'
 
 type Notice = string | null
 type IrisPhase = 'idle' | 'closing' | 'closed' | 'opening'
+type BuilderItem = { type: BuilderMonument; label: string }
+
+const coreBuilderItems: BuilderItem[] = [
+  { type: 'house', label: 'HOUSE' },
+  { type: 'station', label: 'STATION' },
+]
+
+const decorBuilderItems: BuilderItem[] = [
+  { type: 'watchtower', label: 'WATCHTOWER' }, { type: 'guildhall', label: 'GUILD HALL' },
+  { type: 'fountain', label: 'FOUNTAIN' }, { type: 'forge', label: 'FORGE' },
+  { type: 'garden', label: 'GARDEN' }, { type: 'bannerpost', label: 'BANNER POST' },
+  { type: 'castle', label: 'CASTLE' }, { type: 'cottage', label: 'COTTAGE' },
+  { type: 'stable', label: 'STABLE' }, { type: 'storage', label: 'STORAGE' },
+  { type: 'farm', label: 'FARM' }, { type: 'windmill', label: 'WINDMILL' },
+  { type: 'well', label: 'WELL' }, { type: 'market', label: 'MARKET' },
+  { type: 'trainingyard', label: 'TRAINING YARD' }, { type: 'campfire', label: 'CAMPFIRE' },
+  { type: 'signpost', label: 'SIGNPOST' }, { type: 'lantern', label: 'LANTERN' },
+]
 
 const HUDButton = ({ label, icon, image, notice, onClick }: { label: string; icon?: string; image?: string; notice?: string; onClick: () => void }) => (
   <button className="kh-dock-item" onClick={onClick} aria-label={label}>
@@ -84,6 +102,7 @@ export default function KingdomHome() {
   const rubyPreview = typeof window !== 'undefined' && window.location.hash === '#ruby'
   const [notice, setNotice] = useState<Notice>(null)
   const [noticeVisible, setNoticeVisible] = useState(false)
+  const [builderTab, setBuilderTab] = useState<'core' | 'decor'>('core')
   const noticeHideTimer = useRef<number | null>(null)
   const noticeClearTimer = useRef<number | null>(null)
   const [battleLoading, setBattleLoading] = useState(false)
@@ -178,17 +197,9 @@ export default function KingdomHome() {
       </aside>
 
       <aside className="kh-builder" aria-label="Builder monument menu">
-        <header><b>MAP BUILDER</b><small>DRAG TO ADD</small></header>
+        <header><b>MAP BUILDER</b><small>DRAG TO ADD</small><div className="kh-builder-tabs"><button className={builderTab === 'core' ? 'active' : ''} onClick={() => setBuilderTab('core')}>CORE</button><button className={builderTab === 'decor' ? 'active' : ''} onClick={() => setBuilderTab('decor')}>DECOR</button></div></header>
         <div className="kh-builder-list">
-          <div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'watchtower')}><BuilderMonumentPreview type="watchtower" /><b>WATCHTOWER</b></div><div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'guildhall')}><BuilderMonumentPreview type="guildhall" /><b>GUILD HALL</b></div>
-          <div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'fountain')}><BuilderMonumentPreview type="fountain" /><b>FOUNTAIN</b></div><div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'forge')}><BuilderMonumentPreview type="forge" /><b>FORGE</b></div>
-          <div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'garden')}><BuilderMonumentPreview type="garden" /><b>GARDEN</b></div><div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'bannerpost')}><BuilderMonumentPreview type="bannerpost" /><b>BANNER POST</b></div>
-          <div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'castle')}><BuilderMonumentPreview type="castle" /><b>CASTLE</b></div><div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'cottage')}><BuilderMonumentPreview type="cottage" /><b>COTTAGE</b></div>
-          <div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'stable')}><BuilderMonumentPreview type="stable" /><b>STABLE</b></div><div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'storage')}><BuilderMonumentPreview type="storage" /><b>STORAGE</b></div>
-          <div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'farm')}><BuilderMonumentPreview type="farm" /><b>FARM</b></div><div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'windmill')}><BuilderMonumentPreview type="windmill" /><b>WINDMILL</b></div>
-          <div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'well')}><BuilderMonumentPreview type="well" /><b>WELL</b></div><div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'market')}><BuilderMonumentPreview type="market" /><b>MARKET</b></div>
-          <div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'trainingyard')}><BuilderMonumentPreview type="trainingyard" /><b>TRAINING YARD</b></div><div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'campfire')}><BuilderMonumentPreview type="campfire" /><b>CAMPFIRE</b></div>
-          <div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'signpost')}><BuilderMonumentPreview type="signpost" /><b>SIGNPOST</b></div><div draggable onDragStart={(event)=>startBuilderDrag(event.dataTransfer,'lantern')}><BuilderMonumentPreview type="lantern" /><b>LANTERN</b></div>
+          {(builderTab === 'core' ? coreBuilderItems : decorBuilderItems).map((item) => <div key={item.type} draggable onDragStart={(event) => startBuilderDrag(event.dataTransfer,item.type)}><BuilderMonumentPreview type={item.type} /><b>{item.label}</b></div>)}
         </div>
       </aside>
 
