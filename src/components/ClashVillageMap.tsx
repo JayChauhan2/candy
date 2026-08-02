@@ -388,7 +388,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       const castle=new THREE.Group();castle.position.set(x,0,z);island.add(castle)
       const add=(geometry:THREE.BufferGeometry,color:number,y=0,px=0,pz=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.set(px,y,pz);mesh.castShadow=true;mesh.receiveShadow=true;castle.add(mesh);return mesh}
       const box=(width:number,height:number,depth:number,color:number,px:number,pz:number)=>add(new THREE.BoxGeometry(width,height,depth),color,height/2+.38,px,pz)
-      const tower=(px:number,pz:number,height:number)=>{add(new THREE.CylinderGeometry(.98,1.1,height,10),stoneMid,height/2+.38,px,pz);const rim=add(new THREE.TorusGeometry(1.02,.1,6,10),stoneDark,height+.25,px,pz);rim.rotation.x=Math.PI/2;for(let i=0;i<6;i++){const a=i*Math.PI/3;box(.34,.48,.34,stoneLight,px+Math.cos(a)*.78,pz+Math.sin(a)*.78).position.y=height+.62}}
+      const tower=(px:number,pz:number,height:number)=>{add(new THREE.CylinderGeometry(.98,1.1,height,10),stoneMid,height/2+.38,px,pz);add(new THREE.ConeGeometry(1.18,1.75,8),roofBlue,height+1.22,px,pz);const rim=add(new THREE.TorusGeometry(1.02,.1,6,10),stoneDark,height+.25,px,pz);rim.rotation.x=Math.PI/2}
       add(new THREE.CylinderGeometry(4.55,4.8,1.05,8),stoneDark,.53)
       box(6.7,1.85,.7,stoneLight,0,-2.85);box(.7,1.85,5.3,stoneLight,-3,0);box(.7,1.85,5.3,stoneLight,3,0)
       box(4.25,4.75,3.8,stoneLight,0,.45);box(3.65,.42,3.25,stoneMid,0,4.9)
