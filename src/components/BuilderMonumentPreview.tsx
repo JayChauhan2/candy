@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 
 export type BuilderMonument = 'watchtower' | 'guildhall' | 'fountain' | 'forge' | 'garden' | 'bannerpost' | 'castle' | 'cottage' | 'stable' | 'storage' | 'farm' | 'windmill' | 'well' | 'market' | 'trainingyard' | 'campfire' | 'signpost' | 'lantern'
@@ -7,9 +7,25 @@ const makeMaterial = (color:number) => new THREE.MeshStandardMaterial({ color, r
 
 export const BuilderMonumentPreview = ({ type }: { type: BuilderMonument }) => {
   const hostRef = useRef<HTMLSpanElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  // Each card is a real Three.js scene. Keep renderers only for cards visible in
+  // the Builder scroll area so the page never runs out of WebGL contexts.
   useEffect(() => {
     const host = hostRef.current
     if (!host) return
+    const scrollArea = host.closest('.kh-builder-list')
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { root: scrollArea, threshold: 0.05 },
+    )
+    observer.observe(host)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const host = hostRef.current
+    if (!host || !isVisible) return
     const scene = new THREE.Scene()
     const camera = new THREE.OrthographicCamera(-2.5,2.5,1.9,-1.9,.1,30)
     camera.position.set(4.4,4.5,6.2); camera.lookAt(0,1,0)
@@ -67,6 +83,6 @@ export const BuilderMonumentPreview = ({ type }: { type: BuilderMonument }) => {
     }
     monument.rotation.y=-.36; renderer.render(scene,camera)
     return () => { monument.traverse((node) => { if(node instanceof THREE.Mesh){node.geometry.dispose();const materials=Array.isArray(node.material)?node.material:[node.material];materials.forEach(material=>material.dispose())} }); renderer.dispose(); renderer.domElement.remove() }
-  },[type])
+  },[type,isVisible])
   return <span ref={hostRef} className="kh-builder-preview kh-builder-preview-3d" aria-hidden="true" />
 }
