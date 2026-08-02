@@ -37,8 +37,6 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const island = new THREE.Group(); scene.add(island)
     const countryside = new THREE.Mesh(new THREE.PlaneGeometry(130, 100), makeMaterial(0x7fab7b))
     countryside.rotation.x = -Math.PI / 2; countryside.position.y = -.04; countryside.receiveShadow = true; island.add(countryside)
-    const meadow = new THREE.Mesh(new THREE.CircleGeometry(26, 48), makeMaterial(0x91b989))
-    meadow.rotation.x = -Math.PI / 2; meadow.scale.z = .76; meadow.position.y = .01; meadow.receiveShadow = true; island.add(meadow)
     const pathMat = makeMaterial(0xd4d0bf)
     // A full round plaza hides path joins and makes every route flow cleanly into the castle.
     const ring = new THREE.Mesh(new THREE.CircleGeometry(5.7, 40), pathMat); ring.rotation.x = -Math.PI / 2; ring.position.y = .07; ring.receiveShadow = true; island.add(ring)
@@ -280,8 +278,17 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     homeSites.forEach(([x,z],index)=>addUpgradeButton(`H${index+1}`,x,z,4.9));addUpgradeButton('S2',7,-4.3,5);addUpgradeButton('O1',-10,4.7,5.15)
     // The Builder starts with an empty landscape. Keep its terrain and grass
     // details, but clear all prebuilt paths, monuments, and upgrade markers.
-    island.children.slice().forEach(child=>{if(child!==countryside&&child!==meadow&&!child.userData.keepGrass)island.remove(child)})
+    island.children.slice().forEach(child=>{if(child!==countryside&&!child.userData.keepGrass)island.remove(child)})
     upgradeButtons.forEach(button=>scene.remove(button))
+    // Fill the buildable clearing with small, irregularly spaced grass clusters.
+    // A deterministic scatter keeps the scene stable without forming a visible grid.
+    for(let i=0;i<84;i++){
+      const angle=i*2.39996323
+      const radius=Math.sqrt((i+.55)/84)*22.5
+      const x=Math.cos(angle)*radius*1.14+Math.sin(i*1.73)*.72
+      const z=Math.sin(angle)*radius*.78+Math.cos(i*1.21)*.55
+      addGroundTuft(x,z,.55+(i%6)*.09)
+    }
     // Keep the middle open for building. The dense forest begins well outside
     // the clearing rather than scattering individual trees through it.
     // Instanced circular forest: twelve concentric bands continue past the view, never revealing a square map edge.
