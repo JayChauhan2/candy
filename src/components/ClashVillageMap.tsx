@@ -303,8 +303,6 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       const seed=forestIndex*17.41, angle=(i/treesPerBand)*Math.PI*2+band*.19
       const radius=26+band*2.85+Math.sin(seed)*.78, scale=.76+((i*7+band*3)%8)*.1
       const x=Math.cos(angle)*radius*1.18, z=Math.sin(angle)*radius*.9
-      // Leave a single wide woodland corridor aligned with the castle's forward exit road.
-      if(z>6 && Math.abs(x)<3.3) continue
       treeMatrix.position.set(x,.4+(.62*scale),z);treeMatrix.rotation.set(0,angle+.22,0);treeMatrix.scale.setScalar(scale);treeMatrix.updateMatrix();forestTrunks.setMatrixAt(forestIndex,treeMatrix.matrix)
       treeMatrix.position.set(x,.4+(1.85*scale),z);treeMatrix.scale.setScalar(scale);treeMatrix.updateMatrix();forestLeaves.setMatrixAt(forestIndex,treeMatrix.matrix)
       forestIndex++
