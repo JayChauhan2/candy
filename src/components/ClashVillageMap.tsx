@@ -351,7 +351,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const rotationCtx=rotationCanvas.getContext('2d')
     if(rotationCtx){rotationCtx.fillStyle='#ffffff';rotationCtx.font='700 54px Arial';rotationCtx.textAlign='center';rotationCtx.textBaseline='middle';rotationCtx.fillText('↻',48,49)}
     const rotationTexture=new THREE.CanvasTexture(rotationCanvas)
-    const addRotationButton=(monument:THREE.Group,x:number,z:number,height:number)=>{const button=new THREE.Sprite(new THREE.SpriteMaterial({map:rotationTexture,depthTest:false,depthWrite:false,transparent:true}));button.position.set(x,height,z);button.scale.set(1.35,1.35,1);button.userData={monument,x,z};button.visible=false;scene.add(button);rotationButtons.push(button)}
+    const addRotationButton=(monument:THREE.Group,x:number,z:number,height:number)=>{const button=new THREE.Sprite(new THREE.SpriteMaterial({map:rotationTexture,depthTest:false,depthWrite:false,transparent:true}));button.position.set(x,height,z);button.scale.set(1.85,1.85,1);button.userData={monument,x,z};button.visible=false;scene.add(button);rotationButtons.push(button)}
     const placeBuilderMonument=(type:BuilderType,x:number,z:number,isPreview=false)=>{
       const group=new THREE.Group();group.position.set(x,.38,z);island.add(group)
       const add=(geometry:THREE.BufferGeometry,color:number,y=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.y=y;mesh.castShadow=true;group.add(mesh);return mesh}
