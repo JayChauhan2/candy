@@ -396,6 +396,15 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       else if(type==='campfire'){add(new THREE.CylinderGeometry(.7,.84,.13,10),0x5b554c,.13);add(new THREE.ConeGeometry(.44,.94,6),0xe85c2e,.62);add(new THREE.ConeGeometry(.2,.6,6),0xffdc63,.78);buttonHeight=2.15}
       else if(type==='signpost'){add(new THREE.CylinderGeometry(.06,.09,1.5,6),0x755038,.81);const arm=add(new THREE.BoxGeometry(1.12,.25,.1),0xceb16c,1.23);arm.position.x=.28;arm.rotation.y=.2;buttonHeight=2.35}
       else{add(new THREE.CylinderGeometry(.045,.06,1.55,6),0x5e4b3b,.84);add(new THREE.OctahedronGeometry(.19),0xf2d77b,1.62);buttonHeight=2.4}
+      // Core buildings grow out from the castle through a worn, slightly
+      // curved route rather than looking dropped into an isolated clearing.
+      if(!isPreview&&(type==='house'||type==='station1')){
+        const distance=Math.hypot(x,z)
+        if(distance>5){
+          const directionX=x/distance,directionZ=z/distance
+          addPath(directionX*4.25,directionZ*4.25,x-directionX*1.55,z-directionZ*1.55,.82)
+        }
+      }
       if(isPreview){
         const previewWhite=new THREE.Color(0xffffff)
         group.traverse(node=>{if(node instanceof THREE.Mesh){node.castShadow=false;const materials=Array.isArray(node.material)?node.material:[node.material];materials.forEach(material=>{material.transparent=true;material.opacity=.48;material.depthWrite=false;if(material instanceof THREE.MeshStandardMaterial){material.color.lerp(previewWhite,.3);material.emissive.set(0xffffff);material.emissiveIntensity=.1}else if(material instanceof THREE.MeshBasicMaterial){material.color.lerp(previewWhite,.3)}material.needsUpdate=true})}})

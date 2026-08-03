@@ -21,7 +21,7 @@ type BuilderItem = { type: BuilderMonument; label: string }
 
 const coreBuilderItems: BuilderItem[] = [
   { type: 'house', label: 'HOUSE' },
-  { type: 'station1', label: 'SCOUT PERCH' },
+  { type: 'station1', label: 'OUTPOST' },
 ]
 
 const decorBuilderItems: BuilderItem[] = [
