@@ -42,6 +42,17 @@ export const BuilderMonumentPreview = ({ type }: { type: BuilderMonument }) => {
       add(new THREE.CylinderGeometry(1.0,1.14,1.38,8),0xe0bd78,0,.78,0);add(new THREE.ConeGeometry(1.4,1.25,7),0xc85b43,0,2.08,0)
       add(new THREE.BoxGeometry(.46,.72,.08),0x71483a,0,.44,.94)
     }else if(type.startsWith('station')){
+      const variant=Number(type.slice(7)), roofColors=[0x477cb2,0x386ba3,0x5d6fa8,0xd65443,0x527c9c,0x426a91,0x6f8fa0,0x486e9a,0x5b6f9e,0x315f99], woodColors=[0x8c6745,0x765139,0x9b704b,0x704929,0x916f50,0x79543c,0x9b7b58,0x6f5848,0x755038,0x826048], height=2.25+(variant%4)*.35, deck=2.15+(variant%3)*.22
+      add(new THREE.CylinderGeometry(1.32,1.62,.48,8),0x777a74,0,.32,0)
+      ;[[-.86,-.6],[.86,-.6],[-.86,.6],[.86,.6]].forEach(([x,z])=>add(new THREE.CylinderGeometry(.09,.12,height,6),woodColors[variant-1],x,.48+height/2,z))
+      ;[-1,1].forEach(side=>{const brace=add(new THREE.BoxGeometry(.1,height*.8,.1),woodColors[variant-1],side*.72,.85+height*.36,.64);brace.rotation.z=side*(.45+(variant%3)*.06)})
+      add(new THREE.BoxGeometry(deck,.2,1.72),woodColors[variant-1],0,height+.58,0)
+      if(variant===4||variant===8){add(new THREE.CylinderGeometry(1.02,1.18,1.32,8),0xa39273,0,height+1.28,0);add(new THREE.ConeGeometry(1.5,.9,6),roofColors[variant-1],0,height+2.35,0)}
+      else {add(new THREE.BoxGeometry(1.7+(variant%2)*.3,1.16+(variant%3)*.12,1.35),0x916f50,0,height+1.27,0);add(new THREE.ConeGeometry(1.42+(variant%2)*.16,.9,4),roofColors[variant-1],0,height+2.38,0)}
+      if(variant===2||variant===5||variant===7){add(new THREE.BoxGeometry(.92,.12,1.05),woodColors[variant-1],-1.35,height+.76,0)}
+      if(variant===6||variant===9){add(new THREE.ConeGeometry(.28,.7,6),0xe85c2e,.45,height+1.05,.86)}
+      const pole=add(new THREE.CylinderGeometry(.05,.06,2.05,6),0x704929,.7,height+3.32,0);const flag=add(new THREE.PlaneGeometry(1.06,.55),roofColors[variant-1],1.24,height+3.86,0);flag.rotation.y=Math.PI/2
+    }else if(false && type.startsWith('station')){
       const variant=Number(type.slice(7))
       if(variant===1){add(new THREE.CylinderGeometry(1.45,1.6,.16,10),0x916f50,0,.16,0);add(new THREE.ConeGeometry(1.32,1.42,7),0xd65443,0,1.28,0);add(new THREE.CylinderGeometry(.06,.08,2.4,5),0x765139,1.15,1.28,0)}
       else if(variant===2){add(new THREE.BoxGeometry(2.55,.18,1.85),0x916f50,0,.18,0);add(new THREE.BoxGeometry(2.3,1.6,.18),0xb18d63,0,.96,-.78);add(new THREE.ConeGeometry(1.84,.86,4),0x477cb2,0,2.0,0)}
