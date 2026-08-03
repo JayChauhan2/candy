@@ -480,8 +480,15 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       const point = hit ? island.worldToLocal(hit.point.clone()) : null
       monumentControls.forEach(control=>{
         const groundDist=point?Math.hypot(point.x-control.x,point.z-control.z):Infinity
+        controlWorldPosition.set(control.x,control.height,control.z).project(camera)
+        const controlScreenX=(controlWorldPosition.x+1)*.5*rect.width
+        const controlScreenY=(-controlWorldPosition.y+1)*.5*rect.height
+        // The controls sit above the model, so ground-distance alone creates a
+        // dead gap while the cursor travels upward. Keep their whole on-screen
+        // approach area alive as well.
+        const controlDist=Math.hypot(event.clientX-rect.left-controlScreenX,event.clientY-rect.top-controlScreenY)
         const buttonHovered=control.rotate.matches(':hover')||control.remove.matches(':hover')
-        setControlVisibility(control,groundDist<5.5||buttonHovered)
+        setControlVisibility(control,groundDist<5.5||controlDist<175||buttonHovered)
       })
     }
     host.addEventListener('pointermove', move)
