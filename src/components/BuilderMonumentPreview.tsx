@@ -40,7 +40,7 @@ export const BuilderMonumentPreview = ({ type }: { type: BuilderMonument }) => {
     if(!type.startsWith('station')) add(new THREE.CylinderGeometry(1.42,1.55,.16,12),0x907c58,0,.08,0)
     if(type==='house'){
       add(new THREE.CylinderGeometry(1.0,1.14,1.38,8),0xe0bd78,0,.78,0);add(new THREE.ConeGeometry(1.4,1.25,7),0xc85b43,0,2.08,0)
-      add(new THREE.BoxGeometry(.46,.72,.08),0x71483a,0,.44,.94)
+      add(new THREE.BoxGeometry(.46,.72,.08),0x71483a,0,.44,1.16)
     }else if(type.startsWith('station')){
       const variant=Number(type.slice(7)), roofColors=[0x477cb2,0x386ba3,0x5d6fa8,0xd65443,0x527c9c,0x426a91,0x6f8fa0,0x486e9a,0x5b6f9e,0x315f99], woodColors=[0x8c6745,0x765139,0x9b704b,0x704929,0x916f50,0x79543c,0x9b7b58,0x6f5848,0x755038,0x826048], height=2.25+(variant%4)*.35, deck=2.15+(variant%3)*.22
       add(new THREE.CylinderGeometry(1.32,1.62,.48,8),0x777a74,0,.32,0)
