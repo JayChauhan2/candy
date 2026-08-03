@@ -37,7 +37,7 @@ export const BuilderMonumentPreview = ({ type }: { type: BuilderMonument }) => {
     const sun = new THREE.DirectionalLight(0xffe0a0,2.1); sun.position.set(-3,6,5); scene.add(sun)
     const monument = new THREE.Group(); scene.add(monument)
     const add = (geometry:THREE.BufferGeometry,color:number,x=0,y=0,z=0) => { const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.set(x,y,z);monument.add(mesh);return mesh }
-    add(new THREE.CylinderGeometry(1.42,1.55,.16,12),0x907c58,0,.08,0)
+    if(!type.startsWith('station')) add(new THREE.CylinderGeometry(1.42,1.55,.16,12),0x907c58,0,.08,0)
     if(type==='house'){
       add(new THREE.CylinderGeometry(1.0,1.14,1.38,8),0xe0bd78,0,.78,0);add(new THREE.ConeGeometry(1.4,1.25,7),0xc85b43,0,2.08,0)
       add(new THREE.BoxGeometry(.46,.72,.08),0x71483a,0,.44,.94)
