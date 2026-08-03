@@ -463,7 +463,9 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const updateControlPositions=()=>{
       const rect=host.getBoundingClientRect()
       monumentControls.forEach(control=>{
-        controlWorldPosition.set(control.x,control.height,control.z).project(camera)
+        // Convert from the monument's local top point so the HTML controls
+        // inherit the island's tiny animated rotation exactly like the model.
+        control.monument.localToWorld(controlWorldPosition.set(0,control.height-.38,0)).project(camera)
         const left=(controlWorldPosition.x+1)*.5*rect.width
         const top=(-controlWorldPosition.y+1)*.5*rect.height
         control.rotate.style.left=`${left-28}px`;control.rotate.style.top=`${top}px`
@@ -480,7 +482,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       const point = hit ? island.worldToLocal(hit.point.clone()) : null
       monumentControls.forEach(control=>{
         const groundDist=point?Math.hypot(point.x-control.x,point.z-control.z):Infinity
-        controlWorldPosition.set(control.x,control.height,control.z).project(camera)
+        control.monument.localToWorld(controlWorldPosition.set(0,control.height-.38,0)).project(camera)
         const controlScreenX=(controlWorldPosition.x+1)*.5*rect.width
         const controlScreenY=(-controlWorldPosition.y+1)*.5*rect.height
         // The controls sit above the model, so ground-distance alone creates a
