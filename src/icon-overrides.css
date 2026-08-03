@@ -70,7 +70,7 @@
 /* Keep the game composition comfortable on common laptop-sized desktop screens.
    Wide external monitors retain the larger presentation above this breakpoint. */
 @media (min-width:821px) and (max-width:1700px){
-  .kh-top-hud{inset:12px 20px auto;transform:scale(.84);transform-origin:top left;width:calc(100% / .84)}
+  .kh-top-hud{inset:12px 20px auto;transform:scale(.84);transform-origin:top left;width:calc((100% - 40px) / .84)}
   .kh-quest{left:20px;top:102px;transform:scale(.84);transform-origin:top left}
   .kh-kingdom-card{left:20px;bottom:20px;transform:scale(.84);transform-origin:bottom left}
   .kh-event{right:20px;top:112px;transform:scale(.84);transform-origin:top right}
