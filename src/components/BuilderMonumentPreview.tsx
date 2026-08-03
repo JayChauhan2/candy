@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 
-export type BuilderMonument = 'house' | 'station' | 'watchtower' | 'guildhall' | 'fountain' | 'forge' | 'garden' | 'bannerpost' | 'castle' | 'cottage' | 'stable' | 'storage' | 'farm' | 'windmill' | 'well' | 'market' | 'trainingyard' | 'campfire' | 'signpost' | 'lantern'
+export type BuilderMonument = 'house' | 'station1' | 'station2' | 'station3' | 'station4' | 'station5' | 'station6' | 'station7' | 'station8' | 'station9' | 'station10' | 'watchtower' | 'guildhall' | 'fountain' | 'forge' | 'garden' | 'bannerpost' | 'castle' | 'cottage' | 'stable' | 'storage' | 'farm' | 'windmill' | 'well' | 'market' | 'trainingyard' | 'campfire' | 'signpost' | 'lantern'
 
 const makeMaterial = (color:number) => new THREE.MeshStandardMaterial({ color, roughness:.78, flatShading:true })
 
@@ -41,9 +41,18 @@ export const BuilderMonumentPreview = ({ type }: { type: BuilderMonument }) => {
     if(type==='house'){
       add(new THREE.CylinderGeometry(1.0,1.14,1.38,8),0xe0bd78,0,.78,0);add(new THREE.ConeGeometry(1.4,1.25,7),0xc85b43,0,2.08,0)
       add(new THREE.BoxGeometry(.46,.72,.08),0x71483a,0,.44,.94)
-    }else if(type==='station'){
-      add(new THREE.BoxGeometry(2.55,.16,1.85),0x916f50,0,.16,0);add(new THREE.BoxGeometry(2.32,1.55,.16),0xb18d63,0,.9,-.78);add(new THREE.ConeGeometry(1.82,.82,4),0x477cb2,0,1.95,0)
-      ;[-.9,.9].forEach(x=>{add(new THREE.CylinderGeometry(.07,.09,2.15,5),0x765139,x,1.22,.7);const flag=add(new THREE.PlaneGeometry(.42,.52),0xe25a4d,x+.22,1.78,.7);flag.rotation.y=Math.PI/2})
+    }else if(type.startsWith('station')){
+      const variant=Number(type.slice(7))
+      if(variant===1){add(new THREE.CylinderGeometry(1.45,1.6,.16,10),0x916f50,0,.16,0);add(new THREE.ConeGeometry(1.32,1.42,7),0xd65443,0,1.28,0);add(new THREE.CylinderGeometry(.06,.08,2.4,5),0x765139,1.15,1.28,0)}
+      else if(variant===2){add(new THREE.BoxGeometry(2.55,.18,1.85),0x916f50,0,.18,0);add(new THREE.BoxGeometry(2.3,1.6,.18),0xb18d63,0,.96,-.78);add(new THREE.ConeGeometry(1.84,.86,4),0x477cb2,0,2.0,0)}
+      else if(variant===3){add(new THREE.CylinderGeometry(1.58,1.58,.12,12),0xbda978,0,.12,0);for(let i=0;i<4;i++)add(new THREE.CylinderGeometry(.08,.1,1.35,5),0x765139,Math.cos(i*Math.PI/2)*1.18,.75,Math.sin(i*Math.PI/2)*1.18)}
+      else if(variant===4){add(new THREE.CylinderGeometry(1.65,1.78,.22,9),0x78533b,0,.2,0);for(let i=0;i<8;i++)add(new THREE.CylinderGeometry(.1,.13,1.68,5),0x8c6745,Math.cos(i*Math.PI/4)*1.37,.92,Math.sin(i*Math.PI/4)*1.37);add(new THREE.ConeGeometry(.62,1.12,6),0xd65443,0,1.82,0)}
+      else if(variant===5){add(new THREE.CylinderGeometry(.75,.9,2.6,8),0xa39273,0,1.48,0);add(new THREE.ConeGeometry(1.16,1.08,6),0x477cb2,0,3.28,0);add(new THREE.CylinderGeometry(1.3,1.3,.14,10),0x916f50,0,.13,0)}
+      else if(variant===6){add(new THREE.BoxGeometry(2.35,.2,1.72),0x716354,0,.18,0);add(new THREE.CylinderGeometry(.92,1.08,1.48,8),0x744447,0,1.0,0);add(new THREE.ConeGeometry(1.35,.88,6),0x3c2a35,0,2.08,0);add(new THREE.SphereGeometry(.35,7,6),0xff9d46,0,.82,1.08)}
+      else if(variant===7){add(new THREE.BoxGeometry(2.75,.18,1.9),0x9b7b58,0,.16,0);add(new THREE.BoxGeometry(2.5,1.45,.16),0xb18d63,0,.88,-.82);add(new THREE.ConeGeometry(1.95,.78,4),0x6f8fa0,0,1.88,0);add(new THREE.SphereGeometry(.38,7,6),0x8a5d43,-.72,.68,.18);add(new THREE.SphereGeometry(.38,7,6),0x8a5d43,.72,.68,.18)}
+      else if(variant===8){add(new THREE.CylinderGeometry(.82,.96,3.1,8),0xa39d92,0,1.7,0);add(new THREE.ConeGeometry(1.22,1.28,6),0x6e91ad,0,3.9,0);add(new THREE.BoxGeometry(.58,.68,.08),0x71483a,0,1.1,.9)}
+      else if(variant===9){add(new THREE.CylinderGeometry(1.3,1.45,.18,10),0x5b554c,0,.16,0);add(new THREE.CylinderGeometry(.9,1.08,1.55,8),0x6d3b3d,0,.98,0);add(new THREE.ConeGeometry(1.36,.9,6),0x3f2631,0,2.15,0);add(new THREE.ConeGeometry(.42,.95,6),0xe85c2e,0,.95,1.08)}
+      else {add(new THREE.CylinderGeometry(1.48,1.68,.35,8),0x777a74,0,.26,0);add(new THREE.BoxGeometry(2.22,1.8,1.72),0xa89f91,0,1.25,0);[-.88,.88].forEach(x=>{add(new THREE.CylinderGeometry(.36,.42,2.5,8),0x9da89c,x,1.48,0);add(new THREE.ConeGeometry(.52,.66,6),0x577f9b,x,3.05,0)})}
     }else if(type==='watchtower'){
       add(new THREE.CylinderGeometry(.58,.68,1.95,8),0xd6c08a,0,1.06,0);add(new THREE.ConeGeometry(.86,.94,6),0xd65345,0,2.47,0)
       add(new THREE.BoxGeometry(.18,.58,.08),0x70483a,0,.63,.64)
