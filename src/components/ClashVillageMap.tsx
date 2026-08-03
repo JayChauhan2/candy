@@ -475,11 +475,12 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
 
     const move = (event: PointerEvent) => {
       const rect = host.getBoundingClientRect()
-      pointerX = (event.clientX - rect.left) / rect.width - .5
-      pointerY = (event.clientY - rect.top) / rect.height - .5
-      raycaster.setFromCamera(new THREE.Vector2(pointerX * 2, -pointerY * 2), camera)
+      const nextPointerX = (event.clientX - rect.left) / rect.width - .5
+      const nextPointerY = (event.clientY - rect.top) / rect.height - .5
+      raycaster.setFromCamera(new THREE.Vector2(nextPointerX * 2, -nextPointerY * 2), camera)
       const hit = raycaster.intersectObject(countryside, false)[0]
       const point = hit ? island.worldToLocal(hit.point.clone()) : null
+      let nearMonumentControl=false
       monumentControls.forEach(control=>{
         const groundDist=point?Math.hypot(point.x-control.x,point.z-control.z):Infinity
         control.monument.localToWorld(controlWorldPosition.set(0,control.height-.38,0)).project(camera)
@@ -490,8 +491,12 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
         // approach area alive as well.
         const controlDist=Math.hypot(event.clientX-rect.left-controlScreenX,event.clientY-rect.top-controlScreenY)
         const buttonHovered=control.rotate.matches(':hover')||control.remove.matches(':hover')
+        nearMonumentControl ||= groundDist<5.5||controlDist<175||buttonHovered
         setControlVisibility(control,groundDist<5.5||controlDist<175||buttonHovered)
       })
+      // Do not let the decorative cursor-parallax camera chase the cursor
+      // while it is moving from a model up to its controls.
+      if(!nearMonumentControl){pointerX=nextPointerX;pointerY=nextPointerY}
     }
     host.addEventListener('pointermove', move)
 
