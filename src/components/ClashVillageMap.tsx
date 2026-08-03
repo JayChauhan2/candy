@@ -399,7 +399,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       if(isPreview){
         const previewWhite=new THREE.Color(0xffffff)
         group.traverse(node=>{if(node instanceof THREE.Mesh){node.castShadow=false;const materials=Array.isArray(node.material)?node.material:[node.material];materials.forEach(material=>{material.transparent=true;material.opacity=.48;material.depthWrite=false;if(material instanceof THREE.MeshStandardMaterial){material.color.lerp(previewWhite,.3);material.emissive.set(0xffffff);material.emissiveIntensity=.1}else if(material instanceof THREE.MeshBasicMaterial){material.color.lerp(previewWhite,.3)}material.needsUpdate=true})}})
-      }else addRotationButton(group,x,z,buttonHeight)
+      }
       return group
     }
 
