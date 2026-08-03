@@ -191,7 +191,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     }
     const windmillRotors: THREE.Group[] = []
     const addWindmill = (x:number,z:number) => {
-      const group=new THREE.Group();group.position.set(x,.38,z);island.add(group)
+      const group=new THREE.Group();group.position.set(x,0,z);island.add(group)
       const base=new THREE.Mesh(new THREE.CylinderGeometry(1.65,2.05,.34,10),makeMaterial(0x8d7658));base.position.y=.17;group.add(base)
       const body=new THREE.Mesh(new THREE.CylinderGeometry(.88,1.38,4.3,8),makeMaterial(0xe0ba58));body.position.y=2.32;body.castShadow=true;group.add(body)
       const roof=new THREE.Mesh(new THREE.ConeGeometry(1.38,1.75,8),makeMaterial(0x386ba3));roof.position.y=5.35;roof.castShadow=true;group.add(roof)
@@ -433,7 +433,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     let dragPreview:THREE.Group|null=null
     let dragPreviewType:BuilderType|null=null
     const clearDragPreview=()=>{if(!dragPreview)return;island.remove(dragPreview);dragPreview.traverse(node=>{if(node instanceof THREE.Mesh){node.geometry.dispose();const materials=Array.isArray(node.material)?node.material:[node.material];materials.forEach(material=>material.dispose())}});dragPreview=null;dragPreviewType=null}
-    const showDragPreview=(type:BuilderType,x:number,z:number)=>{if(dragPreviewType!==type){clearDragPreview();dragPreview=placeBuilderMonument(type,x,z,true);dragPreviewType=type}else if(dragPreview)dragPreview.position.set(x,.38,z)}
+    const showDragPreview=(type:BuilderType,x:number,z:number)=>{if(dragPreviewType!==type){clearDragPreview();dragPreview=placeBuilderMonument(type,x,z,true);dragPreviewType=type}else if(dragPreview)dragPreview.position.set(x,0,z)}
     const trackBuilderDragStart=(event:DragEvent)=>{const type=event.dataTransfer?.getData('application/x-candy-monument');activeBuilderType=builderTypes.includes(type as BuilderType)?type as BuilderType:null}
     const trackExplicitBuilderDragStart=(event:Event)=>{const type=(event as CustomEvent<string>).detail;activeBuilderType=builderTypes.includes(type as BuilderType)?type as BuilderType:null}
     const endBuilderDrag=()=>{activeBuilderType=null;clearDragPreview()}
