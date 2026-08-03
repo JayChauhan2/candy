@@ -104,6 +104,7 @@ export default function KingdomHome() {
   const [noticeVisible, setNoticeVisible] = useState(false)
   const [builderTab, setBuilderTab] = useState<'core' | 'decor'>('core')
   const [draggingBuilderItem, setDraggingBuilderItem] = useState<BuilderMonument | null>(null)
+  const [coreBuildingCounts, setCoreBuildingCounts] = useState({ house: 0, station1: 0 })
   const noticeHideTimer = useRef<number | null>(null)
   const noticeClearTimer = useRef<number | null>(null)
   const [battleLoading, setBattleLoading] = useState(false)
@@ -113,6 +114,15 @@ export default function KingdomHome() {
   const [rubyIntroStarted, setRubyIntroStarted] = useState(rubyPreview)
   const [closingBattle, setClosingBattle] = useState(false)
   const [irisPhase, setIrisPhase] = useState<IrisPhase>('idle')
+  useEffect(() => {
+    const updateCoreCount = (event: Event) => {
+      const type = (event as CustomEvent<'house' | 'station1'>).detail
+      if (type !== 'house' && type !== 'station1') return
+      setCoreBuildingCounts(counts => ({ ...counts, [type]: Math.min(6, counts[type] + 1) }))
+    }
+    window.addEventListener('candy-builder-monument-placed', updateCoreCount)
+    return () => window.removeEventListener('candy-builder-monument-placed', updateCoreCount)
+  }, [])
   const startBuilderDrag = (dataTransfer: DataTransfer, type: string) => {
     setDraggingBuilderItem(type as BuilderMonument)
     dataTransfer.setData('application/x-candy-monument', type)
@@ -202,7 +212,11 @@ export default function KingdomHome() {
         <header><b>MAP BUILDER</b><small>DRAG TO ADD</small></header>
         <div className="kh-builder-tabs"><button className={builderTab === 'core' ? 'active' : ''} onClick={() => setBuilderTab('core')}>CORE</button><button className={builderTab === 'decor' ? 'active' : ''} onClick={() => setBuilderTab('decor')}>DECOR</button></div>
         <div className="kh-builder-list">
-          {(builderTab === 'core' ? coreBuilderItems : decorBuilderItems).map((item) => <div key={item.type} className={draggingBuilderItem === item.type ? 'dragging' : ''} draggable onDragStart={(event) => startBuilderDrag(event.dataTransfer,item.type)} onDragEnd={() => setDraggingBuilderItem(null)}><BuilderMonumentPreview type={item.type} /><b>{item.label}</b></div>)}
+          {(builderTab === 'core' ? coreBuilderItems : decorBuilderItems).map((item) => {
+            const count = item.type === 'house' || item.type === 'station1' ? coreBuildingCounts[item.type] : null
+            const atLimit = count === 6
+            return <div key={item.type} className={`${draggingBuilderItem === item.type ? 'dragging' : ''}${atLimit ? ' at-limit' : ''}`} draggable={!atLimit} onDragStart={(event) => startBuilderDrag(event.dataTransfer,item.type)} onDragEnd={() => setDraggingBuilderItem(null)}><BuilderMonumentPreview type={item.type} /><b>{item.label}{count !== null && <small>{count}/6</small>}</b></div>
+          })}
         </div>
       </aside>
 

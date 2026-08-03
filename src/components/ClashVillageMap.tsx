@@ -358,6 +358,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const builderTypes=['house','station1','station2','station3','station4','station5','station6','station7','station8','station9','station10','watchtower','guildhall','fountain','forge','garden','bannerpost','castle','cottage','stable','storage','farm','windmill','well','market','trainingyard','campfire','signpost','lantern'] as const
     type BuilderType=typeof builderTypes[number]
     let corePathCount=0
+    const coreBuildingCounts: Record<'house'|'station1',number>={house:0,station1:0}
     // These are DOM controls deliberately, rather than Three.js sprites. The
     // canvas is excellent for the map but it should not be responsible for a
     // two-step destructive UI action: browser buttons give each press a real,
@@ -420,6 +421,10 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       if(isPreview){
         const previewWhite=new THREE.Color(0xffffff)
         group.traverse(node=>{if(node instanceof THREE.Mesh){node.castShadow=false;const materials=Array.isArray(node.material)?node.material:[node.material];materials.forEach(material=>{material.transparent=true;material.opacity=.48;material.depthWrite=false;if(material instanceof THREE.MeshStandardMaterial){material.color.lerp(previewWhite,.3);material.emissive.set(0xffffff);material.emissiveIntensity=.1}else if(material instanceof THREE.MeshBasicMaterial){material.color.lerp(previewWhite,.3)}material.needsUpdate=true})}})
+      }
+      if(!isPreview&&(type==='house'||type==='station1')){
+        coreBuildingCounts[type]++
+        window.dispatchEvent(new CustomEvent('candy-builder-monument-placed',{detail:type}))
       }
       return group
     }
@@ -534,7 +539,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       if (hit) upgradeStructure(hit.object as THREE.Sprite)
     }
     const allowBuilderDrop=(event:DragEvent)=>{event.preventDefault();event.dataTransfer.dropEffect='copy';const type=(activeBuilderType||event.dataTransfer.getData('application/x-candy-monument')) as BuilderType;if(!builderTypes.includes(type))return;const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit)return;const point=island.worldToLocal(hit.point.clone());showDragPreview(type,point.x,point.z)}
-    const dropBuilderMonument=(event:DragEvent)=>{event.preventDefault();const type=(activeBuilderType||event.dataTransfer.getData('application/x-candy-monument')) as BuilderType;if(!builderTypes.includes(type)){clearDragPreview();return}const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit){clearDragPreview();return}const point=island.worldToLocal(hit.point.clone());clearDragPreview();placeBuilderMonument(type,point.x,point.z);activeBuilderType=null}
+    const dropBuilderMonument=(event:DragEvent)=>{event.preventDefault();const type=(activeBuilderType||event.dataTransfer.getData('application/x-candy-monument')) as BuilderType;if(!builderTypes.includes(type)){clearDragPreview();return}if((type==='house'||type==='station1')&&coreBuildingCounts[type]>=6){clearDragPreview();activeBuilderType=null;return}const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit){clearDragPreview();return}const point=island.worldToLocal(hit.point.clone());clearDragPreview();placeBuilderMonument(type,point.x,point.z);activeBuilderType=null}
     host.addEventListener('pointerdown',upgradeClick)
     host.addEventListener('dragover',allowBuilderDrop)
     host.addEventListener('drop',dropBuilderMonument)
