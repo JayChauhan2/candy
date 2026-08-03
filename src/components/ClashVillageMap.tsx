@@ -360,7 +360,10 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const confirmCtx=confirmCanvas.getContext('2d')
     if(confirmCtx){confirmCtx.strokeStyle='#4dc95b';confirmCtx.lineWidth=11;confirmCtx.lineCap='round';confirmCtx.lineJoin='round';confirmCtx.beginPath();confirmCtx.moveTo(25,49);confirmCtx.lineTo(42,66);confirmCtx.lineTo(72,29);confirmCtx.stroke()}
     const confirmTexture=new THREE.CanvasTexture(confirmCanvas);confirmTexture.needsUpdate=true
-    const addRotationButton=(monument:THREE.Group,x:number,z:number,height:number)=>{const button=new THREE.Sprite(new THREE.SpriteMaterial({map:rotationTexture,depthTest:false,depthWrite:false,transparent:true}));const remove=new THREE.Sprite(new THREE.SpriteMaterial({map:deleteTexture,depthTest:false,depthWrite:false,transparent:true}));button.position.set(x-.9,height,z);remove.position.set(x+.9,height,z);button.scale.set(2.25,2.25,1);remove.scale.set(2.25,2.25,1);button.userData={monument,x,z,deleteButton:remove};remove.userData={monument,rotationButton:button};button.visible=false;remove.visible=false;scene.add(button,remove);rotationButtons.push(button);deleteButtons.push(remove)}
+    const rotationMaterial = new THREE.SpriteMaterial({map:rotationTexture,depthTest:false,depthWrite:false,transparent:true})
+    const deleteMaterial = new THREE.SpriteMaterial({map:deleteTexture,depthTest:false,depthWrite:false,transparent:true})
+    const confirmMaterial = new THREE.SpriteMaterial({map:confirmTexture,depthTest:false,depthWrite:false,transparent:true})
+    const addRotationButton=(monument:THREE.Group,x:number,z:number,height:number)=>{const button=new THREE.Sprite(rotationMaterial);const remove=new THREE.Sprite(deleteMaterial);button.position.set(x-.9,height,z);remove.position.set(x+.9,height,z);button.scale.set(2.25,2.25,1);remove.scale.set(2.25,2.25,1);button.userData={monument,x,z,deleteButton:remove};remove.userData={monument,rotationButton:button};button.visible=false;remove.visible=false;scene.add(button,remove);rotationButtons.push(button);deleteButtons.push(remove)}
     const placeBuilderMonument=(type:BuilderType,x:number,z:number,isPreview=false)=>{
       const group=new THREE.Group();group.position.set(x,.38,z);island.add(group)
       const add=(geometry:THREE.BufferGeometry,color:number,y=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.y=y;mesh.castShadow=true;group.add(mesh);return mesh}
@@ -445,20 +448,104 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     }
     resize(); window.addEventListener('resize', resize)
     let pointerX = 0, pointerY = 0, yaw = Math.atan2(26,22), height = 28, frame = 0, hoveredControl:THREE.Sprite|null = null
-    const move = (event:PointerEvent) => {
-      const rect=host.getBoundingClientRect(); pointerX = (event.clientX-rect.left) / rect.width - .5; pointerY = (event.clientY-rect.top) / rect.height - .5
-      raycaster.setFromCamera(new THREE.Vector2(pointerX*2,-pointerY*2),camera)
-      const hit=raycaster.intersectObject(countryside,false)[0]
-      if(!hit){hoveredControl=null;rotationButtons.forEach(button=>{button.visible=false;(button.userData.deleteButton as THREE.Sprite).visible=false});return}
-      const point=island.worldToLocal(hit.point.clone())
-      const pointerNdc=new THREE.Vector2(pointerX*2,-pointerY*2), controlPosition=new THREE.Vector3()
-      rotationButtons.forEach(button=>{const {x,z,deleteButton}=button.userData as {x:number;z:number;deleteButton:THREE.Sprite};button.getWorldPosition(controlPosition).project(camera);const nearRotate=button.visible&&Math.hypot((controlPosition.x-pointerNdc.x)*rect.width*.5,(controlPosition.y-pointerNdc.y)*rect.height*.5)<180;deleteButton.getWorldPosition(controlPosition).project(camera);const nearDelete=button.visible&&Math.hypot((controlPosition.x-pointerNdc.x)*rect.width*.5,(controlPosition.y-pointerNdc.y)*rect.height*.5)<180;const visible=Math.hypot(point.x-x,point.z-z)<4.3||nearRotate||nearDelete;button.visible=visible;deleteButton.visible=visible});hoveredControl=closestVisibleControl([...deleteButtons,...rotationButtons],event,rect)||null
+    const findClosestControl = (buttons: THREE.Sprite[], event: PointerEvent, rect: DOMRect, maxDistance = 180) => {
+      const pointer = new THREE.Vector2((event.clientX - rect.left) / rect.width * 2 - 1, -((event.clientY - rect.top) / rect.height * 2 - 1))
+      const worldPosition = new THREE.Vector3()
+      let nearest: THREE.Sprite | undefined
+      let nearestDistance = Infinity
+      buttons.forEach(button => {
+        button.getWorldPosition(worldPosition).project(camera)
+        const distance = Math.hypot((worldPosition.x - pointer.x) * rect.width * .5, (worldPosition.y - pointer.y) * rect.height * .5)
+        if (distance < nearestDistance) {
+          nearestDistance = distance
+          nearest = button
+        }
+      })
+      return nearestDistance < maxDistance ? nearest : undefined
+    }
+
+    const move = (event: PointerEvent) => {
+      const rect = host.getBoundingClientRect()
+      pointerX = (event.clientX - rect.left) / rect.width - .5
+      pointerY = (event.clientY - rect.top) / rect.height - .5
+      raycaster.setFromCamera(new THREE.Vector2(pointerX * 2, -pointerY * 2), camera)
+      const hit = raycaster.intersectObject(countryside, false)[0]
+      const point = hit ? island.worldToLocal(hit.point.clone()) : null
+      const pointerNdc = new THREE.Vector2(pointerX * 2, -pointerY * 2)
+      const controlPosition = new THREE.Vector3()
+
+      rotationButtons.forEach(button => {
+        const { x, z, deleteButton } = button.userData as { x: number; z: number; deleteButton: THREE.Sprite }
+        button.getWorldPosition(controlPosition).project(camera)
+        const distRotate = Math.hypot((controlPosition.x - pointerNdc.x) * rect.width * .5, (controlPosition.y - pointerNdc.y) * rect.height * .5)
+        deleteButton.getWorldPosition(controlPosition).project(camera)
+        const distDelete = Math.hypot((controlPosition.x - pointerNdc.x) * rect.width * .5, (controlPosition.y - pointerNdc.y) * rect.height * .5)
+        const groundDist = point ? Math.hypot(point.x - x, point.z - z) : Infinity
+
+        const visible = groundDist < 5.5 || distRotate < 180 || distDelete < 180
+        button.visible = visible
+        deleteButton.visible = visible
+        if (!visible && deleteButton.userData.confirming) {
+          deleteButton.userData.confirming = false
+          deleteButton.material = deleteMaterial
+        }
+      })
+
+      const visibleButtons = [...deleteButtons, ...rotationButtons].filter(b => b.visible)
+      hoveredControl = findClosestControl(visibleButtons, event, rect) || null
     }
     host.addEventListener('pointermove', move)
-    const hideRotationButtons=()=>{hoveredControl=null;rotationButtons.forEach(button=>{button.visible=false;(button.userData.deleteButton as THREE.Sprite).visible=false})}
-    host.addEventListener('pointerleave',hideRotationButtons)
-    const closestVisibleControl=(buttons:THREE.Sprite[],event:PointerEvent,rect:DOMRect)=>{const pointer=new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),worldPosition=new THREE.Vector3();let nearest:THREE.Sprite|undefined,nearestDistance=Infinity;buttons.forEach(button=>{if(!button.visible)return;button.getWorldPosition(worldPosition).project(camera);const distance=Math.hypot((worldPosition.x-pointer.x)*rect.width*.5,(worldPosition.y-pointer.y)*rect.height*.5);if(distance<nearestDistance){nearestDistance=distance;nearest=button}});return nearestDistance<160?nearest:undefined}
-    const upgradeClick=(event:PointerEvent)=>{const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const control=hoveredControl||closestVisibleControl([...deleteButtons,...rotationButtons],event,rect);if(control&&deleteButtons.includes(control)){const remove=control;if(!remove.userData.confirming){remove.userData.confirming=true;const oldMaterial=remove.material as THREE.SpriteMaterial;remove.material=new THREE.SpriteMaterial({map:confirmTexture,depthTest:false,depthWrite:false,transparent:true});oldMaterial.dispose();return}const monument=remove.userData.monument as THREE.Group;island.remove(monument);rotationButtons.filter(button=>button.userData.monument===monument).forEach(button=>scene.remove(button,button.userData.deleteButton as THREE.Sprite));for(let i=rotationButtons.length-1;i>=0;i--)if(rotationButtons[i].userData.monument===monument)rotationButtons.splice(i,1);for(let i=deleteButtons.length-1;i>=0;i--)if(deleteButtons[i].userData.monument===monument)deleteButtons.splice(i,1);hoveredControl=null;return}if(control&&rotationButtons.includes(control)){const monument=control.userData.monument as THREE.Group;monument.rotation.y+=Math.PI/2;return}const hit=raycaster.intersectObjects(upgradeButtons,false)[0];if(hit)upgradeStructure(hit.object as THREE.Sprite)}
+
+    const hideRotationButtons = () => {
+      hoveredControl = null
+      rotationButtons.forEach(button => {
+        button.visible = false
+        const remove = button.userData.deleteButton as THREE.Sprite
+        remove.visible = false
+        if (remove.userData.confirming) {
+          remove.userData.confirming = false
+          remove.material = deleteMaterial
+        }
+      })
+    }
+    host.addEventListener('pointerleave', hideRotationButtons)
+
+    const upgradeClick = (event: PointerEvent) => {
+      const rect = host.getBoundingClientRect()
+      raycaster.setFromCamera(new THREE.Vector2((event.clientX - rect.left) / rect.width * 2 - 1, -((event.clientY - rect.top) / rect.height * 2 - 1)), camera)
+
+      const control = (hoveredControl && hoveredControl.visible)
+        ? hoveredControl
+        : (findClosestControl([...deleteButtons, ...rotationButtons].filter(b => b.visible), event, rect)
+          || findClosestControl([...deleteButtons, ...rotationButtons], event, rect))
+
+      if (control && deleteButtons.includes(control)) {
+        event.preventDefault()
+        const remove = control
+        if (!remove.userData.confirming) {
+          remove.userData.confirming = true
+          remove.material = confirmMaterial
+          return
+        }
+        const monument = remove.userData.monument as THREE.Group
+        island.remove(monument)
+        rotationButtons.filter(button => button.userData.monument === monument).forEach(button => scene.remove(button, button.userData.deleteButton as THREE.Sprite))
+        for (let i = rotationButtons.length - 1; i >= 0; i--) if (rotationButtons[i].userData.monument === monument) rotationButtons.splice(i, 1)
+        for (let i = deleteButtons.length - 1; i >= 0; i--) if (deleteButtons[i].userData.monument === monument) deleteButtons.splice(i, 1)
+        hoveredControl = null
+        return
+      }
+
+      if (control && rotationButtons.includes(control)) {
+        event.preventDefault()
+        const monument = control.userData.monument as THREE.Group
+        monument.rotation.y += Math.PI / 2
+        return
+      }
+
+      const hit = raycaster.intersectObjects(upgradeButtons, false)[0]
+      if (hit) upgradeStructure(hit.object as THREE.Sprite)
+    }
     const allowBuilderDrop=(event:DragEvent)=>{event.preventDefault();event.dataTransfer.dropEffect='copy';const type=(activeBuilderType||event.dataTransfer.getData('application/x-candy-monument')) as BuilderType;if(!builderTypes.includes(type))return;const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit)return;const point=island.worldToLocal(hit.point.clone());showDragPreview(type,point.x,point.z)}
     const dropBuilderMonument=(event:DragEvent)=>{event.preventDefault();const type=(activeBuilderType||event.dataTransfer.getData('application/x-candy-monument')) as BuilderType;if(!builderTypes.includes(type)){clearDragPreview();return}const rect=host.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),camera);const hit=raycaster.intersectObject(countryside,false)[0];if(!hit){clearDragPreview();return}const point=island.worldToLocal(hit.point.clone());clearDragPreview();placeBuilderMonument(type,point.x,point.z);activeBuilderType=null}
     host.addEventListener('pointerdown',upgradeClick)
