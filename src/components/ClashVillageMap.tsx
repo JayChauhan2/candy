@@ -346,24 +346,30 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
 
     const builderTypes=['house','station1','station2','station3','station4','station5','station6','station7','station8','station9','station10','watchtower','guildhall','fountain','forge','garden','bannerpost','castle','cottage','stable','storage','farm','windmill','well','market','trainingyard','campfire','signpost','lantern'] as const
     type BuilderType=typeof builderTypes[number]
-    const rotationButtons: THREE.Sprite[]=[]
-    const deleteButtons: THREE.Sprite[]=[]
-    const rotationCanvas=document.createElement('canvas');rotationCanvas.width=96;rotationCanvas.height=96
-    const rotationCtx=rotationCanvas.getContext('2d')
-    if(rotationCtx){rotationCtx.fillStyle='#ffffff';rotationCtx.font='700 54px Arial';rotationCtx.textAlign='center';rotationCtx.textBaseline='middle';rotationCtx.fillText('↻',48,49)}
-    const rotationTexture=new THREE.CanvasTexture(rotationCanvas)
-    const deleteCanvas=document.createElement('canvas');deleteCanvas.width=96;deleteCanvas.height=96
-    const deleteCtx=deleteCanvas.getContext('2d')
-    if(deleteCtx){deleteCtx.fillStyle='#e64b48';deleteCtx.font='700 68px Arial';deleteCtx.textAlign='center';deleteCtx.textBaseline='middle';deleteCtx.fillText('×',48,51)}
-    const deleteTexture=new THREE.CanvasTexture(deleteCanvas)
-    const confirmCanvas=document.createElement('canvas');confirmCanvas.width=96;confirmCanvas.height=96
-    const confirmCtx=confirmCanvas.getContext('2d')
-    if(confirmCtx){confirmCtx.strokeStyle='#4dc95b';confirmCtx.lineWidth=11;confirmCtx.lineCap='round';confirmCtx.lineJoin='round';confirmCtx.beginPath();confirmCtx.moveTo(25,49);confirmCtx.lineTo(42,66);confirmCtx.lineTo(72,29);confirmCtx.stroke()}
-    const confirmTexture=new THREE.CanvasTexture(confirmCanvas);confirmTexture.needsUpdate=true
-    const rotationMaterial = new THREE.SpriteMaterial({map:rotationTexture,depthTest:false,depthWrite:false,transparent:true})
-    const deleteMaterial = new THREE.SpriteMaterial({map:deleteTexture,depthTest:false,depthWrite:false,transparent:true})
-    const confirmMaterial = new THREE.SpriteMaterial({map:confirmTexture,depthTest:false,depthWrite:false,transparent:true})
-    const addRotationButton=(monument:THREE.Group,x:number,z:number,height:number)=>{const button=new THREE.Sprite(rotationMaterial);const remove=new THREE.Sprite(deleteMaterial);button.position.set(x-.9,height,z);remove.position.set(x+.9,height,z);button.scale.set(2.25,2.25,1);remove.scale.set(2.25,2.25,1);button.userData={monument,x,z,deleteButton:remove};remove.userData={monument,rotationButton:button};button.visible=false;remove.visible=false;scene.add(button,remove);rotationButtons.push(button);deleteButtons.push(remove)}
+    // These are DOM controls deliberately, rather than Three.js sprites. The
+    // canvas is excellent for the map but it should not be responsible for a
+    // two-step destructive UI action: browser buttons give each press a real,
+    // deterministic hit target.
+    type MonumentControl={monument:THREE.Group;x:number;z:number;height:number;rotate:HTMLButtonElement;remove:HTMLButtonElement;confirming:boolean}
+    const monumentControls:MonumentControl[]=[]
+    host.style.position='relative'
+    const controlLayer=document.createElement('div')
+    controlLayer.setAttribute('aria-label','Placed monument controls')
+    Object.assign(controlLayer.style,{position:'absolute',inset:'0',pointerEvents:'none',zIndex:'4'})
+    host.appendChild(controlLayer)
+    const makeControlButton=(label:string,color:string)=>{const button=document.createElement('button');button.type='button';button.setAttribute('aria-label',label);button.textContent=label;Object.assign(button.style,{position:'absolute',display:'none',width:'48px',height:'48px',padding:'0',border:'0',background:'transparent',color,fontFamily:'Arial, sans-serif',fontSize:label==='↻'?'48px':'52px',fontWeight:'700',lineHeight:'48px',textAlign:'center',cursor:'pointer',pointerEvents:'auto',textShadow:'0 2px 3px rgba(24,37,49,.28)',transform:'translate(-50%,-50%)'});return button}
+    const addRotationButton=(monument:THREE.Group,x:number,z:number,height:number)=>{
+      const rotate=makeControlButton('↻','#ffffff')
+      const remove=makeControlButton('×','#e64b48')
+      const control:MonumentControl={monument,x,z,height,rotate,remove,confirming:false}
+      const stop=(event:PointerEvent)=>event.stopPropagation()
+      rotate.addEventListener('pointerdown',stop)
+      remove.addEventListener('pointerdown',stop)
+      rotate.addEventListener('click',event=>{event.stopPropagation();monument.rotation.y+=Math.PI/2})
+      remove.addEventListener('click',event=>{event.stopPropagation();if(!control.confirming){control.confirming=true;remove.textContent='✓';remove.style.color='#4dc95b';remove.style.fontSize='48px';remove.setAttribute('aria-label','Confirm remove monument');return}island.remove(monument);rotate.remove();remove.remove();const index=monumentControls.indexOf(control);if(index>=0)monumentControls.splice(index,1)})
+      controlLayer.append(rotate,remove)
+      monumentControls.push(control)
+    }
     const placeBuilderMonument=(type:BuilderType,x:number,z:number,isPreview=false)=>{
       const group=new THREE.Group();group.position.set(x,.38,z);island.add(group)
       const add=(geometry:THREE.BufferGeometry,color:number,y=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.y=y;mesh.castShadow=true;group.add(mesh);return mesh}
@@ -447,21 +453,22 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       camera.updateProjectionMatrix()
     }
     resize(); window.addEventListener('resize', resize)
-    let pointerX = 0, pointerY = 0, yaw = Math.atan2(26,22), height = 28, frame = 0, hoveredControl:THREE.Sprite|null = null
-    const findClosestControl = (buttons: THREE.Sprite[], event: PointerEvent, rect: DOMRect, maxDistance = 180) => {
-      const pointer = new THREE.Vector2((event.clientX - rect.left) / rect.width * 2 - 1, -((event.clientY - rect.top) / rect.height * 2 - 1))
-      const worldPosition = new THREE.Vector3()
-      let nearest: THREE.Sprite | undefined
-      let nearestDistance = Infinity
-      buttons.forEach(button => {
-        button.getWorldPosition(worldPosition).project(camera)
-        const distance = Math.hypot((worldPosition.x - pointer.x) * rect.width * .5, (worldPosition.y - pointer.y) * rect.height * .5)
-        if (distance < nearestDistance) {
-          nearestDistance = distance
-          nearest = button
-        }
+    let pointerX = 0, pointerY = 0, yaw = Math.atan2(26,22), height = 28, frame = 0
+    const controlWorldPosition=new THREE.Vector3()
+    const setControlVisibility=(control:MonumentControl,visible:boolean)=>{
+      control.rotate.style.display=visible?'block':'none'
+      control.remove.style.display=visible?'block':'none'
+      if(!visible&&control.confirming){control.confirming=false;control.remove.textContent='×';control.remove.style.color='#e64b48';control.remove.style.fontSize='52px';control.remove.setAttribute('aria-label','×')}
+    }
+    const updateControlPositions=()=>{
+      const rect=host.getBoundingClientRect()
+      monumentControls.forEach(control=>{
+        controlWorldPosition.set(control.x,control.height,control.z).project(camera)
+        const left=(controlWorldPosition.x+1)*.5*rect.width
+        const top=(-controlWorldPosition.y+1)*.5*rect.height
+        control.rotate.style.left=`${left-28}px`;control.rotate.style.top=`${top}px`
+        control.remove.style.left=`${left+28}px`;control.remove.style.top=`${top}px`
       })
-      return nearestDistance < maxDistance ? nearest : undefined
     }
 
     const move = (event: PointerEvent) => {
@@ -471,77 +478,22 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       raycaster.setFromCamera(new THREE.Vector2(pointerX * 2, -pointerY * 2), camera)
       const hit = raycaster.intersectObject(countryside, false)[0]
       const point = hit ? island.worldToLocal(hit.point.clone()) : null
-      const pointerNdc = new THREE.Vector2(pointerX * 2, -pointerY * 2)
-      const controlPosition = new THREE.Vector3()
-
-      rotationButtons.forEach(button => {
-        const { x, z, deleteButton } = button.userData as { x: number; z: number; deleteButton: THREE.Sprite }
-        button.getWorldPosition(controlPosition).project(camera)
-        const distRotate = Math.hypot((controlPosition.x - pointerNdc.x) * rect.width * .5, (controlPosition.y - pointerNdc.y) * rect.height * .5)
-        deleteButton.getWorldPosition(controlPosition).project(camera)
-        const distDelete = Math.hypot((controlPosition.x - pointerNdc.x) * rect.width * .5, (controlPosition.y - pointerNdc.y) * rect.height * .5)
-        const groundDist = point ? Math.hypot(point.x - x, point.z - z) : Infinity
-
-        const visible = groundDist < 5.5 || distRotate < 180 || distDelete < 180
-        button.visible = visible
-        deleteButton.visible = visible
-        if (!visible && deleteButton.userData.confirming) {
-          deleteButton.userData.confirming = false
-          deleteButton.material = deleteMaterial
-        }
+      monumentControls.forEach(control=>{
+        const groundDist=point?Math.hypot(point.x-control.x,point.z-control.z):Infinity
+        const buttonHovered=control.rotate.matches(':hover')||control.remove.matches(':hover')
+        setControlVisibility(control,groundDist<5.5||buttonHovered)
       })
-
-      const visibleButtons = [...deleteButtons, ...rotationButtons].filter(b => b.visible)
-      hoveredControl = findClosestControl(visibleButtons, event, rect) || null
     }
     host.addEventListener('pointermove', move)
 
     const hideRotationButtons = () => {
-      hoveredControl = null
-      rotationButtons.forEach(button => {
-        button.visible = false
-        const remove = button.userData.deleteButton as THREE.Sprite
-        remove.visible = false
-        if (remove.userData.confirming) {
-          remove.userData.confirming = false
-          remove.material = deleteMaterial
-        }
-      })
+      monumentControls.forEach(control=>setControlVisibility(control,false))
     }
     host.addEventListener('pointerleave', hideRotationButtons)
 
     const upgradeClick = (event: PointerEvent) => {
       const rect = host.getBoundingClientRect()
       raycaster.setFromCamera(new THREE.Vector2((event.clientX - rect.left) / rect.width * 2 - 1, -((event.clientY - rect.top) / rect.height * 2 - 1)), camera)
-
-      const control = (hoveredControl && hoveredControl.visible)
-        ? hoveredControl
-        : (findClosestControl([...deleteButtons, ...rotationButtons].filter(b => b.visible), event, rect)
-          || findClosestControl([...deleteButtons, ...rotationButtons], event, rect))
-
-      if (control && deleteButtons.includes(control)) {
-        event.preventDefault()
-        const remove = control
-        if (!remove.userData.confirming) {
-          remove.userData.confirming = true
-          remove.material = confirmMaterial
-          return
-        }
-        const monument = remove.userData.monument as THREE.Group
-        island.remove(monument)
-        rotationButtons.filter(button => button.userData.monument === monument).forEach(button => scene.remove(button, button.userData.deleteButton as THREE.Sprite))
-        for (let i = rotationButtons.length - 1; i >= 0; i--) if (rotationButtons[i].userData.monument === monument) rotationButtons.splice(i, 1)
-        for (let i = deleteButtons.length - 1; i >= 0; i--) if (deleteButtons[i].userData.monument === monument) deleteButtons.splice(i, 1)
-        hoveredControl = null
-        return
-      }
-
-      if (control && rotationButtons.includes(control)) {
-        event.preventDefault()
-        const monument = control.userData.monument as THREE.Group
-        monument.rotation.y += Math.PI / 2
-        return
-      }
 
       const hit = raycaster.intersectObjects(upgradeButtons, false)[0]
       if (hit) upgradeStructure(hit.object as THREE.Sprite)
@@ -551,9 +503,9 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     host.addEventListener('pointerdown',upgradeClick)
     host.addEventListener('dragover',allowBuilderDrop)
     host.addEventListener('drop',dropBuilderMonument)
-    const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; yaw += ((Math.atan2(26,22) + pointerX*.6) - yaw)*.055; height += ((28 - pointerY*7) - height)*.055; island.rotation.y = Math.sin(time * .16) * .008; camera.position.set(Math.cos(yaw)*34,height,Math.sin(yaw)*34); camera.lookAt(0,.7,0); flag.rotation.z = Math.sin(time * 2.3) * .08; upgradeSparkles.forEach((sparkle)=>{const age=time-sparkle.started;if(age>1.45){sparkle.mesh.visible=false;return}const spread=.35+age*1.5;sparkle.mesh.visible=true;sparkle.mesh.position.set(sparkle.x+Math.cos(sparkle.phase)*spread,1.2+age*3.1+Math.sin(sparkle.phase*3)*.18,sparkle.z+Math.sin(sparkle.phase)*spread);sparkle.mesh.rotation.y=time*6;sparkle.mesh.scale.setScalar(1-age*.45)});campfireFlames.forEach((flame,index)=>{const pulse=1+Math.sin(time*7+index)*.1;flame.scale.set(pulse,1+Math.sin(time*8+index)*.13,pulse)});campfireSmoke.forEach((smoke)=>{const life=(time*.19+smoke.phase)%1;const scale=.55+life*.95;smoke.puff.position.set(Math.sin(time*1.3+smoke.phase*9)*.18,1.45+life*3.9,Math.cos(time*1.1+smoke.phase*7)*.16);smoke.puff.scale.setScalar(scale);smoke.puff.rotation.y=time+smoke.phase*8;smoke.material.opacity=(1-life)*.3}); animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); windmillRotors.forEach((rotor,index)=>{rotor.rotation.z=time*(.75+index*.15)}); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*130; bird.group.position.y = bird.altitude + Math.sin(time*1.1+bird.phase)*.22; bird.group.position.z = bird.startZ + Math.sin(time*.32+bird.phase)*2.1; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.28 + Math.sin(time*4.1+bird.phase)*.38) }) }); renderer.render(scene, camera) }
+    const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; yaw += ((Math.atan2(26,22) + pointerX*.6) - yaw)*.055; height += ((28 - pointerY*7) - height)*.055; island.rotation.y = Math.sin(time * .16) * .008; camera.position.set(Math.cos(yaw)*34,height,Math.sin(yaw)*34); camera.lookAt(0,.7,0); updateControlPositions(); flag.rotation.z = Math.sin(time * 2.3) * .08; upgradeSparkles.forEach((sparkle)=>{const age=time-sparkle.started;if(age>1.45){sparkle.mesh.visible=false;return}const spread=.35+age*1.5;sparkle.mesh.visible=true;sparkle.mesh.position.set(sparkle.x+Math.cos(sparkle.phase)*spread,1.2+age*3.1+Math.sin(sparkle.phase*3)*.18,sparkle.z+Math.sin(sparkle.phase)*spread);sparkle.mesh.rotation.y=time*6;sparkle.mesh.scale.setScalar(1-age*.45)});campfireFlames.forEach((flame,index)=>{const pulse=1+Math.sin(time*7+index)*.1;flame.scale.set(pulse,1+Math.sin(time*8+index)*.13,pulse)});campfireSmoke.forEach((smoke)=>{const life=(time*.19+smoke.phase)%1;const scale=.55+life*.95;smoke.puff.position.set(Math.sin(time*1.3+smoke.phase*9)*.18,1.45+life*3.9,Math.cos(time*1.1+smoke.phase*7)*.16);smoke.puff.scale.setScalar(scale);smoke.puff.rotation.y=time+smoke.phase*8;smoke.material.opacity=(1-life)*.3}); animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); windmillRotors.forEach((rotor,index)=>{rotor.rotation.z=time*(.75+index*.15)}); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*130; bird.group.position.y = bird.altitude + Math.sin(time*1.1+bird.phase)*.22; bird.group.position.z = bird.startZ + Math.sin(time*.32+bird.phase)*2.1; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.28 + Math.sin(time*4.1+bird.phase)*.38) }) }); renderer.render(scene, camera) }
     animate()
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize);window.removeEventListener('dragstart',trackBuilderDragStart);window.removeEventListener('candy-builder-drag-start',trackExplicitBuilderDragStart);window.removeEventListener('dragend',endBuilderDrag);clearDragPreview(); host.removeEventListener('pointermove', move);host.removeEventListener('pointerleave',hideRotationButtons); host.removeEventListener('pointerdown',upgradeClick);host.removeEventListener('dragover',allowBuilderDrop);host.removeEventListener('drop',dropBuilderMonument); renderer.dispose(); host.removeChild(renderer.domElement) }
+    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize);window.removeEventListener('dragstart',trackBuilderDragStart);window.removeEventListener('candy-builder-drag-start',trackExplicitBuilderDragStart);window.removeEventListener('dragend',endBuilderDrag);clearDragPreview(); host.removeEventListener('pointermove', move);host.removeEventListener('pointerleave',hideRotationButtons); host.removeEventListener('pointerdown',upgradeClick);host.removeEventListener('dragover',allowBuilderDrop);host.removeEventListener('drop',dropBuilderMonument); controlLayer.remove();renderer.dispose(); host.removeChild(renderer.domElement) }
 }
 
 export const ClashVillageMap = () => {
