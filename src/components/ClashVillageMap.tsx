@@ -38,11 +38,12 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const countryside = new THREE.Mesh(new THREE.PlaneGeometry(130, 100), makeMaterial(0x7fab7b))
     countryside.rotation.x = -Math.PI / 2; countryside.position.y = -.04; countryside.receiveShadow = true; island.add(countryside)
     const pathMat = makeMaterial(0xd4d0bf)
+    const growingPaths: { segments: THREE.Mesh[]; started: number }[] = []
     // A full round plaza hides path joins and makes every route flow cleanly into the castle.
     const ring = new THREE.Mesh(new THREE.CircleGeometry(5.7, 40), pathMat); ring.rotation.x = -Math.PI / 2; ring.position.y = .07; ring.receiveShadow = true; island.add(ring)
-    const addPath = (x1:number, z1:number, x2:number, z2:number, width = 1.1) => {
-      const dx=x2-x1, dz=z2-z1, distance=Math.hypot(dx,dz), seed=Math.sin(x1*7.7+z1*3.1+x2*5.3+z2*2.7)
-      const bend=(.45+Math.abs(seed)*.6)*Math.min(2.4,distance*.14)
+    const addPath = (x1:number, z1:number, x2:number, z2:number, width = 1.1, drawIn=false, variation=0) => {
+      const dx=x2-x1, dz=z2-z1, distance=Math.hypot(dx,dz), seed=Math.sin(x1*7.7+z1*3.1+x2*5.3+z2*2.7+variation*4.61)
+      const bend=(seed<0?-1:1)*(.45+Math.abs(seed)*.6)*Math.min(2.4,distance*.14)
       const curve = new THREE.CatmullRomCurve3([
         new THREE.Vector3(x1,.06,z1),
         new THREE.Vector3(x1+dx*.3-dz/distance*bend,.06,z1+dz*.3+dx/distance*bend),
@@ -57,9 +58,19 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
         left.push(new THREE.Vector2(point.x-tangent.z*uneven,-(point.z+tangent.x*uneven)))
         right.push(new THREE.Vector2(point.x+tangent.z*uneven,-(point.z-tangent.x*uneven)))
       }
-      const outline=new THREE.Shape();outline.moveTo(left[0].x,left[0].y);left.slice(1).forEach(p=>outline.lineTo(p.x,p.y));right.reverse().forEach(p=>outline.lineTo(p.x,p.y));outline.closePath()
-      const pathGeo=new THREE.ShapeGeometry(outline,1);pathGeo.rotateX(-Math.PI/2)
-      const path = new THREE.Mesh(pathGeo,pathMat);path.position.y=.075;path.receiveShadow=true;island.add(path)
+      if(drawIn){
+        const segments: THREE.Mesh[]=[]
+        for(let i=0;i<28;i++){
+          const segment=new THREE.Shape();segment.moveTo(left[i].x,left[i].y);segment.lineTo(left[i+1].x,left[i+1].y);segment.lineTo(right[i+1].x,right[i+1].y);segment.lineTo(right[i].x,right[i].y);segment.closePath()
+          const geometry=new THREE.ShapeGeometry(segment,1);geometry.rotateX(-Math.PI/2)
+          const mesh=new THREE.Mesh(geometry,pathMat);mesh.position.y=.075;mesh.receiveShadow=true;mesh.visible=false;island.add(mesh);segments.push(mesh)
+        }
+        growingPaths.push({segments,started:performance.now()*.001})
+      }else{
+        const outline=new THREE.Shape();outline.moveTo(left[0].x,left[0].y);left.slice(1).forEach(p=>outline.lineTo(p.x,p.y));right.reverse().forEach(p=>outline.lineTo(p.x,p.y));outline.closePath()
+        const pathGeo=new THREE.ShapeGeometry(outline,1);pathGeo.rotateX(-Math.PI/2)
+        const path = new THREE.Mesh(pathGeo,pathMat);path.position.y=.075;path.receiveShadow=true;island.add(path)
+      }
       // Sparse, subdued tufts are only placed around the path edges to blend path and meadow.
       for(let i=2;i<12;i+=3){
         const t=i/12, point=curve.getPoint(t), tangent=curve.getTangent(t).normalize()
@@ -346,6 +357,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
 
     const builderTypes=['house','station1','station2','station3','station4','station5','station6','station7','station8','station9','station10','watchtower','guildhall','fountain','forge','garden','bannerpost','castle','cottage','stable','storage','farm','windmill','well','market','trainingyard','campfire','signpost','lantern'] as const
     type BuilderType=typeof builderTypes[number]
+    let corePathCount=0
     // These are DOM controls deliberately, rather than Three.js sprites. The
     // canvas is excellent for the map but it should not be responsible for a
     // two-step destructive UI action: browser buttons give each press a real,
@@ -402,7 +414,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
         const distance=Math.hypot(x,z)
         if(distance>5){
           const directionX=x/distance,directionZ=z/distance
-          addPath(directionX*4.25,directionZ*4.25,x-directionX*1.55,z-directionZ*1.55,.82)
+          addPath(directionX*4.25,directionZ*4.25,x-directionX*1.55,z-directionZ*1.55,.82,true,corePathCount++)
         }
       }
       if(isPreview){
@@ -526,7 +538,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     host.addEventListener('pointerdown',upgradeClick)
     host.addEventListener('dragover',allowBuilderDrop)
     host.addEventListener('drop',dropBuilderMonument)
-    const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; yaw += ((Math.atan2(26,22) + pointerX*.6) - yaw)*.055; height += ((28 - pointerY*7) - height)*.055; island.rotation.y = Math.sin(time * .16) * .008; camera.position.set(Math.cos(yaw)*34,height,Math.sin(yaw)*34); camera.lookAt(0,.7,0); updateControlPositions(); flag.rotation.z = Math.sin(time * 2.3) * .08; upgradeSparkles.forEach((sparkle)=>{const age=time-sparkle.started;if(age>1.45){sparkle.mesh.visible=false;return}const spread=.35+age*1.5;sparkle.mesh.visible=true;sparkle.mesh.position.set(sparkle.x+Math.cos(sparkle.phase)*spread,1.2+age*3.1+Math.sin(sparkle.phase*3)*.18,sparkle.z+Math.sin(sparkle.phase)*spread);sparkle.mesh.rotation.y=time*6;sparkle.mesh.scale.setScalar(1-age*.45)});campfireFlames.forEach((flame,index)=>{const pulse=1+Math.sin(time*7+index)*.1;flame.scale.set(pulse,1+Math.sin(time*8+index)*.13,pulse)});campfireSmoke.forEach((smoke)=>{const life=(time*.19+smoke.phase)%1;const scale=.55+life*.95;smoke.puff.position.set(Math.sin(time*1.3+smoke.phase*9)*.18,1.45+life*3.9,Math.cos(time*1.1+smoke.phase*7)*.16);smoke.puff.scale.setScalar(scale);smoke.puff.rotation.y=time+smoke.phase*8;smoke.material.opacity=(1-life)*.3}); animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); windmillRotors.forEach((rotor,index)=>{rotor.rotation.z=time*(.75+index*.15)}); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*130; bird.group.position.y = bird.altitude + Math.sin(time*1.1+bird.phase)*.22; bird.group.position.z = bird.startZ + Math.sin(time*.32+bird.phase)*2.1; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.28 + Math.sin(time*4.1+bird.phase)*.38) }) }); renderer.render(scene, camera) }
+    const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; yaw += ((Math.atan2(26,22) + pointerX*.6) - yaw)*.055; height += ((28 - pointerY*7) - height)*.055; island.rotation.y = Math.sin(time * .16) * .008; camera.position.set(Math.cos(yaw)*34,height,Math.sin(yaw)*34); camera.lookAt(0,.7,0); updateControlPositions(); flag.rotation.z = Math.sin(time * 2.3) * .08; upgradeSparkles.forEach((sparkle)=>{const age=time-sparkle.started;if(age>1.45){sparkle.mesh.visible=false;return}const spread=.35+age*1.5;sparkle.mesh.visible=true;sparkle.mesh.position.set(sparkle.x+Math.cos(sparkle.phase)*spread,1.2+age*3.1+Math.sin(sparkle.phase*3)*.18,sparkle.z+Math.sin(sparkle.phase)*spread);sparkle.mesh.rotation.y=time*6;sparkle.mesh.scale.setScalar(1-age*.45)});campfireFlames.forEach((flame,index)=>{const pulse=1+Math.sin(time*7+index)*.1;flame.scale.set(pulse,1+Math.sin(time*8+index)*.13,pulse)});campfireSmoke.forEach((smoke)=>{const life=(time*.19+smoke.phase)%1;const scale=.55+life*.95;smoke.puff.position.set(Math.sin(time*1.3+smoke.phase*9)*.18,1.45+life*3.9,Math.cos(time*1.1+smoke.phase*7)*.16);smoke.puff.scale.setScalar(scale);smoke.puff.rotation.y=time+smoke.phase*8;smoke.material.opacity=(1-life)*.3}); animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); windmillRotors.forEach((rotor,index)=>{rotor.rotation.z=time*(.75+index*.15)}); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*130; bird.group.position.y = bird.altitude + Math.sin(time*1.1+bird.phase)*.22; bird.group.position.z = bird.startZ + Math.sin(time*.32+bird.phase)*2.1; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.28 + Math.sin(time*4.1+bird.phase)*.38) }) }); growingPaths.forEach(path=>{const visibleCount=Math.min(path.segments.length,Math.floor((time-path.started)*34)+1);path.segments.forEach((segment,index)=>{segment.visible=index<visibleCount})}); renderer.render(scene, camera) }
     animate()
     return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize);window.removeEventListener('dragstart',trackBuilderDragStart);window.removeEventListener('candy-builder-drag-start',trackExplicitBuilderDragStart);window.removeEventListener('dragend',endBuilderDrag);clearDragPreview(); host.removeEventListener('pointermove', move);host.removeEventListener('pointerleave',hideRotationButtons); host.removeEventListener('pointerdown',upgradeClick);host.removeEventListener('dragover',allowBuilderDrop);host.removeEventListener('drop',dropBuilderMonument); controlLayer.remove();renderer.dispose(); host.removeChild(renderer.domElement) }
 }
