@@ -45,7 +45,6 @@ export const BuilderMonumentPreview = ({ type }: { type: BuilderMonument }) => {
       const variant=Number(type.slice(7)), roofColors=[0x477cb2,0x386ba3,0x5d6fa8,0xd65443,0x527c9c,0x426a91,0x6f8fa0,0x486e9a,0x5b6f9e,0x315f99], woodColors=[0x8c6745,0x765139,0x9b704b,0x704929,0x916f50,0x79543c,0x9b7b58,0x6f5848,0x755038,0x826048], height=2.25+(variant%4)*.35, deck=2.15+(variant%3)*.22
       add(new THREE.CylinderGeometry(1.32,1.62,.48,8),0x777a74,0,.32,0)
       ;[[-.86,-.6],[.86,-.6],[-.86,.6],[.86,.6]].forEach(([x,z])=>add(new THREE.CylinderGeometry(.09,.12,height,6),woodColors[variant-1],x,.48+height/2,z))
-      ;[-1,1].forEach(side=>{const brace=add(new THREE.BoxGeometry(.1,height*.8,.1),woodColors[variant-1],side*.72,.85+height*.36,.64);brace.rotation.z=side*(.45+(variant%3)*.06)})
       add(new THREE.BoxGeometry(deck,.2,1.72),woodColors[variant-1],0,height+.58,0)
       if(variant===4||variant===8){add(new THREE.CylinderGeometry(1.02,1.18,1.32,8),0xa39273,0,height+1.28,0);add(new THREE.ConeGeometry(1.5,.9,6),roofColors[variant-1],0,height+2.35,0)}
       else {add(new THREE.BoxGeometry(1.7+(variant%2)*.3,1.16+(variant%3)*.12,1.35),0x916f50,0,height+1.27,0);add(new THREE.ConeGeometry(1.42+(variant%2)*.16,.9,4),roofColors[variant-1],0,height+2.38,0)}
