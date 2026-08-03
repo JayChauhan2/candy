@@ -107,6 +107,7 @@ export const BuilderMonumentPreview = ({ type }: { type: BuilderMonument }) => {
     }else{
       add(new THREE.CylinderGeometry(.045,.06,1.5,6),0x5e4b3b,0,.8,0);add(new THREE.OctahedronGeometry(.18),0xf2d77b,0,1.57,0)
     }
+    if(type.startsWith('station')) monument.scale.setScalar(.45)
     monument.rotation.y=-.36; renderer.render(scene,camera)
     return () => { monument.traverse((node) => { if(node instanceof THREE.Mesh){node.geometry.dispose();const materials=Array.isArray(node.material)?node.material:[node.material];materials.forEach(material=>material.dispose())} }); renderer.dispose(); renderer.domElement.remove() }
   },[type,isVisible])
