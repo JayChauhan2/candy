@@ -21,11 +21,7 @@ type BuilderItem = { type: BuilderMonument; label: string }
 
 const coreBuilderItems: BuilderItem[] = [
   { type: 'house', label: 'HOUSE' },
-  { type: 'station1', label: 'SCOUT PERCH' }, { type: 'station2', label: 'RANGER HOLD' },
-  { type: 'station3', label: 'SIGNAL NEST' }, { type: 'station4', label: 'GATE OUTPOST' },
-  { type: 'station5', label: 'COMMAND POST' }, { type: 'station6', label: 'ARMORY TOWER' },
-  { type: 'station7', label: 'STABLE LOOKOUT' }, { type: 'station8', label: 'STONEWATCH' },
-  { type: 'station9', label: 'FORGE BEACON' }, { type: 'station10', label: 'HIGH BANNER' },
+  { type: 'station1', label: 'SCOUT PERCH' },
 ]
 
 const decorBuilderItems: BuilderItem[] = [
