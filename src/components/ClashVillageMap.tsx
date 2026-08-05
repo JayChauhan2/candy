@@ -359,6 +359,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     type BuilderType=typeof builderTypes[number]
     let corePathCount=0
     const coreBuildingCounts: Record<'house'|'station1',number>={house:0,station1:0}
+    const placedMonuments: { type: BuilderType; x: number; z: number }[]=[]
     // These are DOM controls deliberately, rather than Three.js sprites. The
     // canvas is excellent for the map but it should not be responsible for a
     // two-step destructive UI action: browser buttons give each press a real,
@@ -383,7 +384,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       controlLayer.append(rotate,remove)
       monumentControls.push(control)
     }
-    const placeBuilderMonument=(type:BuilderType,x:number,z:number,isPreview=false)=>{
+    const placeBuilderMonument=(type:BuilderType,x:number,z:number,isPreview=false,notify=true)=>{
       const group=new THREE.Group();group.position.set(x,.38,z);island.add(group)
       const add=(geometry:THREE.BufferGeometry,color:number,y=0)=>{const mesh=new THREE.Mesh(geometry,makeMaterial(color));mesh.position.y=y;mesh.castShadow=true;group.add(mesh);return mesh}
       if(!type.startsWith('station')) add(new THREE.CylinderGeometry(1.45,1.62,.18,12),0x8f7658,.09)
@@ -424,8 +425,9 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       }
       if(!isPreview&&(type==='house'||type==='station1')){
         coreBuildingCounts[type]++
-        window.dispatchEvent(new CustomEvent('candy-builder-monument-placed',{detail:type}))
+        if(notify)window.dispatchEvent(new CustomEvent('candy-builder-monument-placed',{detail:type}))
       }
+      if(!isPreview)placedMonuments.push({type,x,z})
       return group
     }
 
@@ -453,6 +455,10 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     }
 
     buildKingdomCastle(0,0)
+    try {
+      const saved=JSON.parse(window.localStorage.getItem('candy-builder-map-v1')||'[]') as { type?: string; x?: number; z?: number }[]
+      saved.forEach(item=>{if(builderTypes.includes(item.type as BuilderType)&&typeof item.x==='number'&&typeof item.z==='number')placeBuilderMonument(item.type as BuilderType,item.x,item.z,false,false)})
+    } catch { /* No saved local map yet. */ }
 
     const raycaster=new THREE.Raycaster()
     let activeBuilderType:BuilderType|null=null
@@ -466,6 +472,8 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     window.addEventListener('dragstart',trackBuilderDragStart)
     window.addEventListener('candy-builder-drag-start',trackExplicitBuilderDragStart)
     window.addEventListener('dragend',endBuilderDrag)
+    const saveBuilderMap=()=>window.localStorage.setItem('candy-builder-map-v1',JSON.stringify(placedMonuments))
+    window.addEventListener('candy-builder-map-save',saveBuilderMap)
     const resize = () => {
       const { width, height } = host.getBoundingClientRect()
       const aspect = width / height
@@ -546,7 +554,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     host.addEventListener('drop',dropBuilderMonument)
     const animate = () => { frame = requestAnimationFrame(animate); const time = performance.now() * .001; yaw += ((Math.atan2(26,22) + pointerX*.6) - yaw)*.055; height += ((28 - pointerY*7) - height)*.055; island.rotation.y = Math.sin(time * .16) * .008; camera.position.set(Math.cos(yaw)*34,height,Math.sin(yaw)*34); camera.lookAt(0,.7,0); updateControlPositions(); flag.rotation.z = Math.sin(time * 2.3) * .08; upgradeSparkles.forEach((sparkle)=>{const age=time-sparkle.started;if(age>1.45){sparkle.mesh.visible=false;return}const spread=.35+age*1.5;sparkle.mesh.visible=true;sparkle.mesh.position.set(sparkle.x+Math.cos(sparkle.phase)*spread,1.2+age*3.1+Math.sin(sparkle.phase*3)*.18,sparkle.z+Math.sin(sparkle.phase)*spread);sparkle.mesh.rotation.y=time*6;sparkle.mesh.scale.setScalar(1-age*.45)});campfireFlames.forEach((flame,index)=>{const pulse=1+Math.sin(time*7+index)*.1;flame.scale.set(pulse,1+Math.sin(time*8+index)*.13,pulse)});campfireSmoke.forEach((smoke)=>{const life=(time*.19+smoke.phase)%1;const scale=.55+life*.95;smoke.puff.position.set(Math.sin(time*1.3+smoke.phase*9)*.18,1.45+life*3.9,Math.cos(time*1.1+smoke.phase*7)*.16);smoke.puff.scale.setScalar(scale);smoke.puff.rotation.y=time+smoke.phase*8;smoke.material.opacity=(1-life)*.3}); animals.forEach((animal) => { const a = time * animal.speed + animal.phase, dx = -Math.sin(a), dz = Math.cos(a)*.65; animal.group.position.set(animal.cx + Math.cos(a)*animal.radius, .02 + Math.abs(Math.sin(a*3))* .05, animal.cz + Math.sin(a)*animal.radius*.65); animal.group.rotation.y = Math.atan2(-dz, dx); animal.legs.forEach((leg,index) => { leg.rotation.z = Math.sin(a*8 + (index%2)*Math.PI)*.52 }) }); windmillRotors.forEach((rotor,index)=>{rotor.rotation.z=time*(.75+index*.15)}); birds.forEach((bird) => { const travel = ((time*bird.speed + bird.phase) % 1); bird.group.position.x = bird.startX + travel*130; bird.group.position.y = bird.altitude + Math.sin(time*1.1+bird.phase)*.22; bird.group.position.z = bird.startZ + Math.sin(time*.32+bird.phase)*2.1; bird.group.children.forEach((wing,index) => { wing.rotation.z = (index ? -1 : 1) * (.28 + Math.sin(time*4.1+bird.phase)*.38) }) }); growingPaths.forEach(path=>{const visibleCount=Math.min(path.segments.length,Math.floor((time-path.started)*34)+1);path.segments.forEach((segment,index)=>{segment.visible=index<visibleCount})}); renderer.render(scene, camera) }
     animate()
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize);window.removeEventListener('dragstart',trackBuilderDragStart);window.removeEventListener('candy-builder-drag-start',trackExplicitBuilderDragStart);window.removeEventListener('dragend',endBuilderDrag);clearDragPreview(); host.removeEventListener('pointermove', move);host.removeEventListener('pointerleave',hideRotationButtons); host.removeEventListener('pointerdown',upgradeClick);host.removeEventListener('dragover',allowBuilderDrop);host.removeEventListener('drop',dropBuilderMonument); controlLayer.remove();renderer.dispose(); host.removeChild(renderer.domElement) }
+    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize);window.removeEventListener('dragstart',trackBuilderDragStart);window.removeEventListener('candy-builder-drag-start',trackExplicitBuilderDragStart);window.removeEventListener('dragend',endBuilderDrag);window.removeEventListener('candy-builder-map-save',saveBuilderMap);clearDragPreview(); host.removeEventListener('pointermove', move);host.removeEventListener('pointerleave',hideRotationButtons); host.removeEventListener('pointerdown',upgradeClick);host.removeEventListener('dragover',allowBuilderDrop);host.removeEventListener('drop',dropBuilderMonument); controlLayer.remove();renderer.dispose(); host.removeChild(renderer.domElement) }
 }
 
 export const ClashVillageMap = () => {

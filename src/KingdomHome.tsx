@@ -104,8 +104,14 @@ export default function KingdomHome() {
   const [notice, setNotice] = useState<Notice>(null)
   const [noticeVisible, setNoticeVisible] = useState(false)
   const [builderTab, setBuilderTab] = useState<'core' | 'decor'>('core')
+  const [builderOpen, setBuilderOpen] = useState(false)
   const [draggingBuilderItem, setDraggingBuilderItem] = useState<BuilderMonument | null>(null)
-  const [coreBuildingCounts, setCoreBuildingCounts] = useState({ house: 0, station1: 0 })
+  const [coreBuildingCounts, setCoreBuildingCounts] = useState(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem('candy-builder-map-v1') || '[]') as { type?: string }[]
+      return { house: saved.filter(item => item.type === 'house').length, station1: saved.filter(item => item.type === 'station1').length }
+    } catch { return { house: 0, station1: 0 } }
+  })
   const noticeHideTimer = useRef<number | null>(null)
   const noticeClearTimer = useRef<number | null>(null)
   const [battleLoading, setBattleLoading] = useState(false)
@@ -144,6 +150,11 @@ export default function KingdomHome() {
     setNoticeVisible(true)
     noticeHideTimer.current = window.setTimeout(() => setNoticeVisible(false), 1900)
     noticeClearTimer.current = window.setTimeout(() => setNotice(null), 2160)
+  }
+  const saveBuilderMap = () => {
+    window.dispatchEvent(new Event('candy-builder-map-save'))
+    setBuilderOpen(false)
+    show('Map saved on this device')
   }
   const closeBattle = () => {
     setClosingBattle(true)
@@ -209,7 +220,7 @@ export default function KingdomHome() {
         <button onClick={() => show('Bob-omb Bonanza selected')} aria-label="Open event">›</button>
       </aside>
 
-      <aside className="kh-builder" aria-label="Builder monument menu">
+      {builderOpen ? <aside className="kh-builder" aria-label="Builder monument menu">
         <header><b>MAP BUILDER</b><small>DRAG TO ADD</small></header>
         <div className="kh-builder-tabs"><button className={builderTab === 'core' ? 'active' : ''} onClick={() => setBuilderTab('core')}>CORE</button><button className={builderTab === 'decor' ? 'active' : ''} onClick={() => setBuilderTab('decor')}>DECOR</button></div>
         <div className="kh-builder-list">
@@ -219,7 +230,8 @@ export default function KingdomHome() {
             return <div key={item.type} className={`${draggingBuilderItem === item.type ? 'dragging' : ''}${atLimit ? ' at-limit' : ''}`} draggable={!atLimit} onDragStart={(event) => startBuilderDrag(event.dataTransfer,item.type)} onDragEnd={() => setDraggingBuilderItem(null)}><BuilderMonumentPreview type={item.type} /><b>{item.label}{count !== null && <small>{count}/6</small>}</b></div>
           })}
         </div>
-      </aside>
+        <footer className="kh-builder-actions"><button onClick={() => setBuilderOpen(false)}>CANCEL</button><button onClick={saveBuilderMap}>SAVE</button></footer>
+      </aside> : <button className="kh-builder-toggle" onClick={() => setBuilderOpen(true)}>MAP BUILDER</button>}
 
       <nav className="kh-dock" aria-label="Game actions">
         <HUDButton label="SHOP" image={shopIcon} onClick={() => show('Shop coming soon')} />
