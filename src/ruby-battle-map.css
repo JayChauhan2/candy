@@ -21,3 +21,4 @@
 .ruby-pan-mouse{position:absolute;top:50%;left:50%;width:27px;height:39px;border:3px solid #ffe99b;border-radius:15px;transform:translate(-50%,-50%);box-shadow:0 3px #67243d}.ruby-pan-mouse:before{content:"";position:absolute;top:0;left:50%;width:3px;height:13px;background:#ffe99b;transform:translateX(-50%)}.ruby-pan-mouse:after{content:"☝";position:absolute;right:-18px;bottom:-17px;color:#fff5c8;font-size:23px;text-shadow:0 2px #67243d;animation:ruby-pan-hand 1.05s ease-in-out infinite alternate}
 @keyframes ruby-pan-coach-pulse{from{transform:scale(.9);opacity:.72}to{transform:scale(1.08);opacity:1}}@keyframes ruby-pan-caret-pulse{from{opacity:.45}to{opacity:1}}@keyframes ruby-pan-hand{from{transform:translate(-3px,-2px)}to{transform:translate(4px,3px)}}
 @media(max-width:700px){.ruby-turn-indicator{top:16px;right:13px;font-size:20px}}
+.ruby-chat-quick{display:none}.ruby-chat-compose{background:transparent;padding-bottom:10px}

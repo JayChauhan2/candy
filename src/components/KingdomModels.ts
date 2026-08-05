@@ -2,14 +2,21 @@ import * as THREE from 'three'
 
 type MaterialFactory = (color: number) => THREE.MeshStandardMaterial
 
+export const addTroopCount = (parent: THREE.Group, y: number) => {
+  const canvas=document.createElement('canvas');canvas.width=96;canvas.height=52;const context=canvas.getContext('2d');if(context){context.font='800 38px Arial';context.textAlign='center';context.textBaseline='middle';context.fillStyle='#fff';context.shadowColor='#243442';context.shadowBlur=5;context.shadowOffsetY=2;context.fillText('0',48,28)}
+  const label=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true,depthTest:false,depthWrite:false}));label.position.set(0,y,0);label.scale.set(1.1,.6,1);parent.add(label)
+}
+
 export const addHomeHouse = (parent: THREE.Group, material: MaterialFactory, roofColor = 0xc85b43) => {
   const add=(geometry:THREE.BufferGeometry,color:number,y:number)=>{const mesh=new THREE.Mesh(geometry,material(color));mesh.position.y=y;mesh.castShadow=true;parent.add(mesh);return mesh}
   add(new THREE.CylinderGeometry(1.45,1.62,.18,12),0x8f7658,.09);add(new THREE.CylinderGeometry(1.02,1.16,1.42,8),0xe0bd78,.8);add(new THREE.ConeGeometry(1.42,1.28,7),roofColor,2.12)
+  addTroopCount(parent,3.15)
 }
 
 export const addHomeOutpost = (parent: THREE.Group, material: MaterialFactory) => {
   const add=(geometry:THREE.BufferGeometry,color:number,y:number)=>{const mesh=new THREE.Mesh(geometry,material(color));mesh.position.y=y;mesh.castShadow=true;parent.add(mesh);return mesh}
   add(new THREE.CylinderGeometry(1.36,1.66,.52,8),0x777a74,.34);[[-.9,-.62],[.9,-.62],[-.9,.62],[.9,.62]].forEach(([x,z])=>{const leg=add(new THREE.CylinderGeometry(.1,.13,3.12,6),0x8c6745,1.9);leg.position.set(x,1.9,z)});add(new THREE.BoxGeometry(2.25,.22,1.78),0x8c6745,3.8);add(new THREE.BoxGeometry(2.04,1.32,1.4),0x916f50,4.54);const roof=add(new THREE.ConeGeometry(1.61,.94,4),0x477cb2,5.66);roof.rotation.y=Math.PI/4;const pole=add(new THREE.CylinderGeometry(.05,.06,2.12,6),0x704929,6.74);pole.position.x=.74;const flag=new THREE.Mesh(new THREE.PlaneGeometry(1.1,.58),new THREE.MeshBasicMaterial({color:0x477cb2,side:THREE.DoubleSide}));flag.position.set(1.29,7.28,0);parent.add(flag)
+  addTroopCount(parent,8.05)
 }
 
 export const addHomeCastle = (parent: THREE.Object3D, material: MaterialFactory, x:number, z:number) => {

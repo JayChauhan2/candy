@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { addTroopCount } from './KingdomModels'
 
 const makeMaterial = (color: number, roughness = .8) => new THREE.MeshStandardMaterial({ color, roughness, flatShading: true })
 
@@ -426,6 +427,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       if(!isPreview&&(type==='house'||type==='station1')){
         coreBuildingCounts[type]++
         if(notify)window.dispatchEvent(new CustomEvent('candy-builder-monument-placed',{detail:type}))
+        addTroopCount(group,type==='house'?3.15:8.05)
       }
       if(!isPreview)placedMonuments.push({type,x,z})
       return group
