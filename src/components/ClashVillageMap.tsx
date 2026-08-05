@@ -470,7 +470,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       if(kind==='spear'){const spear=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1.7,6),makeMaterial(0x765139));spear.position.set(.39,1.17,0);spear.rotation.z=-.15;group.add(spear);const tip=new THREE.Mesh(new THREE.ConeGeometry(.11,.35,5),makeMaterial(0xcfd9dc));tip.position.set(.51,2.02,0);tip.rotation.z=-.15;group.add(tip)}
       if(kind==='mage'){const hat=new THREE.Mesh(new THREE.ConeGeometry(.5,.78,7),makeMaterial(0x6a4693));hat.position.y=1.68;hat.rotation.z=-.12;group.add(hat);const staff=new THREE.Mesh(new THREE.CylinderGeometry(.035,.04,1.45,6),makeMaterial(0x704d35));staff.position.set(.38,1.05,0);staff.rotation.z=-.2;group.add(staff);const orb=new THREE.Mesh(new THREE.OctahedronGeometry(.13),makeMaterial(0x8ce7ed,.4));orb.position.set(.52,1.78,0);group.add(orb)}
       if(kind==='archer'){const hood=new THREE.Mesh(new THREE.ConeGeometry(.42,.48,7),makeMaterial(0x4d804e));hood.position.y=1.5;group.add(hood);const bow=new THREE.Mesh(new THREE.TorusGeometry(.3,.025,5,12,Math.PI),makeMaterial(0x80583c));bow.position.set(.35,.96,.04);bow.rotation.y=Math.PI/2;group.add(bow)}
-      troopShowcase.push({group,legs,phase,cx:x,cz:z,speed:.32+(phase%3)*.04})
+      troopShowcase.push({group,legs,phase,cx:x,cz:z,speed:.8+(phase%3)*.06})
     }
     ;[[-7,-5],[-5,-7],[-2,-7],[2,-7],[5,-6],[7,-3],[-7,0],[-6,4],[6,4]].forEach(([x,z],index)=>addTroop('spear',x,z,index*.7))
     try {
