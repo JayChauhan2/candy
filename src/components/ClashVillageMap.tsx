@@ -469,10 +469,11 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const resize = () => {
       const { width, height } = host.getBoundingClientRect()
       const aspect = width / height
-      // Laptop-sized desktop viewports need a little more breathing room than
-      // wide external monitors, otherwise the map reads unnecessarily zoomed in.
-      const halfHeight = width <= 1700 ? 18.5 : 13.5
-      // Matching the horizontal and vertical world-unit scale prevents the old tall/stretchy look.
+      // Browser CSS width changes across Retina and external-monitor setups,
+      // so do not use it as a proxy for device type. One roomy desktop framing
+      // keeps the kingdom at the same readable scale on both displays.
+      const halfHeight = 18.5
+      // Matching the horizontal and vertical world-unit scale prevents a tall/stretchy look.
       camera.left = -halfHeight * aspect; camera.right = halfHeight * aspect
       camera.top = halfHeight; camera.bottom = -halfHeight
       renderer.setSize(width, height, false)
