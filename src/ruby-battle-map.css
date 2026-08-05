@@ -6,11 +6,11 @@
 /* Enemy presence and battle conversation belong together on the right edge. */
 .ruby-commands{left:20px;right:auto}
 .ruby-chat-stack{position:absolute;right:20px;bottom:21px;z-index:2}.ruby-chat{left:auto;right:auto;bottom:auto}
-.ruby-ruler-thought{position:absolute;right:0;bottom:100%;z-index:2;display:flex;flex-direction:column;align-items:center;width:310px;height:145px;color:#ffe99b;pointer-events:none}
+.ruby-ruler-thought{position:absolute;right:0;bottom:calc(100% - 16px);z-index:1;display:flex;flex-direction:column;align-items:center;width:310px;height:145px;color:#ffe99b;pointer-events:none}
 .ruby-ruler-thought>b{display:block;margin:0 0 4px;color:#fff;font-size:14px;letter-spacing:1.2px;line-height:1;text-shadow:0 2px #67243d,0 4px 7px #250d1bcc}
-.ruby-ruler-thought figure{display:grid;place-items:end center;width:118px;height:118px;margin:0;overflow:hidden}
-.ruby-ruler-thought img{width:119px;height:132px;object-fit:contain;object-position:center bottom;transform:translateY(13px);filter:drop-shadow(0 5px 4px #210b1dcc)}
-.ruby-chat{border-color:transparent}.ruby-chat-stack:has(.ruby-chat.closed) .ruby-ruler-thought{width:190px}
+.ruby-ruler-thought figure{display:grid;place-items:end center;width:118px;height:126px;margin:0;overflow:visible}
+.ruby-ruler-thought img{width:119px;height:132px;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 5px 4px #210b1dcc)}
+.ruby-chat{z-index:2;border-color:transparent}.ruby-chat-stack:has(.ruby-chat.closed) .ruby-ruler-thought{width:190px}
 @media(max-width:700px){.ruby-commands{left:8px;right:auto;transform-origin:top left}.ruby-chat{left:auto;right:8px;bottom:8px;transform-origin:bottom right}.ruby-ruler-thought{right:8px;bottom:158px;transform:scale(.72);transform-origin:bottom right}}
 
 .ruby-turn-indicator{position:absolute;top:25px;right:26px;z-index:2;color:#ffe99b;font-size:31px;font-weight:800;letter-spacing:1px;line-height:1;text-shadow:0 3px #67243d,0 6px 10px #250d1bcc;pointer-events:none}
