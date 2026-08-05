@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import rubyPortrait from '../assets/ruby-clean.png'
 import { addHomeCastle, addHomeHouse, addHomeOutpost, addSpearScout } from './KingdomModels'
@@ -35,7 +36,7 @@ export const RubyBattleMap = ({ onBack, startIntro = true }: { onBack: () => voi
     const camera=new THREE.OrthographicCamera(-24,24,13.5,-13.5,.1,120);camera.position.set(24,29,27);camera.lookAt(0,0,0)
     const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement)
     const composer=new EffectComposer(renderer),outlinePass=new OutlinePass(new THREE.Vector2(1,1),scene,camera)
-    composer.addPass(new RenderPass(scene,camera));composer.addPass(outlinePass)
+    composer.addPass(new RenderPass(scene,camera));composer.addPass(outlinePass);composer.addPass(new OutputPass())
     outlinePass.visibleEdgeColor.set(0xffffff);outlinePass.hiddenEdgeColor.set(0x000000);outlinePass.edgeStrength=4;outlinePass.edgeThickness=1.5;outlinePass.edgeGlow=0
     host.style.position='relative';const selectionLayer=document.createElement('div');Object.assign(selectionLayer.style,{position:'absolute',inset:'0',zIndex:'3',pointerEvents:'none'});host.appendChild(selectionLayer)
     const makeSelectionButton=(label:string)=>{const button=document.createElement('button');button.textContent=label;Object.assign(button.style,{position:'absolute',display:'none',pointerEvents:'auto',border:'0',borderRadius:'9px',background:'#fff',boxShadow:'0 3px #a9a9a9',color:'#532b45',padding:'6px 9px',font:'800 10px Arial',letterSpacing:'1px',transform:'translate(-50%,-50%)'});selectionLayer.appendChild(button);return button}
