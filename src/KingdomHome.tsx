@@ -10,13 +10,11 @@ import { ClashVillageMap } from './components/ClashVillageMap'
 import { BuilderMonumentPreview, type BuilderMonument } from './components/BuilderMonumentPreview'
 import { RubyBattleMap } from './components/RubyBattleMap'
 import { RivalBattleMap } from './components/RivalBattleMap'
-import { TroopRoster } from './components/TroopRoster'
 import './kingdom-home.css'
 import './icon-overrides.css'
 import './battle-picker.css'
 import './ruby-battle-map.css'
 import './leaderboard.css'
-import './troop-roster.css'
 
 type Notice = string | null
 type IrisPhase = 'idle' | 'closing' | 'closed' | 'opening'
@@ -107,7 +105,6 @@ export default function KingdomHome() {
   const [noticeVisible, setNoticeVisible] = useState(false)
   const [builderTab, setBuilderTab] = useState<'core' | 'decor'>('core')
   const [builderOpen, setBuilderOpen] = useState(false)
-  const [troopRosterOpen, setTroopRosterOpen] = useState(false)
   const [draggingBuilderItem, setDraggingBuilderItem] = useState<BuilderMonument | null>(null)
   const [coreBuildingCounts, setCoreBuildingCounts] = useState(() => {
     try {
@@ -238,14 +235,13 @@ export default function KingdomHome() {
 
       <nav className="kh-dock" aria-label="Game actions">
         <HUDButton label="SHOP" image={shopIcon} onClick={() => show('Shop coming soon')} />
-        <HUDButton label="TROOPS" image={troopsIcon} notice="3" onClick={() => setTroopRosterOpen(true)} />
+        <HUDButton label="TROOPS" image={troopsIcon} notice="3" onClick={() => show('Troops coming soon')} />
         <button className="kh-battle" onClick={() => setBattlePicker(true)}><img className="kh-battle-icon" src={battleIcon} alt="" /><b>BATTLE!</b><small>TOAD RALLY</small></button>
         <HUDButton label="FRIENDS" icon="♛" notice="1" onClick={() => show('Friends coming soon')} />
         <HUDButton label="LEADERBOARD" icon="♜" onClick={() => show('Leaderboard coming soon')} />
       </nav>
       <div className={`kh-toast${noticeVisible ? ' visible' : ''}`} role="status">{notice}</div>
       {battlePicker && <BattlePicker onClose={() => setBattlePicker(false)} onChoose={chooseOpponent} />}
-      {troopRosterOpen && <TroopRoster onClose={() => setTroopRosterOpen(false)} />}
       {battleLoading && <BattleLoading closing={closingBattle} onBack={closeBattle} />}
       {activeBattleMap === 'Empress Ruby' && <RubyBattleMap startIntro={rubyIntroStarted} onBack={() => { setActiveBattleMap(null); setRubyIntroStarted(false); setBattleOpponent(null) }} />}
       {activeBattleMap !== null && activeBattleMap !== 'Empress Ruby' && <RivalBattleMap rival={activeBattleMap as 'Queen Marigold' | 'Duke Bramble' | 'Lord Cinder'} startIntro={rubyIntroStarted} onBack={() => { setActiveBattleMap(null); setRubyIntroStarted(false); setBattleOpponent(null) }} />}

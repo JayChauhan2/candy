@@ -6,6 +6,7 @@
 /* Enemy presence and battle conversation belong together on the right edge. */
 .ruby-commands{left:20px;right:auto}
 .ruby-chat-stack{position:absolute;right:20px;bottom:21px;z-index:2}.ruby-chat{left:auto;right:auto;bottom:auto}
+.ruby-battle-map header,.ruby-commands{border-color:transparent}
 .ruby-ruler-thought{position:absolute;right:0;bottom:calc(100% - 16px);z-index:1;display:flex;flex-direction:column;align-items:center;width:310px;height:145px;color:#ffe99b;pointer-events:none}
 .ruby-ruler-thought>b{display:block;margin:0 0 4px;color:#fff;font-size:14px;letter-spacing:1.2px;line-height:1;text-shadow:0 2px #67243d,0 4px 7px #250d1bcc}
 .ruby-ruler-thought figure{display:grid;place-items:end center;width:118px;height:126px;margin:0;overflow:visible}

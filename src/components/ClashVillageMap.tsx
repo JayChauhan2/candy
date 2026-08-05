@@ -472,7 +472,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
       if(kind==='archer'){const hood=new THREE.Mesh(new THREE.ConeGeometry(.42,.48,7),makeMaterial(0x4d804e));hood.position.y=1.5;group.add(hood);const bow=new THREE.Mesh(new THREE.TorusGeometry(.3,.025,5,12,Math.PI),makeMaterial(0x80583c));bow.position.set(.35,.96,.04);bow.rotation.y=Math.PI/2;group.add(bow)}
       troopShowcase.push({group,legs,phase,cx:x,cz:z,speed:.65+(phase%3)*.07})
     }
-    addTroop('shield',-7,-4.2,0);addTroop('spear',-6.1,-5.2,1.2);addTroop('mage',-4.9,-4.3,2.4);addTroop('archer',-5.7,-3.1,3.6)
+    ;[[-7,-5],[-5,-7],[-2,-7],[2,-7],[5,-6],[7,-3],[-7,0],[-6,4],[6,4]].forEach(([x,z],index)=>addTroop('spear',x,z,index*.7))
     try {
       const saved=JSON.parse(window.localStorage.getItem('candy-builder-map-v1')||'[]') as { type?: string; x?: number; z?: number }[]
       saved.forEach(item=>{if(builderTypes.includes(item.type as BuilderType)&&typeof item.x==='number'&&typeof item.z==='number')placeBuilderMonument(item.type as BuilderType,item.x,item.z,false,false)})
