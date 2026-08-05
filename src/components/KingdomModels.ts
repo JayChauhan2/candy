@@ -7,9 +7,9 @@ export const addTroopCount = (parent: THREE.Group, y: number) => {
   const label=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true,depthTest:false,depthWrite:false}));label.position.set(0,y,0);label.scale.set(1.1,.6,1);parent.add(label)
 }
 
-export const addSpearScout = (parent: THREE.Object3D, x: number, z: number, material: MaterialFactory, rotation = 0) => {
+export const addSpearScout = (parent: THREE.Object3D, x: number, z: number, material: MaterialFactory, rotation = 0, dressColor = 0xd85c43) => {
   const group=new THREE.Group();group.position.set(x,.03,z);group.rotation.y=rotation;parent.add(group)
-  const body=new THREE.Mesh(new THREE.CylinderGeometry(.3,.38,.72,7),material(0xd85c43));body.position.y=.7;body.castShadow=true;group.add(body)
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(.3,.38,.72,7),material(dressColor));body.position.y=.7;body.castShadow=true;group.add(body)
   const head=new THREE.Mesh(new THREE.DodecahedronGeometry(.31,0),material(0xf0c58e));head.position.y=1.23;group.add(head)
   const legs:THREE.Mesh[]=[];[[-.14,-.09],[.14,.09]].forEach(([lx,lz])=>{const leg=new THREE.Mesh(new THREE.CylinderGeometry(.055,.065,.46,5),material(0x4a3540));leg.position.set(lx,.25,lz);group.add(leg);legs.push(leg)})
   const spear=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1.7,6),material(0x765139));spear.position.set(.39,1.17,0);spear.rotation.z=-.15;group.add(spear);const tip=new THREE.Mesh(new THREE.ConeGeometry(.11,.35,5),material(0xcfd9dc));tip.position.set(.51,2.02,0);tip.rotation.z=-.15;group.add(tip)

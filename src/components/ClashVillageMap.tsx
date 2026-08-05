@@ -462,7 +462,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     const addTroop=(kind:'shield'|'spear'|'mage'|'archer',x:number,z:number,phase:number)=>{
       const group=new THREE.Group();group.position.set(x,.03,z);island.add(group)
       const legs:THREE.Mesh[]=[]
-      const colors={shield:0x4d80b8,spear:0xd85c43,mage:0x8b5cb6,archer:0x5f9b63}[kind]
+      const colors={shield:0x4d80b8,spear:0x4d80b8,mage:0x8b5cb6,archer:0x5f9b63}[kind]
       const body=new THREE.Mesh(new THREE.CylinderGeometry(.3,.38,.72,7),makeMaterial(colors));body.position.y=.7;body.castShadow=true;group.add(body)
       const head=new THREE.Mesh(new THREE.DodecahedronGeometry(.31,0),makeMaterial(0xf0c58e));head.position.y=1.23;head.castShadow=true;group.add(head)
       for(const [lx,lz] of [[-.14,-.09],[.14,.09]]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.055,.065,.46,5),makeMaterial(0x4a3540));leg.position.set(lx,.25,lz);group.add(leg);legs.push(leg)}

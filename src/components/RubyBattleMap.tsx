@@ -71,7 +71,7 @@ export const RubyBattleMap = ({ onBack, startIntro = true }: { onBack: () => voi
     // Ruby's complete realm is one movable unit. Shift it to the far side before creating your civilization
     // at the original, near-side position.
     const rubyRealm=new THREE.Group();world.children.slice().forEach(child=>{if(child!==ground)rubyRealm.add(child)});world.add(rubyRealm);rubyRealm.position.x=-47;rubyRealm.rotation.y=Math.PI/2
-    ;[[-7,-5],[-5,-7],[-2,-7],[2,-7],[5,-6],[7,-3],[-7,0],[-6,4],[6,4]].forEach(([x,z],index)=>marchingScouts.push(addSpearScout(rubyRealm,x,z,material,index*.2)))
+    ;[[-7,-5],[-5,-7],[-2,-7],[2,-7],[5,-6],[7,-3],[-7,0],[-6,4],[6,4]].forEach(([x,z],index)=>marchingScouts.push(addSpearScout(rubyRealm,x,z,material,index*.2,0xb83f50)))
     // Build one home realm only. The previous preliminary green realm survived beneath
     // the crimson battlefield version and duplicated castles, paths, and trees.
     const homeX=0,homeZ=1
@@ -130,7 +130,7 @@ export const RubyBattleMap = ({ onBack, startIntro = true }: { onBack: () => voi
     // with the current layout.
     world.children.slice().filter(child=>child!==ground&&child!==rubyRealm).forEach(child=>world.remove(child))
     const playerCastle=addHomeCastle(world,material,homeX,homeZ);playerCastle.rotation.y=-Math.PI/2
-    ;[[-7,-5],[-5,-7],[-2,-7],[2,-7],[5,-6],[7,-3],[-7,0],[-6,4],[6,4]].forEach(([x,z],index)=>marchingScouts.push(addSpearScout(world,homeX+x,homeZ+z,material,-Math.PI/2+index*.2)))
+    ;[[-7,-5],[-5,-7],[-2,-7],[2,-7],[5,-6],[7,-3],[-7,0],[-6,4],[6,4]].forEach(([x,z],index)=>marchingScouts.push(addSpearScout(world,homeX+x,homeZ+z,material,-Math.PI/2+index*.2,0x4d80b8)))
     try{(JSON.parse(window.localStorage.getItem('candy-builder-map-v1')||'[]') as {type?:string;x?:number;z?:number}[]).forEach((item,index)=>{if(typeof item.x!=='number'||typeof item.z!=='number')return;const x=homeX-item.z,z=homeZ+item.x,g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=-Math.PI/2;if(item.type==='house'){world.add(g);addHomeHouse(g,material,index%2?0xc85b43:0x627492)}if(item.type==='station1'){world.add(g);addHomeOutpost(g,material)}if(item.type==='house'||item.type==='station1')addRubyHomeRoad(homeX,homeZ,x,z,.7)})}catch{/* no saved map */}
     addRubyHomeRoad(homeX-4.4,homeZ,-42,homeZ,2.05);addRubyHomeRoad(-42,homeZ,-47,2.55,1.55)
     const forestMat={trunk:material(0x38252b),bark:material(0x5a3540),crimson:material(0x7d2e49),plum:material(0x562b47),ember:material(0xa84355),pine:material(0x4b213c),pineLight:material(0x702846)}
