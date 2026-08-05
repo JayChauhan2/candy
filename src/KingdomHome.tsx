@@ -9,6 +9,7 @@ import troopsIcon from './assets/troops.png'
 import { ClashVillageMap } from './components/ClashVillageMap'
 import { BuilderMonumentPreview, type BuilderMonument } from './components/BuilderMonumentPreview'
 import { RubyBattleMap } from './components/RubyBattleMap'
+import { RivalBattleMap } from './components/RivalBattleMap'
 import './kingdom-home.css'
 import './icon-overrides.css'
 import './battle-picker.css'
@@ -110,7 +111,7 @@ export default function KingdomHome() {
   const [battleLoading, setBattleLoading] = useState(false)
   const [battlePicker, setBattlePicker] = useState(false)
   const [battleOpponent, setBattleOpponent] = useState<string | null>(rubyPreview ? 'Empress Ruby' : null)
-  const [rubyBattleMap, setRubyBattleMap] = useState(rubyPreview)
+  const [activeBattleMap, setActiveBattleMap] = useState<string | null>(rubyPreview ? 'Empress Ruby' : null)
   const [rubyIntroStarted, setRubyIntroStarted] = useState(rubyPreview)
   const [closingBattle, setClosingBattle] = useState(false)
   const [irisPhase, setIrisPhase] = useState<IrisPhase>('idle')
@@ -150,6 +151,7 @@ export default function KingdomHome() {
   }
   const chooseOpponent = (name: string) => {
     setBattlePicker(false)
+    setActiveBattleMap(null)
     setBattleOpponent(name)
     setRubyIntroStarted(false)
     setIrisPhase('closing')
@@ -163,11 +165,10 @@ export default function KingdomHome() {
   useEffect(() => {
     if (irisPhase !== 'closed') return
     const mountTimer = window.setTimeout(() => {
-      if (battleOpponent === 'Empress Ruby') setRubyBattleMap(true)
-      else setBattleLoading(true)
+      if (battleOpponent) setActiveBattleMap(battleOpponent)
     }, 0)
     const revealTimer = window.setTimeout(() => {
-      if (battleOpponent === 'Empress Ruby') setRubyIntroStarted(true)
+      if (battleOpponent) setRubyIntroStarted(true)
       setIrisPhase('opening')
     }, 1000)
     return () => { window.clearTimeout(mountTimer); window.clearTimeout(revealTimer) }
@@ -230,7 +231,8 @@ export default function KingdomHome() {
       <div className={`kh-toast${noticeVisible ? ' visible' : ''}`} role="status">{notice}</div>
       {battlePicker && <BattlePicker onClose={() => setBattlePicker(false)} onChoose={chooseOpponent} />}
       {battleLoading && <BattleLoading closing={closingBattle} onBack={closeBattle} />}
-      {rubyBattleMap && <RubyBattleMap startIntro={rubyIntroStarted} onBack={() => { setRubyBattleMap(false); setRubyIntroStarted(false); setBattleOpponent(null) }} />}
+      {activeBattleMap === 'Empress Ruby' && <RubyBattleMap startIntro={rubyIntroStarted} onBack={() => { setActiveBattleMap(null); setRubyIntroStarted(false); setBattleOpponent(null) }} />}
+      {activeBattleMap !== null && activeBattleMap !== 'Empress Ruby' && <RivalBattleMap rival={activeBattleMap as 'Queen Marigold' | 'Duke Bramble' | 'Lord Cinder'} startIntro={rubyIntroStarted} onBack={() => { setActiveBattleMap(null); setRubyIntroStarted(false); setBattleOpponent(null) }} />}
       {irisPhase !== 'idle' && <div className={`battle-iris ${irisPhase}`} aria-hidden="true" />}
     </main>
   )
