@@ -69,7 +69,7 @@ export const RubyBattleMap = ({ onBack, startIntro = true }: { onBack: () => voi
     addStable(-7.5,12);addWindmill(13,-13);addEmberFarm(-13,-13);addMarket(12,7);addForge(-12,-3);addWatchPost(-19,12);addWatchPost(18,-13);addWatchPost(-6,18);addWatchPost(6,18)
     // Ruby's complete realm is one movable unit. Shift it to the far side before creating your civilization
     // at the original, near-side position.
-    const rubyRealm=new THREE.Group();world.children.slice().forEach(child=>{if(child!==ground)rubyRealm.add(child)});world.add(rubyRealm);rubyRealm.position.x=-47
+    const rubyRealm=new THREE.Group();world.children.slice().forEach(child=>{if(child!==ground)rubyRealm.add(child)});world.add(rubyRealm);rubyRealm.position.x=-47;rubyRealm.rotation.y=-Math.PI/2
     // Build one home realm only. The previous preliminary green realm survived beneath
     // the crimson battlefield version and duplicated castles, paths, and trees.
     const homeX=0,homeZ=1
