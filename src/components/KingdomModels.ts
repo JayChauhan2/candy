@@ -13,7 +13,7 @@ export const addSpearScout = (parent: THREE.Object3D, x: number, z: number, mate
   const head=new THREE.Mesh(new THREE.DodecahedronGeometry(.31,0),material(0xf0c58e));head.position.y=1.23;group.add(head)
   const legs:THREE.Mesh[]=[];[[-.14,-.09],[.14,.09]].forEach(([lx,lz])=>{const leg=new THREE.Mesh(new THREE.CylinderGeometry(.055,.065,.46,5),material(0x4a3540));leg.position.set(lx,.25,lz);group.add(leg);legs.push(leg)})
   const spear=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1.7,6),material(0x765139));spear.position.set(.39,1.17,0);spear.rotation.z=-.15;group.add(spear);const tip=new THREE.Mesh(new THREE.ConeGeometry(.11,.35,5),material(0xcfd9dc));tip.position.set(.51,2.02,0);tip.rotation.z=-.15;group.add(tip)
-  group.userData={scoutBaseX:x,scoutBaseZ:z,scoutLegs:legs};return group
+  group.userData={scoutBaseX:x,scoutBaseZ:z,scoutLegs:legs,scoutBaseRotation:rotation,scoutCurrentRotation:rotation};return group
 }
 
 export const addHomeHouse = (parent: THREE.Group, material: MaterialFactory, roofColor = 0xc85b43) => {
