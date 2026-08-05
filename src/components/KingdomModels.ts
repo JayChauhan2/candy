@@ -2,10 +2,12 @@ import * as THREE from 'three'
 
 type MaterialFactory = (color: number) => THREE.MeshStandardMaterial
 
-export const addTroopCount = (parent: THREE.Group, y: number) => {
-  const canvas=document.createElement('canvas');canvas.width=96;canvas.height=52;const context=canvas.getContext('2d');if(context){context.font='800 38px Arial';context.textAlign='center';context.textBaseline='middle';context.fillStyle='#fff';context.shadowColor='#243442';context.shadowBlur=5;context.shadowOffsetY=2;context.fillText('0',48,28)}
-  const label=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true,depthTest:false,depthWrite:false}));label.position.set(0,y,0);label.scale.set(1.1,.6,1);parent.add(label)
+export const addTroopCount = (parent: THREE.Object3D, y: number, count = 0) => {
+  const canvas=document.createElement('canvas');canvas.width=96;canvas.height=52;const context=canvas.getContext('2d');if(context){context.font='800 38px "Baloo 2", "Trebuchet MS", sans-serif';context.textAlign='center';context.textBaseline='middle';context.fillStyle='#fff';context.shadowColor='#243442';context.shadowBlur=5;context.shadowOffsetY=2;context.fillText(String(count),48,28)}
+  const label=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true,depthTest:false,depthWrite:false}));label.position.set(0,y,0);label.scale.set(1.1,.6,1);label.userData={troopLabel:true,troopCanvas:canvas,troopContext:context,troopCount:count};parent.add(label)
 }
+
+export const setTroopCount = (parent: THREE.Object3D, count: number) => parent.traverse(object=>{if(!(object instanceof THREE.Sprite)||!object.userData.troopLabel)return;const canvas=object.userData.troopCanvas as HTMLCanvasElement,context=object.userData.troopContext as CanvasRenderingContext2D|null;if(!context)return;context.clearRect(0,0,canvas.width,canvas.height);context.font='800 38px "Baloo 2", "Trebuchet MS", sans-serif';context.textAlign='center';context.textBaseline='middle';context.fillStyle='#fff';context.shadowColor='#243442';context.shadowBlur=5;context.shadowOffsetY=2;context.fillText(String(count),48,28);(object.material as THREE.SpriteMaterial).map!.needsUpdate=true;object.userData.troopCount=count})
 
 export const addSpearScout = (parent: THREE.Object3D, x: number, z: number, material: MaterialFactory, rotation = 0, dressColor = 0xd85c43) => {
   const group=new THREE.Group();group.position.set(x,.03,z);group.rotation.y=rotation;parent.add(group)
