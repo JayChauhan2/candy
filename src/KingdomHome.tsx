@@ -108,7 +108,7 @@ export default function KingdomHome() {
   const [draggingBuilderItem, setDraggingBuilderItem] = useState<BuilderMonument | null>(null)
   const [coreBuildingCounts, setCoreBuildingCounts] = useState(() => {
     try {
-      const saved = JSON.parse(window.localStorage.getItem('candy-builder-map-v1') || '[]') as { type?: string }[]
+      const saved = JSON.parse(window.localStorage.getItem('candy-builder-map-v2') || '[]') as { type?: string }[]
       return { house: saved.filter(item => item.type === 'house').length, station1: saved.filter(item => item.type === 'station1').length }
     } catch { return { house: 0, station1: 0 } }
   })
@@ -236,7 +236,7 @@ export default function KingdomHome() {
       <nav className="kh-dock" aria-label="Game actions">
         <HUDButton label="SHOP" image={shopIcon} onClick={() => show('Shop coming soon')} />
         <HUDButton label="TROOPS" image={troopsIcon} notice="3" onClick={() => show('Troops coming soon')} />
-        <button className="kh-battle" onClick={() => setBattlePicker(true)}><img className="kh-battle-icon" src={battleIcon} alt="" /><b>BATTLE!</b><small>TOAD RALLY</small></button>
+        <button className="kh-battle" onClick={() => setBattlePicker(true)}><img className="kh-battle-icon" src={battleIcon} alt="" /><b>BATTLE!</b></button>
         <HUDButton label="FRIENDS" icon="♛" notice="1" onClick={() => show('Friends coming soon')} />
         <HUDButton label="LEADERBOARD" icon="♜" onClick={() => show('Leaderboard coming soon')} />
       </nav>

@@ -474,7 +474,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     }
     ;[[-7,-5],[-5,-7],[-2,-7],[2,-7],[5,-6],[7,-3],[-7,0],[-6,4],[6,4]].forEach(([x,z],index)=>addTroop('spear',x,z,index*.7))
     try {
-      const saved=JSON.parse(window.localStorage.getItem('candy-builder-map-v1')||'[]') as { type?: string; x?: number; z?: number }[]
+      const saved=JSON.parse(window.localStorage.getItem('candy-builder-map-v2')||'[]') as { type?: string; x?: number; z?: number }[]
       saved.forEach(item=>{if(builderTypes.includes(item.type as BuilderType)&&typeof item.x==='number'&&typeof item.z==='number')placeBuilderMonument(item.type as BuilderType,item.x,item.z,false,false)})
     } catch { /* No saved local map yet. */ }
 
@@ -490,7 +490,7 @@ export const mountClashVillageScene = (host: HTMLDivElement) => {
     window.addEventListener('dragstart',trackBuilderDragStart)
     window.addEventListener('candy-builder-drag-start',trackExplicitBuilderDragStart)
     window.addEventListener('dragend',endBuilderDrag)
-    const saveBuilderMap=()=>window.localStorage.setItem('candy-builder-map-v1',JSON.stringify(placedMonuments))
+    const saveBuilderMap=()=>window.localStorage.setItem('candy-builder-map-v2',JSON.stringify(placedMonuments))
     window.addEventListener('candy-builder-map-save',saveBuilderMap)
     const resize = () => {
       const { width, height } = host.getBoundingClientRect()
