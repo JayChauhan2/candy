@@ -51,7 +51,7 @@ export const RivalBattleMap = ({ rival, onBack, startIntro = true }: { rival: Ri
     const playerX = -28, rivalX = rival === 'Queen Marigold' ? 43 : 30, rivalOffset = rival === 'Queen Marigold' ? 26 : 0
     addHomeCastle(world,mat,playerX,0); addCastle(rivalX, 0, { stone: config.stone, roof: config.roof, flag: config.accent })
     addRoad(playerX + 4.1, 0, rivalX - 4.1, 0, 2.15); addRoad(playerX, -3.8, playerX - 5, -10, .9);addRoad(rivalX, 3.8, rivalX + 5, 10, .9)
-    let savedMap:{type?:string;x?:number;z?:number}[]=[];try{savedMap=JSON.parse(window.localStorage.getItem('candy-builder-map-v1')||'[]')}catch{/* no saved map */}
+    let savedMap:{type?:string;x?:number;z?:number}[]=[];try{savedMap=JSON.parse(window.localStorage.getItem('candy-builder-map-v2')||'[]')}catch{/* no saved map */}
     savedMap.forEach((item,index)=>{if(typeof item.x!=='number'||typeof item.z!=='number')return;const x=playerX+item.x,z=item.z,g=new THREE.Group();g.position.set(x,0,z);if(item.type==='house'){world.add(g);addHomeHouse(g,mat,index%2?0xc85b43:0x627492)}if(item.type==='station1'){world.add(g);addHomeOutpost(g,mat)}if(item.type==='house'||item.type==='station1')addRoad(playerX,0,x,z,.7)})
     ;[[10, -9], [23, 8], [27, -7], [14, 10]].forEach(([x, z], i) => addHouse(x + rivalOffset, z, i % 2 ? config.roof : config.leaf))
     for (let i = 0; i < 220; i++) { const a = i * 2.399, r = 31 + (i % 11) * 3.1, x = Math.cos(a) * r * 1.28, z = Math.sin(a) * r * .84; if (Math.abs(z) < 12 && x > -30 && x < 31) continue; addTree(x, z, 1.2 + (i % 4) * .16, i) }
