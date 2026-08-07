@@ -24,3 +24,4 @@
 @keyframes ruby-pan-coach-pulse{from{transform:scale(.9);opacity:.72}to{transform:scale(1.08);opacity:1}}@keyframes ruby-pan-caret-pulse{from{opacity:.45}to{opacity:1}}@keyframes ruby-pan-hand{from{transform:translate(-3px,-2px)}to{transform:translate(4px,3px)}}
 @media(max-width:700px){.ruby-turn-indicator{top:16px;right:13px;font-size:20px}}
 .ruby-chat-quick{display:none}.ruby-chat-compose{background:transparent;padding-bottom:10px}
+.ruby-chat-log .ruby-chat-action{background:#f0b9332b;border-left:3px solid #f0b933}.ruby-chat-log .ruby-chat-action b{color:#fff0af}
